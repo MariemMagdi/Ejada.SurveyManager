@@ -1,0 +1,116 @@
+{
+  "template": "app",
+  "imports": {
+    "Volo.Abp.LeptonXLiteTheme": {
+      "version": "4.3.5",
+      "isInstalled": true
+    },
+    "Volo.Abp.Account": {
+      "version": "9.3.5",
+      "isInstalled": true,
+      "creationTime": "11/11/2025 09:20:36 +00:00"
+    },
+    "Volo.Abp.OpenIddict": {
+      "version": "9.3.5",
+      "isInstalled": true,
+      "creationTime": "11/11/2025 09:20:36 +00:00"
+    },
+    "Volo.Abp.Identity": {
+      "version": "9.3.5",
+      "isInstalled": true,
+      "creationTime": "11/11/2025 09:20:36 +00:00"
+    },
+    "Volo.Abp.TenantManagement": {
+      "version": "9.3.5",
+      "isInstalled": true,
+      "creationTime": "11/11/2025 09:20:36 +00:00"
+    },
+    "Volo.Abp.SettingManagement": {
+      "version": "9.3.5",
+      "isInstalled": true,
+      "creationTime": "11/11/2025 09:20:36 +00:00"
+    },
+    "Volo.Abp.PermissionManagement": {
+      "version": "9.3.5",
+      "isInstalled": true,
+      "creationTime": "11/11/2025 09:20:36 +00:00"
+    },
+    "Volo.Abp.FeatureManagement": {
+      "version": "9.3.5",
+      "isInstalled": true,
+      "creationTime": "11/11/2025 09:20:36 +00:00"
+    }
+  },
+  "folders": {
+    "items": {
+      "src": {},
+      "test": {}
+    }
+  },
+  "packages": {
+    "Ejada.SurveyManager.Application": {
+      "path": "src/Ejada.SurveyManager.Application/Ejada.SurveyManager.Application.abppkg",
+      "folder": "src"
+    },
+    "Ejada.SurveyManager.Application.Tests": {
+      "path": "test/Ejada.SurveyManager.Application.Tests/Ejada.SurveyManager.Application.Tests.abppkg",
+      "folder": "test"
+    },
+    "Ejada.SurveyManager.Domain.Shared": {
+      "path": "src/Ejada.SurveyManager.Domain.Shared/Ejada.SurveyManager.Domain.Shared.abppkg",
+      "folder": "src"
+    },
+    "Ejada.SurveyManager.Application.Contracts": {
+      "path": "src/Ejada.SurveyManager.Application.Contracts/Ejada.SurveyManager.Application.Contracts.abppkg",
+      "folder": "src"
+    },
+    "Ejada.SurveyManager.HttpApi": {
+      "path": "src/Ejada.SurveyManager.HttpApi/Ejada.SurveyManager.HttpApi.abppkg",
+      "folder": "src"
+    },
+    "Ejada.SurveyManager.HttpApi.Client": {
+      "path": "src/Ejada.SurveyManager.HttpApi.Client/Ejada.SurveyManager.HttpApi.Client.abppkg",
+      "folder": "src"
+    },
+    "Ejada.SurveyManager.EntityFrameworkCore.Tests": {
+      "path": "test/Ejada.SurveyManager.EntityFrameworkCore.Tests/Ejada.SurveyManager.EntityFrameworkCore.Tests.abppkg",
+      "folder": "test"
+    },
+    "Ejada.SurveyManager.EntityFrameworkCore": {
+      "path": "src/Ejada.SurveyManager.EntityFrameworkCore/Ejada.SurveyManager.EntityFrameworkCore.abppkg",
+      "folder": "src"
+    },
+    "Ejada.SurveyManager.TestBase": {
+      "path": "test/Ejada.SurveyManager.TestBase/Ejada.SurveyManager.TestBase.abppkg",
+      "folder": "test"
+    },
+    "Ejada.SurveyManager.Domain.Tests": {
+      "path": "test/Ejada.SurveyManager.Domain.Tests/Ejada.SurveyManager.Domain.Tests.abppkg",
+      "folder": "test"
+    },
+    "Ejada.SurveyManager.HttpApi.Client.ConsoleTestApp": {
+      "path": "test/Ejada.SurveyManager.HttpApi.Client.ConsoleTestApp/Ejada.SurveyManager.HttpApi.Client.ConsoleTestApp.abppkg",
+      "folder": "test"
+    },
+    "Ejada.SurveyManager.DbMigrator": {
+      "path": "src/Ejada.SurveyManager.DbMigrator/Ejada.SurveyManager.DbMigrator.abppkg",
+      "folder": "src"
+    },
+    "Ejada.SurveyManager.HttpApi.Host": {
+      "path": "src/Ejada.SurveyManager.HttpApi.Host/Ejada.SurveyManager.HttpApi.Host.abppkg",
+      "folder": "src"
+    },
+    "Ejada.SurveyManager.Blazor": {
+      "path": "src/Ejada.SurveyManager.Blazor/Ejada.SurveyManager.Blazor.abppkg",
+      "folder": "src"
+    },
+    "Ejada.SurveyManager.Blazor.Client": {
+      "path": "src/Ejada.SurveyManager.Blazor.Client/Ejada.SurveyManager.Blazor.Client.abppkg",
+      "folder": "src"
+    },
+    "Ejada.SurveyManager.Domain": {
+      "path": "src/Ejada.SurveyManager.Domain/Ejada.SurveyManager.Domain.abppkg",
+      "folder": "src"
+    }
+  }
+}

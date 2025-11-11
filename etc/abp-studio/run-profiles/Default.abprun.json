@@ -1,0 +1,42 @@
+﻿{
+  "applications": {
+    "Ejada.SurveyManager.HttpApi.Host": {
+      "type": "dotnet-project",
+      "launchUrl": "https://localhost:44360",
+      "path": "../../../src/Ejada.SurveyManager.HttpApi.Host/Ejada.SurveyManager.HttpApi.Host.csproj",
+      "kubernetesService": ".*-httpapihost$",
+      "healthCheckEndpoint": "/health-status",
+      "healthUiEndpoint": "/health-ui",
+      "execution": {
+        "order": 4
+      }
+    },
+    "Ejada.SurveyManager.Blazor": {
+      "type": "dotnet-project",
+      "launchUrl": "https://localhost:44317",
+      "path": "../../../src/Ejada.SurveyManager.Blazor/Ejada.SurveyManager.Blazor.csproj",
+      "healthCheckEndpoint": "/",
+      "kubernetesService": ".*-blazor$",
+      "execution": {
+        "order": 2
+      }
+    }
+  },
+  "containers": {
+    "serviceName": "SurveyManager-Containers",
+  },
+  "tasks":{
+    "Initialize Solution":{
+    "type": "cli",
+    "runOnSolutionOpen": true,
+    "startCommand": "etc/scripts/initialize-solution.ps1",
+    "workingDirectory": "../../../"
+    },
+    "Migrate Database":{
+    "type": "cli",
+    "runOnSolutionOpen": false,
+    "startCommand": "etc/scripts/migrate-database.ps1",
+    "workingDirectory": "../../../"
+    }
+  }
+}
