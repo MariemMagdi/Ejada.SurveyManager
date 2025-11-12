@@ -65,13 +65,13 @@ namespace Ejada.SurveyManager.Surveys
         }
 
         //Child Behavior
-        public Option AddOption(Guid id, string label, int value) 
+        public Option AddOption(Guid id, string label, OptionDataType type) 
         {
             if(Type == QuestionType.Likert1To5 || Type == QuestionType.Likert1To7)
             {
                 throw new BusinessException("Question.Options.NotAllowedForLikert");
             }
-            var option = Option.Create(id, this.Id, label, value);
+            var option = Option.Create(id, this.Id, label, type);
             _options.Add(option);
             return option;
         }

@@ -10,7 +10,9 @@ namespace Ejada.SurveyManager.Common
     {
         public const int SurveyNameMaxLength = 128;
         public const int SurveyPurposeMaxLength = 1024;
-        public const int QuestionTextMaxLength = 1024;
         public const int SurveyTargetAudienceMaxLength = 256;
+        public const int QuestionTextMaxLength = 1024;
+        public const int OptionLabelMaxLength = 256;
+
     }
 }
