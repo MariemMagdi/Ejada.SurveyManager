@@ -18,9 +18,6 @@ namespace Ejada.SurveyManager.Surveys
         public bool IsActive { get; private set; } = true;
         public Guid? CreatedByUserId => CreatorId;
 
-        //Navigational Child
-        private readonly List<Question> _questions = new();
-        public IReadOnlyCollection<Question> Questions => _questions.AsReadOnly();
 
         private Survey() { } //EF Core
 
@@ -75,33 +72,6 @@ namespace Ejada.SurveyManager.Surveys
         {
             IsActive = false;
             return this;
-        }
-
-        // Child Behavior
-        public Question AddQuestion(Guid id, string text, QuestionType type) 
-        {
-            Check.NotNullOrWhiteSpace(text, nameof(text));
-            var q = Question.Create(id, this.Id, text, type);
-            _questions.Add(q);
-            return q;
-        }
-        public bool RemoveQuestion(Guid questionId) 
-        {
-            var idx = _questions.FindIndex(q => q.Id == questionId);
-            if(idx >= 0)
-            {
-                _questions.RemoveAt(idx);
-                return true;
-            }
-            return false;
-        }
-        public void UpdateQuestion(Guid questionId, string newText, QuestionType newType) 
-        {
-            var q = _questions.Find(q => q.Id == questionId) ??
-                throw new BusinessException("Survey.Question.NotFound").WithData("QuestionId", questionId);
-
-            q.SetText(newText);
-            q.SetType(newType);
         }
     }
 }

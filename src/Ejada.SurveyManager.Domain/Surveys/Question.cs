@@ -12,7 +12,6 @@ namespace Ejada.SurveyManager.Surveys
 {
     public class Question : FullAuditedEntity<Guid>
     {
-        public Guid SurveyId { get; private set; }
         public string Text { get; private set; }
         public QuestionType Type { get; private set; }
 
@@ -22,25 +21,15 @@ namespace Ejada.SurveyManager.Surveys
 
         private Question() { } // EF Core
 
-        private Question(Guid id, Guid surveyId, string text, QuestionType type) : base(id)
+        private Question(Guid id, string text, QuestionType type) : base(id)
         {
-            SetSurvey(surveyId);
             SetText(text);
             SetType(type);
         }
 
-        public static Question Create(Guid id, Guid surveyId, string text, QuestionType type) =>
-            new Question(id, surveyId, text, type);
+        public static Question Create(Guid id, string text, QuestionType type) =>
+            new Question(id, text, type);
 
-        private Question SetSurvey(Guid surveyId) 
-        {
-            if(surveyId == Guid.Empty)
-            {
-                throw new BusinessException("Question.SurveyId.Invalid");
-            }
-            SurveyId = surveyId;
-            return this;
-        }
         public Question SetText(string text) 
         {
             Check.NotNullOrWhiteSpace(text, nameof(text));
