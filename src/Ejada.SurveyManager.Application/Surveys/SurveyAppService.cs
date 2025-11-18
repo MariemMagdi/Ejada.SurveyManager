@@ -24,28 +24,31 @@ namespace Ejada.SurveyManager.Surveys
     {
         private readonly IRepository<Question, Guid> _questionRepository;
         private readonly IRepository<SurveyQuestion, Guid> _surveyQuestionRepository;
+        private readonly IRepository<Option, Guid> _optionRepository;
 
 
         public SurveyAppService(
             IRepository<Survey, Guid> surveyRepository,
             IRepository<Question, Guid> questionRepository,
-            IRepository<SurveyQuestion,Guid> surveyQuestionRepository)
+            IRepository<SurveyQuestion,Guid> surveyQuestionRepository,
+            IRepository<Option, Guid> optionRepository)
             : base(surveyRepository)
         {
             _questionRepository = questionRepository;
             _surveyQuestionRepository = surveyQuestionRepository;
+            _optionRepository = optionRepository;
 
-            GetPolicyName = "Surveys.Default";
-            GetListPolicyName = "Surveys.Default";
-            CreatePolicyName = "Surveys.Create";
-            UpdatePolicyName = "Surveys.Update";
-            DeletePolicyName = "Surveys.Delete";
+            //GetPolicyName = "Surveys.Default";
+            //GetListPolicyName = "Surveys.Default";
+            //CreatePolicyName = "Surveys.Create";
+            //UpdatePolicyName = "Surveys.Update";
+            //DeletePolicyName = "Surveys.Delete";
         }
 
         protected override async Task<Survey> MapToEntityAsync(CreateSurveyDto createInput)
         {
-            if (CurrentUser == null || CurrentUser.Id == null)
-                throw new BusinessException("Survey.CreatorId.MissingUser");
+            //if (CurrentUser == null || CurrentUser.Id == null)
+            //    throw new BusinessException("Survey.CreatorId.MissingUser");
             var survey = Survey.Create(
                 GuidGenerator.Create(),
                 createInput.Name,
@@ -118,6 +121,55 @@ namespace Ejada.SurveyManager.Surveys
             }
 
             return surveyDto;
+        }
+
+        public virtual async Task<SurveyWithQuestionsDto> GetWithQuestionAsync(Guid id) 
+        {
+            //Load the survey
+            var survey = await Repository.GetAsync(id);
+
+            //Load all questions linked to this survey
+            var surveyQuestionQueryable = await _surveyQuestionRepository.GetQueryableAsync();
+            var questionsQueryable = await _questionRepository.GetQueryableAsync();
+
+            var questionQuery =
+                from sq in surveyQuestionQueryable
+                join q in questionsQueryable
+                on sq.QuestionId equals q.Id
+                where sq.SurveyId == id
+                select q;
+
+            var questionEntities = await AsyncExecuter.ToListAsync(questionQuery);
+
+            //Load all options for these questions
+            var questionIds = questionEntities.Select(q => q.Id).ToList();
+            var optionList = questionIds.Any() ?
+                await _optionRepository.GetListAsync(o => questionIds.Contains(o.QuestionId))
+                : new List<Option>();
+            var optionsByQuestion = optionList
+                .GroupBy(o => o.QuestionId)
+                .ToDictionary(g=>g.Key, g=>g.ToList());
+
+            // Map Survey
+            var dto = ObjectMapper.Map<Survey, SurveyWithQuestionsDto>(survey);
+            dto.Questions = new List<QuestionDto>();
+
+            //Map questions and attach its options
+            foreach(var question in questionEntities)
+            {
+                var questionDto = ObjectMapper.Map<Question, QuestionDto>(question);
+                if (optionsByQuestion.TryGetValue(question.Id, out var qOptions)) 
+                {
+                    questionDto.Options = ObjectMapper.Map<List<Option>, List<OptionDto>>(qOptions);
+                }
+                else
+                {
+                    questionDto.Options = new List<OptionDto>();
+                }
+                dto.Questions.Add(questionDto);
+            }
+
+            return dto;
         }
     }
 }

@@ -9,14 +9,12 @@ using Volo.Abp.Application.Services;
 
 namespace Ejada.SurveyManager.Surveys
 {
-    public interface ISurveyAppService 
-        : ICrudAppService<
-            SurveyDto, 
-            Guid,
-            PagedAndSortedResultRequestDto,
-            CreateSurveyDto,
-            UpdateSurveyDto>
+    public interface IQuestionAppService : ICrudAppService<
+        QuestionDto, 
+        Guid, 
+        PagedAndSortedResultRequestDto, 
+        CreateQuestionDto, 
+        UpdateQuestionDto>
     {
-        Task<SurveyWithQuestionsDto> GetWithQuestionAsync(Guid id);
     }
 }

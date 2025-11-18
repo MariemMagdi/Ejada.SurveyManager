@@ -16,6 +16,7 @@ using Volo.Abp.TenantManagement;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
 using Ejada.SurveyManager.EntityConfigurations;
 using Ejada.SurveyManager.Surveys;
+using Ejada.SurveyManager.SurveyInstances;
 
 namespace Ejada.SurveyManager.EntityFrameworkCore;
 
@@ -68,8 +69,12 @@ public class SurveyManagerDbContext :
     public DbSet<Survey> Surveys { get; set; }
     public DbSet<Question> Questions { get; set; }
     public DbSet<Option> Options { get; set; }
-
     public DbSet<SurveyQuestion> SurveyQuestions { get; set; }
+
+    public DbSet<SurveyInstance> SurveyInstances { get; set; }
+    public DbSet<Response> Responses { get; set; }
+    public DbSet<ResponseOption> ResponseOptions { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
