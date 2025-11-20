@@ -1,0 +1,103 @@
+﻿@page "/surveys/{Id:guid}/edit"
+@using Volo.Abp.Application.Dtos
+@using Ejada.SurveyManager.Surveys.Dtos
+@using Ejada.SurveyManager.Surveys
+@using Ejada.SurveyManager.Localization
+@inject NavigationManager NavigationManager
+@inject ISurveyAppService SurveyService
+@inject Volo.Abp.AspNetCore.Components.Web.AbpBlazorMessageLocalizerHelper<SurveyManagerResource> LH
+
+@inherits AbpCrudPageBase<ISurveyAppService, SurveyDto, Guid, PagedAndSortedResultRequestDto, CreateSurveyDto, UpdateSurveyDto>
+
+<Card>
+    <CardHeader>
+        <Row Class="justify-content-between">
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <h2>@L["Edit"]</h2>
+            </Column>
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <Button Color="Color.Secondary" Clicked="Back">
+                    @L["Back"]
+                </Button>
+            </Column>
+        </Row>
+    </CardHeader>
+
+    <CardBody>
+        <Form>
+            @* Add @key so form subtree is recreated when EditingEntity changes *@
+            <Validations @ref="@EditValidationsRef" Model="@EditingEntity" ValidateOnLoad="false" @key="EditingEntity">
+                <Validation MessageLocalizer="@LH.Localize">
+                    <Field>
+                        <FieldLabel>@L["Name"]</FieldLabel>
+                        <TextEdit @bind-Text="@EditingEntity.Name">
+                            <Feedback>
+                                <ValidationError />
+                            </Feedback>
+                        </TextEdit>
+                    </Field>
+                </Validation>
+
+                <Field>
+                    <FieldLabel>@L["Purpose"]</FieldLabel>
+                    <TextEdit @bind-Text="EditingEntity.Purpose" />
+                </Field>
+
+                <Field>
+                    <FieldLabel>@L["TargetAudience"]</FieldLabel>
+                    <TextEdit @bind-Text="EditingEntity.TargetAudience" />
+                </Field>
+
+                <Field>
+                    <FieldLabel>@L["Active"]</FieldLabel>
+                    <InputCheckbox @bind-Value="EditingEntity.IsActive" />
+                </Field>
+            </Validations>
+
+            <div class="mt-3">
+                <Button Color="Color.Secondary" Clicked="Back">
+                    @L["Cancel"]
+                </Button>
+
+                <Button Color="Color.Primary"
+                        Type="@ButtonType.Submit"
+                        PreventDefaultOnSubmit="true"
+                        Clicked="UpdateEntityAsync">
+                    @L["Save"]
+                </Button>
+            </div>
+        </Form>
+    </CardBody>
+</Card>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var dto = await SurveyService.GetAsync(Id);
+
+        // Map SurveyDto -> UpdateSurveyDto
+        try
+        {
+            // If your project exposes ObjectMapper, you'd use it. If not, fallback to manual mapping.
+            EditingEntity = ObjectMapper.Map<SurveyDto, UpdateSurveyDto>(dto);
+        }
+        catch
+        {
+            EditingEntity = new UpdateSurveyDto
+            {
+                Name = dto.Name,
+                Purpose = dto.Purpose,
+                TargetAudience = dto.TargetAudience,
+                IsActive = dto.IsActive
+            };
+        }
+    }
+
+    private void Back()
+    {
+        NavigationManager.NavigateTo("/surveys");
+    }
+}

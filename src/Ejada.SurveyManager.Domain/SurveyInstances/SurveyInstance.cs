@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Domain.Entities.Auditing;
+using Volo.Abp.Timing;
 
 namespace Ejada.SurveyManager.SurveyInstances
 {
@@ -24,7 +25,7 @@ namespace Ejada.SurveyManager.SurveyInstances
         {
             SetSurvey(surveyId);
             SetAssigneeUser(assigneeUserId);
-            DueDate = dueDate;
+            SetDueDate(dueDate);
             Status = status;
         }
 
@@ -53,6 +54,22 @@ namespace Ejada.SurveyManager.SurveyInstances
                     .WithData("AssigneeUserId", assigneeUserId);
             }
             AssigneeUserId = assigneeUserId;
+            return this;
+        }
+
+        public SurveyInstance SetDueDate(DateTime? dueDate) 
+        {
+            if (dueDate.HasValue)
+            {
+                if (dueDate.Value <= DateTime.UtcNow)
+                {
+                    throw new BusinessException("SurveyInstance.DueDate.MustBeFuture")
+                .WithData("DueDate", dueDate.Value)
+                .WithData("CurrentTime", DateTime.UtcNow);
+                }
+            }
+
+            DueDate = dueDate;
             return this;
         }
 

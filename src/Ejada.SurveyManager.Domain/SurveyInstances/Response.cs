@@ -24,7 +24,7 @@ namespace Ejada.SurveyManager.SurveyInstances
             SetAnswerValue(answerValue);
         }
 
-        public Response Create(Guid id, Guid surveyInstanceId, Guid questionId, int? answerValue = null)
+        public static Response Create(Guid id, Guid surveyInstanceId, Guid questionId, int? answerValue = null)
         {
             return new Response(id, surveyInstanceId, questionId, answerValue);
         } 

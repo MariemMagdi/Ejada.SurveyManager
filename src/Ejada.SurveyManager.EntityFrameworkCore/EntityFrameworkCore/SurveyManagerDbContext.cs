@@ -99,6 +99,9 @@ public class SurveyManagerDbContext :
         builder.ApplyConfiguration(new QuestionConfiguration());
         builder.ApplyConfiguration(new OptionConfiguration());
         builder.ApplyConfiguration(new SurveyQuestionConfiguration());
+        builder.ApplyConfiguration(new SurveyInstanceConfiguration());
+        builder.ApplyConfiguration(new ResponseConfiguration());
+        builder.ApplyConfiguration(new ResponseOptionConfiguration());
 
         //builder.Entity<YourEntity>(b =>
         //{

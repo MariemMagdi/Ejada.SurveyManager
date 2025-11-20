@@ -26,7 +26,8 @@ namespace Ejada.SurveyManager.Surveys
             SetName(name);
             SetPurpose(purpose);
             SetTargetAudience(targetAudience);
-            IsActive = isActive;
+            if (isActive) Activate();
+            else Deactivate();
         }
 
         public static Survey Create(Guid id, string name, string? purpose = null, string? targetAudience = null, bool isActive = true)

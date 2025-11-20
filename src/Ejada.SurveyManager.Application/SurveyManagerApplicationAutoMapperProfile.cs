@@ -1,4 +1,6 @@
 using AutoMapper;
+using Ejada.SurveyManager.SurveyInstances;
+using Ejada.SurveyManager.SurveyInstances.Dtos;
 using Ejada.SurveyManager.Surveys;
 using Ejada.SurveyManager.Surveys.Dtos;
 using System;
@@ -12,6 +14,8 @@ public class SurveyManagerApplicationAutoMapperProfile : Profile
         CreateMap<Survey, SurveyDto>()
             .ForMember(d => d.CreatedByUserId, opt => opt.MapFrom(s => s.CreatedByUserId));
         CreateMap<Survey, SurveyWithQuestionsDto>();
+        CreateMap<SurveyDto, UpdateSurveyDto>();
+        CreateMap<SurveyDto, CreateSurveyDto>();
 
         // Question (Domain -> DTO)
         CreateMap<Question, QuestionDto>();
@@ -31,6 +35,9 @@ public class SurveyManagerApplicationAutoMapperProfile : Profile
                 opts.Condition((src, dest, srcMember) => srcMember != null));
 
         CreateMap<Option, OptionDto>();
+
+        CreateMap<SurveyInstance, SurveyInstanceDto>();
+        CreateMap<Response, ResponseDto>();
         /* You can configure your AutoMapper mapping configuration here.
          * Alternatively, you can split your mapping configurations
          * into multiple profile classes for a better organization. */

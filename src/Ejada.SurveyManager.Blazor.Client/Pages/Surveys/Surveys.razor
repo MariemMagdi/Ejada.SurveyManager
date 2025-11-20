@@ -1,0 +1,86 @@
+﻿@page "/surveys"
+@using Volo.Abp.Application.Dtos
+@using Ejada.SurveyManager.Surveys.Dtos
+@using Ejada.SurveyManager.Surveys
+@using Ejada.SurveyManager.Localization
+@inject NavigationManager NavigationManager
+@inject ISurveyAppService SurveyService
+@inject Volo.Abp.AspNetCore.Components.Web.AbpBlazorMessageLocalizerHelper<SurveyManagerResource> LH
+
+@inherits AbpCrudPageBase<ISurveyAppService, SurveyDto, Guid, PagedAndSortedResultRequestDto, CreateSurveyDto, UpdateSurveyDto>
+
+<Card>
+    <CardHeader>
+        <Row class="justify-content-between">
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <h2>@L["Surveys"]</h2>
+            </Column>
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <Button Color="Color.Primary"
+                        Clicked="GoToCreatePage">
+                    @L["NewSurvey"]
+                </Button>
+            </Column>
+        </Row>
+    </CardHeader>
+
+    <CardBody>
+        <DataGrid TItem="SurveyDto"
+                  Data="Entities"
+                  ReadData="OnDataGridReadAsync"
+                  TotalItems="TotalCount"
+                  ShowPager="true"
+                  PageSize="PageSize"
+                  ShowFilterRow="true"
+                  Striped="true">
+            <DataGridColumns>
+                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.Name)" Caption="@L["Name"]" />
+                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.Purpose)" Caption="@L["Purpose"]" />
+                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.TargetAudience)" Caption="@L["TargetAudience"]" />
+                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.IsActive)" Caption="@L["Active"]">
+                    <DisplayTemplate Context="context">
+                        @if (context.IsActive)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Inactive</span>
+                        }
+                    </DisplayTemplate>
+                </DataGridColumn>
+
+                <DataGridEntityActionsColumn TItem="SurveyDto" @ref="@EntityActionsColumn" Caption="@L["Actions"]">
+                    <DisplayTemplate Context="context">
+                        <EntityActions TItem="SurveyDto" EntityActionsColumn="@EntityActionsColumn">
+                            <EntityAction TItem="SurveyDto"
+                                          Text="@L["Edit"]"
+                                          Clicked="() => GoToEditPage(context.Id)" />
+                            <EntityAction TItem="SurveyDto"
+                                          Text="@L["Details"]"
+                                          Clicked="() => GoToDetailsPage(context.Id)" />
+                        </EntityActions>
+                    </DisplayTemplate>
+                </DataGridEntityActionsColumn>
+            </DataGridColumns>
+        </DataGrid>
+    </CardBody>
+</Card>
+
+@code {
+
+private void GoToCreatePage()
+    {
+        NavigationManager.NavigateTo("/surveys/create");
+    }
+
+    private void GoToEditPage(Guid id)
+    {
+        NavigationManager.NavigateTo($"/surveys/{id}/edit");
+    }
+
+    private void GoToDetailsPage(Guid id)
+    {
+        NavigationManager.NavigateTo($"/surveys/{id}/details");
+    }
+}
