@@ -1,0 +1,89 @@
+﻿@page "/surveys/{Id:guid}/details"
+@using Volo.Abp.Application.Dtos
+@using Ejada.SurveyManager.Surveys.Dtos
+@using Ejada.SurveyManager.Surveys
+@using Ejada.SurveyManager.Localization
+@inject NavigationManager NavigationManager
+@inject ISurveyAppService SurveyService
+@inject Volo.Abp.AspNetCore.Components.Web.AbpBlazorMessageLocalizerHelper<SurveyManagerResource> LH
+
+@inherits AbpCrudPageBase<ISurveyAppService, SurveyDto, Guid, PagedAndSortedResultRequestDto, CreateSurveyDto, UpdateSurveyDto>
+
+<Card>
+    <CardHeader>
+        <Row Class="justify-content-between">
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <h2>@L["SurveyDetails"]</h2>
+            </Column>
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <Button Color="Color.Secondary" Clicked="Back">
+                    @L["Back"]
+                </Button>
+            </Column>
+        </Row>
+    </CardHeader>
+
+    <CardBody>
+        @if (Survey == null)
+        {
+            <p>@L["Loading"]...</p>
+        }
+        else
+        {
+            <div class="mb-3">
+                <h4>@Survey.Name</h4>
+            </div>
+
+            <dl class="row">
+                <dt class="col-sm-3">@L["Purpose"]</dt>
+                <dd class="col-sm-9">@Survey.Purpose</dd>
+
+                <dt class="col-sm-3">@L["TargetAudience"]</dt>
+                <dd class="col-sm-9">@Survey.TargetAudience</dd>
+
+                <dt class="col-sm-3">@L["Active"]</dt>
+                <dd class="col-sm-9">
+                    @if (Survey.IsActive)
+                    {
+                        <span class="badge bg-success">Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">Inactive</span>
+                    }
+                </dd>
+            </dl>
+
+            <div class="mt-3">
+                <Button Color="Color.Primary" Clicked="Edit">
+                    @L["Edit"]
+                </Button>
+                <Button Color="Color.Secondary" Clicked="Back" Class="ms-2">
+                    @L["Back"]
+                </Button>
+            </div>
+        }
+    </CardBody>
+</Card>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private SurveyDto Survey { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Survey = await SurveyService.GetAsync(Id);
+    }
+
+    private void Back()
+    {
+        NavigationManager.NavigateTo("/surveys");
+    }
+
+    private void Edit()
+    {
+        NavigationManager.NavigateTo($"/surveys/{Id}/edit");
+    }
+}

@@ -4,6 +4,7 @@ using Ejada.SurveyManager.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Volo.Abp.EntityFrameworkCore;
 
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace Ejada.SurveyManager.Migrations
 {
     [DbContext(typeof(SurveyManagerDbContext))]
-    partial class SurveyManagerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251116153217_AddSurveyQuestion")]
+    partial class AddSurveyQuestion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -112,6 +115,9 @@ namespace Ejada.SurveyManager.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("LastModifierId");
 
+                    b.Property<Guid>("SurveyId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasMaxLength(1024)
@@ -121,6 +127,8 @@ namespace Ejada.SurveyManager.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SurveyId");
 
                     b.ToTable("Questions", (string)null);
                 });
@@ -2110,6 +2118,15 @@ namespace Ejada.SurveyManager.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Ejada.SurveyManager.Surveys.Question", b =>
+                {
+                    b.HasOne("Ejada.SurveyManager.Surveys.Survey", null)
+                        .WithMany("Questions")
+                        .HasForeignKey("SurveyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Ejada.SurveyManager.Surveys.SurveyQuestion", b =>
                 {
                     b.HasOne("Ejada.SurveyManager.Surveys.Question", null)
@@ -2279,6 +2296,11 @@ namespace Ejada.SurveyManager.Migrations
             modelBuilder.Entity("Ejada.SurveyManager.Surveys.Question", b =>
                 {
                     b.Navigation("Options");
+                });
+
+            modelBuilder.Entity("Ejada.SurveyManager.Surveys.Survey", b =>
+                {
+                    b.Navigation("Questions");
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLog", b =>
