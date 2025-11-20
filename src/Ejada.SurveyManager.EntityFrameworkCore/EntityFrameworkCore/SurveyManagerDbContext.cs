@@ -14,6 +14,9 @@ using Volo.Abp.SettingManagement.EntityFrameworkCore;
 using Volo.Abp.OpenIddict.EntityFrameworkCore;
 using Volo.Abp.TenantManagement;
 using Volo.Abp.TenantManagement.EntityFrameworkCore;
+using Ejada.SurveyManager.EntityConfigurations;
+using Ejada.SurveyManager.Surveys;
+using Ejada.SurveyManager.SurveyInstances;
 
 namespace Ejada.SurveyManager.EntityFrameworkCore;
 
@@ -63,9 +66,21 @@ public class SurveyManagerDbContext :
 
     }
 
+    public DbSet<Survey> Surveys { get; set; }
+    public DbSet<Question> Questions { get; set; }
+    public DbSet<Option> Options { get; set; }
+    public DbSet<SurveyQuestion> SurveyQuestions { get; set; }
+
+    public DbSet<SurveyInstance> SurveyInstances { get; set; }
+    public DbSet<Response> Responses { get; set; }
+    public DbSet<ResponseOption> ResponseOptions { get; set; }
+
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+
+        
 
         /* Include modules to your migration db context */
 
@@ -78,8 +93,15 @@ public class SurveyManagerDbContext :
         builder.ConfigureOpenIddict();
         builder.ConfigureTenantManagement();
         builder.ConfigureBlobStoring();
-        
+
         /* Configure your own tables/entities inside here */
+        builder.ApplyConfiguration(new SurveyConfiguration());
+        builder.ApplyConfiguration(new QuestionConfiguration());
+        builder.ApplyConfiguration(new OptionConfiguration());
+        builder.ApplyConfiguration(new SurveyQuestionConfiguration());
+        builder.ApplyConfiguration(new SurveyInstanceConfiguration());
+        builder.ApplyConfiguration(new ResponseConfiguration());
+        builder.ApplyConfiguration(new ResponseOptionConfiguration());
 
         //builder.Entity<YourEntity>(b =>
         //{
