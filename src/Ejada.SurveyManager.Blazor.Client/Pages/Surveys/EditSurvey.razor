@@ -1,10 +1,14 @@
 ﻿@page "/surveys/{Id:guid}/edit"
+@using System.Linq
+@using System.Collections.Generic
 @using Volo.Abp.Application.Dtos
 @using Ejada.SurveyManager.Surveys.Dtos
 @using Ejada.SurveyManager.Surveys
+@using Ejada.SurveyManager.Surveys.Enums
 @using Ejada.SurveyManager.Localization
 @inject NavigationManager NavigationManager
 @inject ISurveyAppService SurveyService
+@inject IQuestionAppService QuestionService
 @inject Volo.Abp.AspNetCore.Components.Web.AbpBlazorMessageLocalizerHelper<SurveyManagerResource> LH
 
 @inherits AbpCrudPageBase<ISurveyAppService, SurveyDto, Guid, PagedAndSortedResultRequestDto, CreateSurveyDto, UpdateSurveyDto>
@@ -25,7 +29,6 @@
 
     <CardBody>
         <Form>
-            @* Add @key so form subtree is recreated when EditingEntity changes *@
             <Validations @ref="@EditValidationsRef" Model="@EditingEntity" ValidateOnLoad="false" @key="EditingEntity">
                 <Validation MessageLocalizer="@LH.Localize">
                     <Field>
@@ -50,9 +53,141 @@
 
                 <Field>
                     <FieldLabel>@L["Active"]</FieldLabel>
-                    <InputCheckbox @bind-Value="EditingEntity.IsActive" />
+                    <InputCheckbox @bind-Value="@EditingEntity.IsActive" />
                 </Field>
             </Validations>
+
+            <hr class="my-4" />
+
+            @* Section 1: Select from Existing Questions *@
+            <Accordion>
+                <Collapse Visible="@ShowExistingQuestionsSection">
+                    <CollapseHeader>
+                        <Heading Size="HeadingSize.Is5">
+                            <AccordionToggle Clicked="@(() => ShowExistingQuestionsSection = !ShowExistingQuestionsSection)">
+                                <Icon Name="IconName.Add" /> @L["AddMoreQuestions"]
+                            </AccordionToggle>
+                        </Heading>
+                    </CollapseHeader>
+                    <CollapseBody>
+                        <Field>
+                            <FieldLabel>@L["AvailableQuestions"]</FieldLabel>
+                            <Select TValue="Guid?" @bind-SelectedValue="SelectedQuestionId">
+                                <SelectItem Value="@((Guid?)null)">-- @L["SelectQuestion"] --</SelectItem>
+                                @foreach (var q in FilteredAvailableQuestions)
+                                {
+                                    <SelectItem Value="@((Guid?)q.Id)">@q.Text</SelectItem>
+                                }
+                            </Select>
+                            <Button Color="Color.Success" Clicked="AttachExistingQuestion" class="mt-2">
+                                @L["AddQuestion"]
+                            </Button>
+                        </Field>
+                    </CollapseBody>
+                </Collapse>
+            </Accordion>
+
+            @* Section 2: Create New Question Inline *@
+            <Accordion>
+                <Collapse Visible="@ShowNewQuestionSection">
+                    <CollapseHeader>
+                        <Heading Size="HeadingSize.Is5">
+                            <AccordionToggle Clicked="@(() => ShowNewQuestionSection = !ShowNewQuestionSection)">
+                                <Icon Name="IconName.Add" /> @L["CreateNewQuestion"]
+                            </AccordionToggle>
+                        </Heading>
+                    </CollapseHeader>
+                    <CollapseBody>
+            <Field>
+                <FieldLabel>@L["QuestionText"]</FieldLabel>
+                <TextEdit @bind-Text="NewQuestionText" Placeholder="@L["EnterQuestionText"]" />
+            </Field>
+            <Field>
+                <FieldLabel>@L["QuestionType"]</FieldLabel>
+                <Select TValue="QuestionType" @bind-SelectedValue="NewQuestionType">
+                    @foreach (var type in QuestionTypes)
+                    {
+                        <SelectItem Value="@type">@type.ToString()</SelectItem>
+                    }
+                </Select>
+            </Field>
+
+            @if (NewQuestionRequiresOptions)
+            {
+                <Field>
+                    <FieldLabel>@L["Options"]</FieldLabel>
+                    @for (var i = 0; i < NewQuestionOptions.Count; i++)
+                    {
+                        var idx = i;
+                        var opt = NewQuestionOptions[i];
+                        <Row class="align-items-end mb-2" @key="opt">
+                            <Column>
+                                <TextEdit @bind-Text="opt.Label" Placeholder="@L["OptionLabel"]" />
+                            </Column>
+                            <Column ColumnSize="ColumnSize.IsAuto">
+                                <Select TValue="OptionDataType" @bind-SelectedValue="opt.Type">
+                                    @foreach (var dataType in OptionDataTypes)
+                                    {
+                                        <SelectItem Value="@dataType">@dataType.ToString()</SelectItem>
+                                    }
+                                </Select>
+                            </Column>
+                            <Column ColumnSize="ColumnSize.IsAuto">
+                                <Button Color="Color.Danger" Clicked="@(() => RemoveNewQuestionOption(idx))">
+                                    @L["Remove"]
+                                </Button>
+                            </Column>
+                        </Row>
+                    }
+                    <Button Color="Color.Secondary" Clicked="AddNewQuestionOption">
+                        @L["AddOption"]
+                    </Button>
+                </Field>
+            }
+
+                        <Button Color="Color.Info" Clicked="AddNewQuestion" class="mt-2">
+                            @L["AddNewQuestionToSurvey"]
+                        </Button>
+                    </CollapseBody>
+                </Collapse>
+            </Accordion>
+
+            @* Section 3: Currently Attached Questions *@
+            <hr class="my-4" />
+            <h5>@L["CurrentQuestions"]</h5>
+            @if (!CurrentQuestions.Any())
+            {
+                <p class="text-muted">@L["NoQuestionsAttached"]</p>
+            }
+            else
+            {
+                @foreach (var q in CurrentQuestions)
+                {
+                    <Card class="mb-2" @key="q">
+                        <CardBody>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>@q.Text</strong> (@q.Type)
+                                    @if (q.Options?.Any() == true)
+                                    {
+                                        <ul class="mt-2">
+                                            @foreach (var opt in q.Options)
+                                            {
+                                                <li>@opt.Label (@opt.Type)</li>
+                                            }
+                                        </ul>
+                                    }
+                                </div>
+                                <div>
+                                    <Button Color="Color.Danger" Size="Size.Small" Clicked="@(() => DetachQuestion(q.Id))">
+                                        @L["Remove"]
+                                    </Button>
+                                </div>
+                            </div>
+                        </CardBody>
+                    </Card>
+                }
+            }
 
             <div class="mt-3">
                 <Button Color="Color.Secondary" Clicked="Back">
@@ -62,7 +197,7 @@
                 <Button Color="Color.Primary"
                         Type="@ButtonType.Submit"
                         PreventDefaultOnSubmit="true"
-                        Clicked="UpdateEntityAsync">
+                        Clicked="SaveSurveyAsync">
                     @L["Save"]
                 </Button>
             </div>
@@ -74,26 +209,154 @@
     [Parameter]
     public Guid Id { get; set; }
 
+    private List<QuestionDto> AvailableQuestions { get; set; } = new();
+    private List<QuestionDto> CurrentQuestions { get; set; } = new();
+    private List<Guid> OriginalQuestionIds { get; set; } = new(); // Track original questions
+    private Guid? SelectedQuestionId { get; set; }= new();
+    private List<Guid> QuestionsToDetach { get; set; } = new();
+    
+    // Collapse states
+    private bool ShowExistingQuestionsSection { get; set; } = false;
+    private bool ShowNewQuestionSection { get; set; } = false;
+    
+    // New question inline
+    private string NewQuestionText { get; set; } = string.Empty;
+    private QuestionType NewQuestionType { get; set; } = QuestionType.SingleChoice;
+    private List<CreateOptionInQuestionDto> NewQuestionOptions { get; set; } = new() { new CreateOptionInQuestionDto() };
+    private List<CreateQuestionInSurveyDto> NewQuestions { get; set; } = new();
+
+    private static IEnumerable<QuestionType> QuestionTypes => Enum.GetValues<QuestionType>();
+    private static IEnumerable<OptionDataType> OptionDataTypes => Enum.GetValues<OptionDataType>();
+
+    private bool NewQuestionRequiresOptions => 
+        NewQuestionType == QuestionType.SingleChoice || NewQuestionType == QuestionType.MultiChoice;
+
+    // Filter out questions that are already attached to the survey
+    private IEnumerable<QuestionDto> FilteredAvailableQuestions
+    {
+        get
+        {
+            var currentQuestionIds = CurrentQuestions.Select(q => q.Id).ToHashSet();
+            return AvailableQuestions.Where(q => !currentQuestionIds.Contains(q.Id));
+        }
+    }
+
     protected override async Task OnParametersSetAsync()
     {
         var dto = await SurveyService.GetAsync(Id);
+        EditingEntityId = Id;
 
-        // Map SurveyDto -> UpdateSurveyDto
-        try
+        EditingEntity = ObjectMapper.Map<SurveyDto, UpdateSurveyDto>(dto);
+
+        await LoadAvailableQuestions();
+        await LoadCurrentQuestions();
+    }
+
+    private async Task LoadAvailableQuestions()
+    {
+        var result = await QuestionService.GetListAsync(new PagedAndSortedResultRequestDto { MaxResultCount = 1000 });
+        AvailableQuestions = result.Items.ToList();
+    }
+
+    private async Task LoadCurrentQuestions()
+    {
+        var survey = await SurveyService.GetWithQuestionAsync(Id);
+        CurrentQuestions = survey.Questions.ToList();
+        OriginalQuestionIds = CurrentQuestions.Select(q => q.Id).ToList(); // Track original IDs
+    }
+
+    private void AttachExistingQuestion()
+    {
+        if (SelectedQuestionId == null) return;
+        
+        var question = AvailableQuestions.FirstOrDefault(q => q.Id == SelectedQuestionId.Value);
+        if (question == null) return;
+        
+        if (CurrentQuestions.Any(q => q.Id == question.Id)) return;
+        
+        CurrentQuestions.Add(question);
+        SelectedQuestionId = null;
+    }
+
+    private void AddNewQuestion()
+    {
+        if (string.IsNullOrWhiteSpace(NewQuestionText)) return;
+        
+        // Filter out options with empty labels
+        var validOptions = NewQuestionRequiresOptions ? 
+            NewQuestionOptions.Where(o => !string.IsNullOrWhiteSpace(o.Label)).ToList() : 
+            null;
+        
+        var newQ = new CreateQuestionInSurveyDto
         {
-            // If your project exposes ObjectMapper, you'd use it. If not, fallback to manual mapping.
-            EditingEntity = ObjectMapper.Map<SurveyDto, UpdateSurveyDto>(dto);
-        }
-        catch
+            Text = NewQuestionText,
+            Type = NewQuestionType,
+            Options = validOptions
+        };
+        
+        NewQuestions.Add(newQ);
+        
+        // Add to display list
+        CurrentQuestions.Add(new QuestionDto
         {
-            EditingEntity = new UpdateSurveyDto
-            {
-                Name = dto.Name,
-                Purpose = dto.Purpose,
-                TargetAudience = dto.TargetAudience,
-                IsActive = dto.IsActive
-            };
+            Id = Guid.NewGuid(), // Temporary ID for display
+            Text = NewQuestionText,
+            Type = NewQuestionType,
+            Options = validOptions != null ? 
+                validOptions.Select(o => new OptionDto { Label = o.Label, Type = o.Type }).ToList() : 
+                new List<OptionDto>()
+        });
+        
+        // Reset form
+        NewQuestionText = string.Empty;
+        NewQuestionType = QuestionType.SingleChoice;
+        NewQuestionOptions = new() { new CreateOptionInQuestionDto() };
+    }
+
+    private void AddNewQuestionOption()
+    {
+        NewQuestionOptions.Add(new CreateOptionInQuestionDto());
+    }
+
+    private void RemoveNewQuestionOption(int index)
+    {
+        if (NewQuestionOptions.Count > 1 && index >= 0 && index < NewQuestionOptions.Count)
+        {
+            NewQuestionOptions.RemoveAt(index);
         }
+    }
+
+    private void DetachQuestion(Guid questionId)
+    {
+        QuestionsToDetach.Add(questionId);
+        CurrentQuestions.RemoveAll(q => q.Id == questionId);
+    }
+
+    private async Task SaveSurveyAsync()
+    {
+        // Find questions that are currently attached and exist in the system (not temp IDs)
+        var currentRealQuestionIds = CurrentQuestions
+            .Where(q => AvailableQuestions.Any(aq => aq.Id == q.Id))
+            .Select(q => q.Id)
+            .ToList();
+        
+        // Questions to attach = current real questions that weren't originally attached
+        var questionsToAttach = currentRealQuestionIds
+            .Where(qId => !OriginalQuestionIds.Contains(qId))
+            .ToList();
+        
+        EditingEntity.AttachQuestionIds = questionsToAttach.Any() ? questionsToAttach : null;
+        EditingEntity.DetachQuestionIds = QuestionsToDetach.Any() ? QuestionsToDetach.Distinct().ToList() : null;
+        EditingEntity.NewQuestions = NewQuestions.Any() ? NewQuestions : null;
+        
+        await UpdateEntityAsync();
+    }
+
+    protected override Task OnUpdatedEntityAsync()
+    {
+        EditValidationsRef?.ClearAll();
+        NavigationManager.NavigateTo("/surveys");
+        return Task.CompletedTask;
     }
 
     private void Back()

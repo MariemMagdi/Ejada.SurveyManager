@@ -66,4 +66,14 @@ namespace Ejada.SurveyManager.SurveyInstances.Dtos
         public OptionDataType Type { get; set; }
     }
 
+    public class QuestionResponseSummaryDto
+    {
+        public Guid ResponseId { get; set; }
+        public Guid SurveyInstanceId { get; set; }
+        public int? AnswerValue { get; set; }
+        public List<Guid> SelectedOptionIds { get; set; } = new();
+        public bool IsSubmitted { get; set; }
+        public DateTime CreationTime { get; set; }
+    }
+
 }

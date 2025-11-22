@@ -1,0 +1,199 @@
+@page "/survey-instances/{Id:guid}/details"
+@using Ejada.SurveyManager.SurveyInstances
+@using Ejada.SurveyManager.SurveyInstances.Dtos
+@using Ejada.SurveyManager.SurveyInstances.Enums
+@using Ejada.SurveyManager.Surveys.Enums
+@using Ejada.SurveyManager.Localization
+@using Volo.Abp.Identity
+@inject NavigationManager NavigationManager
+@inject IResponseAppService ResponseService
+@inject ISurveyInstanceAppService SurveyInstanceService
+@inject IIdentityUserAppService UserService
+@inject Volo.Abp.AspNetCore.Components.Web.AbpBlazorMessageLocalizerHelper<SurveyManagerResource> LH
+
+@inherits AbpComponentBase
+
+<Card>
+    <CardHeader>
+        <Row class="justify-content-between">
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <h2>@L["SurveyInstanceDetails"]</h2>
+            </Column>
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <Button Color="Color.Secondary" Clicked="Back">
+                    @L["Back"]
+                </Button>
+            </Column>
+        </Row>
+    </CardHeader>
+
+    <CardBody>
+        @if (SurveyInstanceData == null)
+        {
+            <p>@L["Loading"]...</p>
+        }
+        else
+        {
+            <Card class="mb-3">
+                <CardBody>
+                    <Row>
+                        <Column>
+                            <strong>@L["Survey"]:</strong> @SurveyInstanceData.SurveyName
+                        </Column>
+                        <Column>
+                            <strong>@L["Status"]:</strong>
+                            @switch (SurveyInstanceData.Status)
+                            {
+                                case SurveyInstanceStatus.Assigned:
+                                    <span class="badge bg-info">@L["Assigned"]</span>
+                                    break;
+                                case SurveyInstanceStatus.InProgress:
+                                    <span class="badge bg-warning">@L["InProgress"]</span>
+                                    break;
+                                case SurveyInstanceStatus.Submitted:
+                                    <span class="badge bg-success">@L["Submitted"]</span>
+                                    break;
+                                case SurveyInstanceStatus.Expired:
+                                    <span class="badge bg-danger">@L["Expired"]</span>
+                                    break;
+                            }
+                        </Column>
+                    </Row>
+                    <Row class="mt-2">
+                        <Column>
+                            <strong>@L["AssignedTo"]:</strong> @AssigneeUserEmail
+                        </Column>
+                        <Column>
+                            <strong>@L["DueDate"]:</strong>
+                            @if (SurveyInstanceData.DueDate.HasValue)
+                            {
+                                @SurveyInstanceData.DueDate.Value.ToString("yyyy-MM-dd HH:mm")
+                            }
+                            else
+                            {
+                                <span class="text-muted">@L["NoDueDate"]</span>
+                            }
+                        </Column>
+                    </Row>
+                </CardBody>
+            </Card>
+
+            <h4>@L["Responses"]</h4>
+
+            @if (!SurveyInstanceData.Questions.Any())
+            {
+                <Alert Color="Color.Info" Visible="true">
+                    @L["NoQuestionsInSurvey"]
+                </Alert>
+            }
+            else if (SurveyInstanceData.Status == SurveyInstanceStatus.Assigned)
+            {
+                <Alert Color="Color.Warning" Visible="true">
+                    @L["EmployeeHasNotStarted"]
+                </Alert>
+            }
+            else
+            {
+                @foreach (var question in SurveyInstanceData.Questions)
+                {
+                    <Card class="mb-3">
+                        <CardBody>
+                            <h5>@question.Text</h5>
+                            <p class="text-muted">@L["Type"]: @question.Type.ToString()</p>
+
+                            @if (question.Type == QuestionType.Likert1To5 || question.Type == QuestionType.Likert1To7)
+                            {
+                                @if (question.AnswerValue.HasValue)
+                                {
+                                    <div class="alert alert-success">
+                                        <strong>@L["Answer"]:</strong> @question.AnswerValue.Value / @(question.Type == QuestionType.Likert1To5 ? 5 : 7)
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-secondary">
+                                        @L["NotAnswered"]
+                                    </div>
+                                }
+                            }
+                            else if (question.Type == QuestionType.SingleChoice || question.Type == QuestionType.MultiChoice)
+                            {
+                                @if (question.SelectedOptionIds.Any())
+                                {
+                                    <div class="alert alert-success">
+                                        <strong>@L["SelectedOptions"]:</strong>
+                                        <ul class="mb-0">
+                                            @foreach (var optionId in question.SelectedOptionIds)
+                                            {
+                                                var option = question.Options.FirstOrDefault(o => o.Id == optionId);
+                                                if (option != null)
+                                                {
+                                                    <li>@option.Label</li>
+                                                }
+                                            }
+                                        </ul>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-secondary">
+                                        @L["NotAnswered"]
+                                    </div>
+                                }
+
+                                @if (question.Options.Any())
+                                {
+                                    <p class="text-muted mt-2">@L["AvailableOptions"]:</p>
+                                    <ul>
+                                        @foreach (var option in question.Options)
+                                        {
+                                            <li>@option.Label</li>
+                                        }
+                                    </ul>
+                                }
+                            }
+                        </CardBody>
+                    </Card>
+                }
+            }
+        }
+    </CardBody>
+</Card>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private SurveyInstanceForAnsweringDto? SurveyInstanceData { get; set; }
+    private string AssigneeUserEmail { get; set; } = "Loading...";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        SurveyInstanceData = await ResponseService.GetSurveyInstanceForAnsweringAsync(Id);
+        
+        // Load user email
+        if (SurveyInstanceData != null)
+        {
+            try
+            {
+                var user = await UserService.GetAsync(SurveyInstanceData.AssigneeUserId);
+                AssigneeUserEmail = user.Email ?? user.UserName;
+            }
+            catch
+            {
+                AssigneeUserEmail = "Unknown User";
+            }
+        }
+    }
+
+    private void Back()
+    {
+        NavigationManager.NavigateTo("/survey-instances");
+    }
+}
+

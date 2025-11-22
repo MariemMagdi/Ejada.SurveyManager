@@ -111,6 +111,7 @@ public class SurveyManagerHttpApiHostModule : AbpModule
         }
 
         ConfigureAuthentication(context);
+        ConfigureLocalization();
         ConfigureUrls(configuration);
         ConfigureBundles();
         ConfigureConventionalControllers();
@@ -118,6 +119,21 @@ public class SurveyManagerHttpApiHostModule : AbpModule
         ConfigureSwagger(context, configuration);
         ConfigureVirtualFileSystem(context);
         ConfigureCors(context, configuration);
+    }
+
+    private void ConfigureLocalization()
+    {
+        Configure<AbpLocalizationOptions>(options =>
+        {
+            options.Languages.Clear();
+            options.Languages.Add(new LanguageInfo("en", "en", "English"));
+            options.Languages.Add(new LanguageInfo("ar", "ar", "العربية"));
+            
+            // Ensure resources are loaded from JSON files
+            options.Resources
+                .Get<Ejada.SurveyManager.Localization.SurveyManagerResource>()
+                .AddVirtualJson("/Localization/SurveyManager");
+        });
     }
 
     private void ConfigureAuthentication(ServiceConfigurationContext context)

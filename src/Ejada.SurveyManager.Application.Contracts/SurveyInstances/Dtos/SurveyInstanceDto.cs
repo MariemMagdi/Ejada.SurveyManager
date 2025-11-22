@@ -1,4 +1,5 @@
-﻿using Ejada.SurveyManager.SurveyInstances.Enums;
+﻿//using Ejada.SurveyManager.SurveyInstances.Enums;
+using Ejada.SurveyManager.SurveyInstances.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -16,7 +17,7 @@ namespace Ejada.SurveyManager.SurveyInstances.Dtos
         public DateTime? DueDate { get;  set; }
         public SurveyInstanceStatus Status { get;  set; }
 
-        public string? SurveyName { get; set; }
+        public string SurveyName { get; set; } = string.Empty;
     }
 
     public class CreateSurveyInstanceDto

@@ -1,0 +1,350 @@
+@page "/indicators"
+@using Volo.Abp.Application.Dtos
+@using Ejada.SurveyManager.Indicators
+@using Ejada.SurveyManager.Indicators.Dtos
+@using Ejada.SurveyManager.Surveys
+@using Ejada.SurveyManager.Surveys.Dtos
+@using Ejada.SurveyManager.Localization
+@using Ejada.SurveyManager.Permissions
+@using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.AspNetCore.Components.Web
+@inject IIndicatorAppService IndicatorAppService
+@inject IQuestionAppService QuestionAppService
+@inject NavigationManager NavigationManager
+@inject Volo.Abp.AspNetCore.Components.Web.AbpBlazorMessageLocalizerHelper<SurveyManagerResource> LH
+@inherits AbpCrudPageBase<IIndicatorAppService, IndicatorDto, Guid, PagedAndSortedResultRequestDto, CreateIndicatorDto, UpdateIndicatorDto>
+
+<Card>
+    <CardHeader>
+        <Row Class="justify-content-between">
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <h2>@L["Indicators"]</h2>
+            </Column>
+            <Column ColumnSize="ColumnSize.IsAuto">
+                @if (HasCreatePermission)
+                {
+                    <Button Color="Color.Primary" Clicked="OpenCreateModalAsync">
+                        <Icon Name="IconName.Add" /> @L["CreateIndicator"]
+                    </Button>
+                }
+            </Column>
+        </Row>
+    </CardHeader>
+    <CardBody>
+        <DataGrid TItem="IndicatorDto"
+                  Data="Entities"
+                  ReadData="OnDataGridReadAsync"
+                  TotalItems="TotalCount"
+                  ShowPager="true"
+                  PageSize="PageSize"
+                  Responsive>
+            <DataGridColumns>
+                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.Name)" Caption="@L["IndicatorName"]" />
+                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.Description)" Caption="@L["IndicatorDescription"]" />
+                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.IsActive)" Caption="@L["IsActive"]">
+                    <DisplayTemplate>
+                        @if (context.IsActive)
+                        {
+                            <Badge Color="Color.Success">@L["Active"]</Badge>
+                        }
+                        else
+                        {
+                            <Badge Color="Color.Secondary">@L["Inactive"]</Badge>
+                        }
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.QuestionIds)" Caption="@L["LinkedQuestions"]">
+                    <DisplayTemplate>
+                        <Badge Color="Color.Info">@context.QuestionIds.Count @L["Questions"]</Badge>
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridEntityActionsColumn TItem="IndicatorDto" @ref="@EntityActionsColumn" Caption="@L["Actions"]">
+                    <DisplayTemplate Context="context">
+                        <EntityActions TItem="IndicatorDto" EntityActionsColumn="@EntityActionsColumn">
+                            <EntityAction TItem="IndicatorDto" 
+                                          Text="@L["ViewDetails"]" 
+                                          Clicked="() => NavigateToDetails(context.Id)" />
+                            <EntityAction TItem="IndicatorDto" 
+                                          Text="@L["Edit"]" 
+                                          Visible="@HasUpdatePermission" 
+                                          Clicked="() => OpenEditModalAsync(context)" />
+                            <EntityAction TItem="IndicatorDto" 
+                                          Text="@L["Delete"]" 
+                                          Visible="@HasDeletePermission" 
+                                          Clicked="() => DeleteEntityAsync(context)" 
+                                          ConfirmationMessage="() => GetDeleteConfirmationMessage(context)" />
+                        </EntityActions>
+                    </DisplayTemplate>
+                </DataGridEntityActionsColumn>
+                
+            </DataGridColumns>
+        </DataGrid>
+    </CardBody>
+</Card>
+
+<!-- Create Modal -->
+<Modal @ref="@CreateModal">
+    <ModalContent Centered Size="ModalSize.Large">
+        <Form>
+            <ModalHeader>
+                <ModalTitle>@L["CreateIndicator"]</ModalTitle>
+                <CloseButton Clicked="CloseCreateModalAsync" />
+            </ModalHeader>
+            <ModalBody>
+                <Validations @ref="@CreateValidationsRef" Model="@NewEntity" ValidateOnLoad="false">
+                    <Validation MessageLocalizer="@LH.Localize">
+                        <Field>
+                            <FieldLabel>@L["IndicatorName"] *</FieldLabel>
+                            <TextEdit @bind-Text="@NewEntity.Name">
+                                <Feedback>
+                                    <ValidationError />
+                                </Feedback>
+                            </TextEdit>
+                        </Field>
+                    </Validation>
+                    
+                    <Field>
+                        <FieldLabel>@L["IndicatorDescription"]</FieldLabel>
+                        <MemoEdit @bind-Text="@NewEntity.Description" Rows="3" />
+                    </Field>
+
+                    <Field>
+                        <Check TValue="bool" @bind-Checked="@NewEntity.IsActive">@L["IsActive"]</Check>
+                    </Field>
+
+                    <Field>
+                        <FieldLabel>@L["LinkedQuestions"]</FieldLabel>
+                        @if (AllQuestions != null && AllQuestions.Any())
+                        {
+                            <div style="max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; padding: 10px; border-radius: 4px;">
+                                @foreach (var question in AllQuestions)
+                                {
+                                    <Check TValue="bool" 
+                                           Checked="@NewEntity.QuestionIds.Contains(question.Id)"
+                                           CheckedChanged="@((bool isChecked) => OnQuestionSelectionChanged(question.Id, isChecked))">
+                                        <strong>@question.Text</strong> <Badge Color="Color.Secondary">@question.Type</Badge>
+                                    </Check>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <Alert Color="Color.Info" Visible>
+                                @L["NoQuestionsAvailable"]
+                            </Alert>
+                        }
+                    </Field>
+                </Validations>
+            </ModalBody>
+            <ModalFooter>
+                <Button Color="Color.Secondary" Clicked="CloseCreateModalAsync">@L["Cancel"]</Button>
+                <Button Color="Color.Primary" Type="@ButtonType.Submit" PreventDefaultOnSubmit Clicked="CreateEntityAsync">
+                    @L["Save"]
+                </Button>
+            </ModalFooter>
+        </Form>
+    </ModalContent>
+</Modal>
+
+<!-- Edit Modal -->
+<Modal @ref="@EditModal">
+    <ModalContent Centered Size="ModalSize.Large">
+        <Form>
+            <ModalHeader>
+                <ModalTitle>@L["EditIndicator"]</ModalTitle>
+                <CloseButton Clicked="CloseEditModalAsync" />
+            </ModalHeader>
+            <ModalBody>
+                <Validations @ref="@EditValidationsRef" Model="@EditingEntity" ValidateOnLoad="false">
+                    <Validation MessageLocalizer="@LH.Localize">
+                        <Field>
+                            <FieldLabel>@L["IndicatorName"] *</FieldLabel>
+                            <TextEdit @bind-Text="@EditingEntity.Name">
+                                <Feedback>
+                                    <ValidationError />
+                                </Feedback>
+                            </TextEdit>
+                        </Field>
+                    </Validation>
+                    
+                    <Field>
+                        <FieldLabel>@L["IndicatorDescription"]</FieldLabel>
+                        <MemoEdit @bind-Text="@EditingEntity.Description" Rows="3" />
+                    </Field>
+
+                    <Field>
+                        <Check TValue="bool" @bind-Checked="@EditingEntity.IsActive">@L["IsActive"]</Check>
+                    </Field>
+
+                    <Field>
+                        <FieldLabel>@L["LinkedQuestions"]</FieldLabel>
+                        @if (AllQuestions != null && AllQuestions.Any())
+                        {
+                            <div style="max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; padding: 10px; border-radius: 4px;">
+                                @foreach (var question in AllQuestions)
+                                {
+                                    <Check TValue="bool" 
+                                           Checked="@EditingEntity.QuestionIds.Contains(question.Id)"
+                                           CheckedChanged="@((bool isChecked) => OnEditQuestionSelectionChanged(question.Id, isChecked))">
+                                        <strong>@question.Text</strong> <Badge Color="Color.Secondary">@question.Type</Badge>
+                                    </Check>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <Alert Color="Color.Info" Visible>
+                                @L["NoQuestionsAvailable"]
+                            </Alert>
+                        }
+                    </Field>
+                </Validations>
+            </ModalBody>
+            <ModalFooter>
+                <Button Color="Color.Secondary" Clicked="CloseEditModalAsync">@L["Cancel"]</Button>
+                <Button Color="Color.Primary" Type="@ButtonType.Submit" PreventDefaultOnSubmit Clicked="UpdateEntityAsync">
+                    @L["Save"]
+                </Button>
+            </ModalFooter>
+        </Form>
+    </ModalContent>
+</Modal>
+
+@code {
+    private List<QuestionDto> AllQuestions = new List<QuestionDto>();
+    private Modal EditModal;
+    private Validations EditValidationsRef;
+    private UpdateIndicatorDto EditingEntity = new UpdateIndicatorDto();
+
+    public Indicators()
+    {
+        CreatePolicyName = SurveyManagerPermissions.Indicators.Create;
+        UpdatePolicyName = SurveyManagerPermissions.Indicators.Edit;
+        DeletePolicyName = SurveyManagerPermissions.Indicators.Delete;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await LoadAllQuestionsAsync();
+    }
+
+    private async Task LoadAllQuestionsAsync()
+    {
+        var result = await QuestionAppService.GetListAsync(new PagedAndSortedResultRequestDto { MaxResultCount = 1000 });
+        AllQuestions = result.Items.ToList();
+    }
+
+    private void OnQuestionSelectionChanged(Guid questionId, bool isChecked)
+    {
+        if (isChecked)
+        {
+            if (!NewEntity.QuestionIds.Contains(questionId))
+            {
+                NewEntity.QuestionIds.Add(questionId);
+            }
+        }
+        else
+        {
+            NewEntity.QuestionIds.Remove(questionId);
+        }
+    }
+
+    private void OnEditQuestionSelectionChanged(Guid questionId, bool isChecked)
+    {
+        if (isChecked)
+        {
+            if (!EditingEntity.QuestionIds.Contains(questionId))
+            {
+                EditingEntity.QuestionIds.Add(questionId);
+            }
+        }
+        else
+        {
+            EditingEntity.QuestionIds.Remove(questionId);
+        }
+    }
+
+    protected override async Task OpenCreateModalAsync()
+    {
+        await base.OpenCreateModalAsync();
+        NewEntity.QuestionIds = new List<Guid>();
+        await LoadAllQuestionsAsync();
+    }
+
+    protected override async Task OpenEditModalAsync(IndicatorDto entity)
+    {
+        try
+        {
+            await CheckUpdatePolicyAsync();
+
+            EditingEntityId = entity.Id;
+
+            // Load the indicator with its question IDs
+            var indicator = await AppService.GetAsync(entity.Id);
+
+            // Populate the EditingEntity
+            EditingEntity = new UpdateIndicatorDto
+            {
+                Name = indicator.Name,
+                Description = indicator.Description,
+                IsActive = indicator.IsActive,
+                QuestionIds = indicator.QuestionIds ?? new List<Guid>()
+            };
+
+            await LoadAllQuestionsAsync();
+
+            await InvokeAsync(async () =>
+            {
+                StateHasChanged();
+                if (EditModal != null)
+                {
+                    await EditModal.Show();
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            await HandleErrorAsync(ex);
+        }
+    }
+
+    private async Task CloseEditModalAsync()
+    {
+        await EditModal.Hide();
+        EditingEntity = new UpdateIndicatorDto();
+        EditingEntityId = Guid.Empty;
+    }
+
+    protected override async Task UpdateEntityAsync()
+    {
+        try
+        {
+            await CheckUpdatePolicyAsync();
+
+            if (EditValidationsRef != null && !await EditValidationsRef.ValidateAll())
+            {
+                return;
+            }
+
+            await AppService.UpdateAsync(EditingEntityId, EditingEntity);
+            await GetEntitiesAsync();
+            await CloseEditModalAsync();
+        }
+        catch (Exception ex)
+        {
+            await HandleErrorAsync(ex);
+        }
+    }
+
+    protected override string GetDeleteConfirmationMessage(IndicatorDto entity)
+    {
+        return string.Format(L["IndicatorDeletionConfirmationMessage"], entity.Name);
+    }
+
+    private void NavigateToDetails(Guid indicatorId)
+    {
+        NavigationManager.NavigateTo($"/indicators/{indicatorId}/details");
+    }
+}
+

@@ -19,6 +19,10 @@ namespace Ejada.SurveyManager.SurveyInstances
         Task<SurveyInstanceDto> MarkInProgressAsync(Guid id);
         Task<SurveyInstanceDto> SubmitAsync(Guid id);
         Task<SurveyInstanceDto> MarkExpiredAsync(Guid id);
-
+        
+        /// <summary>
+        /// Get survey instances assigned to the current user (employee)
+        /// </summary>
+        Task<PagedResultDto<SurveyInstanceDto>> GetMyAssignedSurveysAsync(PagedAndSortedResultRequestDto input);
     }
 }

@@ -1,0 +1,166 @@
+@page "/survey-instances"
+@using Volo.Abp.Application.Dtos
+@using Ejada.SurveyManager.SurveyInstances
+@using Ejada.SurveyManager.SurveyInstances.Dtos
+@using Ejada.SurveyManager.SurveyInstances.Enums
+@using Ejada.SurveyManager.Localization
+@using Volo.Abp.Identity
+@inject NavigationManager NavigationManager
+@inject ISurveyInstanceAppService SurveyInstanceService
+@inject IIdentityUserAppService UserService
+@inject Volo.Abp.AspNetCore.Components.Web.AbpBlazorMessageLocalizerHelper<SurveyManagerResource> LH
+
+@inherits AbpCrudPageBase<ISurveyInstanceAppService, SurveyInstanceDto, Guid, PagedAndSortedResultRequestDto, CreateSurveyInstanceDto, UpdateSurveyInstanceDto>
+
+<Card>
+    <CardHeader>
+        <Row class="justify-content-between">
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <h2>@L["SurveyInstances"]</h2>
+            </Column>
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <Button Color="Color.Primary"
+                        Clicked="GoToCreatePage">
+                    @L["AssignSurvey"]
+                </Button>
+            </Column>
+        </Row>
+    </CardHeader>
+
+    <CardBody>
+        <DataGrid TItem="SurveyInstanceDto"
+                  Data="Entities"
+                  ReadData="OnDataGridReadAsync"
+                  TotalItems="TotalCount"
+                  ShowPager="true"
+                  PageSize="PageSize"
+                  ShowFilterRow="true"
+                  Striped="true">
+            <DataGridColumns>
+                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.SurveyName)" Caption="@L["Survey"]" />
+                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.AssigneeUserId)" Caption="@L["AssigneeUser"]">
+                    <DisplayTemplate Context="context">
+                        @GetUserEmail(context.AssigneeUserId)
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.DueDate)" Caption="@L["DueDate"]">
+                    <DisplayTemplate Context="context">
+                        @if (context.DueDate.HasValue)
+                        {
+                            @context.DueDate.Value.ToString("yyyy-MM-dd HH:mm")
+                        }
+                        else
+                        {
+                            <span class="text-muted">@L["NoDueDate"]</span>
+                        }
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.Status)" Caption="@L["Status"]">
+                    <DisplayTemplate Context="context">
+                        @switch (context.Status)
+                        {
+                            case SurveyInstanceStatus.Assigned:
+                                <span class="badge bg-info">@L["Assigned"]</span>
+                                break;
+                            case SurveyInstanceStatus.InProgress:
+                                <span class="badge bg-warning">@L["InProgress"]</span>
+                                break;
+                            case SurveyInstanceStatus.Submitted:
+                                <span class="badge bg-success">@L["Submitted"]</span>
+                                break;
+                            case SurveyInstanceStatus.Expired:
+                                <span class="badge bg-danger">@L["Expired"]</span>
+                                break;
+                        }
+                    </DisplayTemplate>
+                </DataGridColumn>
+
+                <DataGridEntityActionsColumn TItem="SurveyInstanceDto" @ref="@EntityActionsColumn" Caption="@L["Actions"]">
+                    <DisplayTemplate Context="context">
+                        <EntityActions TItem="SurveyInstanceDto" EntityActionsColumn="@EntityActionsColumn">
+                            <EntityAction TItem="SurveyInstanceDto"
+                                          Text="@L["ViewResponses"]"
+                                          Visible="@(context.Status == SurveyInstanceStatus.Submitted)"
+                                          Clicked="() => GoToDetailsPage(context.Id)" />
+                            <EntityAction TItem="SurveyInstanceDto"
+                                          Text="@L["MarkExpired"]"
+                                          Visible="@(context.Status != SurveyInstanceStatus.Submitted && context.Status != SurveyInstanceStatus.Expired)"
+                                          Clicked="() => MarkExpiredAsync(context.Id)"
+                                          ConfirmationMessage="@(() => L["MarkExpiredConfirmation"])" />
+                            <EntityAction TItem="SurveyInstanceDto"
+                                          Text="@L["Delete"]"
+                                          Clicked="() => DeleteEntityAsync(context)"
+                                          ConfirmationMessage="() => GetDeleteConfirmationMessage(context)" />
+                        </EntityActions>
+                    </DisplayTemplate>
+                </DataGridEntityActionsColumn>
+            </DataGridColumns>
+        </DataGrid>
+    </CardBody>
+</Card>
+
+@code {
+    private Dictionary<Guid, string> UserEmails = new Dictionary<Guid, string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await LoadUsersAsync();
+    }
+
+    protected override async Task GetEntitiesAsync()
+    {
+        await base.GetEntitiesAsync();
+        await LoadUsersAsync();
+    }
+
+    private async Task LoadUsersAsync()
+    {
+        // Get unique user IDs from current entities
+        var userIds = Entities.Select(e => e.AssigneeUserId).Distinct().ToList();
+        
+        // Load user details for each ID
+        foreach (var userId in userIds)
+        {
+            if (!UserEmails.ContainsKey(userId))
+            {
+                try
+                {
+                    var user = await UserService.GetAsync(userId);
+                    UserEmails[userId] = user.Email ?? user.UserName;
+                }
+                catch
+                {
+                    UserEmails[userId] = "Unknown User";
+                }
+            }
+        }
+    }
+
+    private string GetUserEmail(Guid userId)
+    {
+        return UserEmails.TryGetValue(userId, out var email) ? email : "Loading...";
+    }
+
+    private void GoToCreatePage()
+    {
+        NavigationManager.NavigateTo("/survey-instances/create");
+    }
+
+    private void GoToDetailsPage(Guid id)
+    {
+        NavigationManager.NavigateTo($"/survey-instances/{id}/details");
+    }
+
+    private async Task MarkExpiredAsync(Guid id)
+    {
+        await SurveyInstanceService.MarkExpiredAsync(id);
+        await GetEntitiesAsync();
+    }
+
+    protected override string GetDeleteConfirmationMessage(SurveyInstanceDto entity)
+    {
+        return string.Format(L["SurveyInstanceDeletionConfirmation"], entity.SurveyName);
+    }
+}
+

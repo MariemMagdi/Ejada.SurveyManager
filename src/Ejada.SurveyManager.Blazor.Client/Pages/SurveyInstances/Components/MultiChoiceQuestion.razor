@@ -1,0 +1,44 @@
+@using Ejada.SurveyManager.SurveyInstances.Dtos
+@using Ejada.SurveyManager.Localization
+@inject Volo.Abp.AspNetCore.Components.Web.AbpBlazorMessageLocalizerHelper<SurveyManagerResource> LH
+
+@inherits AbpComponentBase
+
+<Field>
+    <FieldLabel>@L["SelectMultipleOptions"]</FieldLabel>
+    @foreach (var option in Question.Options)
+    {
+        <Field>
+            <Check TValue="bool"
+                   Checked="@Question.SelectedOptionIds.Contains(option.Id)"
+                   CheckedChanged="@(value => OnOptionToggled(option.Id, value))"
+                   Disabled="@IsReadOnly">
+                @option.Label
+            </Check>
+        </Field>
+    }
+</Field>
+
+@code {
+    [Parameter]
+    public QuestionForAnsweringDto Question { get; set; } = null!;
+
+    [Parameter]
+    public bool IsReadOnly { get; set; }
+
+    private void OnOptionToggled(Guid optionId, bool isChecked)
+    {
+        if (isChecked)
+        {
+            if (!Question.SelectedOptionIds.Contains(optionId))
+            {
+                Question.SelectedOptionIds.Add(optionId);
+            }
+        }
+        else
+        {
+            Question.SelectedOptionIds.Remove(optionId);
+        }
+    }
+}
+

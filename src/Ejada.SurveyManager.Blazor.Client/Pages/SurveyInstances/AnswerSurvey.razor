@@ -1,0 +1,228 @@
+@page "/answer-survey/{Id:guid}"
+@using Ejada.SurveyManager.SurveyInstances
+@using Ejada.SurveyManager.SurveyInstances.Dtos
+@using Ejada.SurveyManager.SurveyInstances.Enums
+@using Ejada.SurveyManager.Surveys.Enums
+@using Ejada.SurveyManager.Localization
+@using Ejada.SurveyManager.Blazor.Client.Pages.SurveyInstances.Components
+@inject NavigationManager NavigationManager
+@inject IResponseAppService ResponseService
+@inject Volo.Abp.AspNetCore.Components.Web.AbpBlazorMessageLocalizerHelper<SurveyManagerResource> LH
+
+@inherits AbpComponentBase
+
+<Card>
+    <CardHeader>
+        <Row class="justify-content-between">
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <h2>@(SurveyInstanceData?.SurveyName ?? L["AnswerSurvey"])</h2>
+            </Column>
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <Button Color="Color.Secondary" Clicked="Back">
+                    @L["Back"]
+                </Button>
+            </Column>
+        </Row>
+    </CardHeader>
+
+    <CardBody>
+        @if (SurveyInstanceData == null)
+        {
+            <p>@L["Loading"]...</p>
+        }
+        else if (IsReadOnly)
+        {
+            <Alert Color="Color.Info" Visible="true">
+                @L["SurveyIsReadOnly"]
+            </Alert>
+
+            @if (!SurveyInstanceData.Questions.Any())
+            {
+                <Alert Color="Color.Info" Visible="true">
+                    @L["NoQuestionsInSurvey"]
+                </Alert>
+            }
+            else
+            {
+                @foreach (var question in SurveyInstanceData.Questions)
+                {
+                    <Card class="mb-3">
+                        <CardBody>
+                            <h5>@question.Text</h5>
+                            <p class="text-muted">@L["Type"]: @question.Type</p>
+
+                            @if (question.Type == QuestionType.Likert1To5 || question.Type == QuestionType.Likert1To7)
+                            {
+                                <LikertQuestion Question="@question" IsReadOnly="true" />
+                            }
+                            else if (question.Type == QuestionType.SingleChoice)
+                            {
+                                <SingleChoiceQuestion Question="@question" IsReadOnly="true" />
+                            }
+                            else if (question.Type == QuestionType.MultiChoice)
+                            {
+                                <MultiChoiceQuestion Question="@question" IsReadOnly="true" />
+                            }
+                        </CardBody>
+                    </Card>
+                }
+            }
+        }
+        else
+        {
+            @if (SurveyInstanceData.DueDate.HasValue)
+            {
+                var timeLeft = SurveyInstanceData.DueDate.Value - DateTime.UtcNow;
+                @if (timeLeft.TotalDays < 1 && timeLeft.TotalHours > 0)
+                {
+                    <Alert Color="Color.Warning" Visible="true">
+                        @L["DueSoon"]: @SurveyInstanceData.DueDate.Value.ToString("yyyy-MM-dd HH:mm")
+                    </Alert>
+                }
+            }
+
+            @if (!SurveyInstanceData.Questions.Any())
+            {
+                <Alert Color="Color.Info" Visible="true">
+                    @L["NoQuestionsInSurvey"]
+                </Alert>
+            }
+            else
+            {
+                @foreach (var question in SurveyInstanceData.Questions)
+                {
+                    <Card class="mb-3">
+                        <CardBody>
+                            <h5>@question.Text</h5>
+                            <p class="text-muted">@L["Type"]: @question.Type</p>
+
+                            @if (question.Type == QuestionType.Likert1To5 || question.Type == QuestionType.Likert1To7)
+                            {
+                                <LikertQuestion Question="@question" IsReadOnly="false" />
+                            }
+                            else if (question.Type == QuestionType.SingleChoice)
+                            {
+                                <SingleChoiceQuestion Question="@question" IsReadOnly="false" />
+                            }
+                            else if (question.Type == QuestionType.MultiChoice)
+                            {
+                                <MultiChoiceQuestion Question="@question" IsReadOnly="false" />
+                            }
+                        </CardBody>
+                    </Card>
+                }
+            }
+
+            <div class="mt-4">
+                <Button Color="Color.Secondary" Clicked="Back">
+                    @L["Cancel"]
+                </Button>
+
+                <Button Color="Color.Info"
+                        Clicked="SaveDraftAsync"
+                        Disabled="@IsSaving">
+                    @if (IsSaving)
+                    {
+                        <span class="spinner-border spinner-border-sm me-1"></span>
+                    }
+                    @L["SaveDraft"]
+                </Button>
+
+                <Button Color="Color.Success"
+                        Clicked="SubmitSurveyAsync"
+                        Disabled="@IsSaving">
+                    @if (IsSaving)
+                    {
+                        <span class="spinner-border spinner-border-sm me-1"></span>
+                    }
+                    @L["Submit"]
+                </Button>
+            </div>
+        }
+    </CardBody>
+</Card>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private SurveyInstanceForAnsweringDto? SurveyInstanceData { get; set; }
+    private bool IsSaving { get; set; } = false;
+    private bool IsReadOnly => SurveyInstanceData?.Status == SurveyInstanceStatus.Submitted || 
+                                SurveyInstanceData?.Status == SurveyInstanceStatus.Expired;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        SurveyInstanceData = await ResponseService.GetSurveyInstanceForAnsweringAsync(Id);
+    }
+
+    private async Task SaveDraftAsync()
+    {
+        if (SurveyInstanceData == null) return;
+
+        IsSaving = true;
+        try
+        {
+            var dto = new SaveResponsesBulkDto
+            {
+                SurveyInstanceId = Id,
+                Responses = SurveyInstanceData.Questions.Select(q => new SaveResponseDto
+                {
+                    SurveyInstanceId = Id,
+                    QuestionId = q.Id,
+                    AnswerValue = q.AnswerValue,
+                    SelectedOptionIds = q.SelectedOptionIds.Any() ? q.SelectedOptionIds : null
+                }).ToList()
+            };
+
+            await ResponseService.SaveResponsesBulkAsync(dto);
+            
+            // Reload to show updated status
+            await LoadDataAsync();
+        }
+        finally
+        {
+            IsSaving = false;
+        }
+    }
+
+    private async Task SubmitSurveyAsync()
+    {
+        if (SurveyInstanceData == null) return;
+
+        IsSaving = true;
+        try
+        {
+            var dto = new SaveResponsesBulkDto
+            {
+                SurveyInstanceId = Id,
+                Responses = SurveyInstanceData.Questions.Select(q => new SaveResponseDto
+                {
+                    SurveyInstanceId = Id,
+                    QuestionId = q.Id,
+                    AnswerValue = q.AnswerValue,
+                    SelectedOptionIds = q.SelectedOptionIds.Any() ? q.SelectedOptionIds : null
+                }).ToList()
+            };
+
+            await ResponseService.SaveAndSubmitResponsesBulkAsync(dto);
+            
+            NavigationManager.NavigateTo("/my-surveys");
+        }
+        finally
+        {
+            IsSaving = false;
+        }
+    }
+
+    private void Back()
+    {
+        NavigationManager.NavigateTo("/my-surveys");
+    }
+}
+

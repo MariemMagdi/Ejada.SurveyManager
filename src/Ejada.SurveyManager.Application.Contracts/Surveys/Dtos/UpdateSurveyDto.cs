@@ -33,8 +33,16 @@ namespace Ejada.SurveyManager.Surveys.Dtos
 
     public class UpdateQuestionInSurveyDto
     {
-        [Required] public Guid Id { get; set; }
-        [Required] public string Text { get; set; } = string.Empty;
-        [Required] public QuestionType Type { get; set; }
+        [Required] 
+        public Guid Id { get; set; }
+        
+        [Required]
+        [StringLength(1024)]
+        public string Text { get; set; } = string.Empty;
+        
+        [Required] 
+        public QuestionType Type { get; set; }
+        
+        public List<CreateOptionInQuestionDto>? Options { get; set; }
     }
 }

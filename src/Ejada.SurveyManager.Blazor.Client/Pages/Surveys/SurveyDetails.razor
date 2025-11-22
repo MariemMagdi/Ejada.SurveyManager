@@ -54,6 +54,38 @@
                 </dd>
             </dl>
 
+            <hr class="my-4" />
+
+            <h5>@L["Questions"] (@Survey.Questions.Count)</h5>
+            @if (!Survey.Questions.Any())
+            {
+                <p class="text-muted">@L["NoQuestionsAttached"]</p>
+            }
+            else
+            {
+                @foreach (var question in Survey.Questions)
+                {
+                    <Card class="mb-2" @key="question">
+                        <CardBody>
+                            <h6>@question.Text</h6>
+                            <p class="text-muted mb-2">
+                                <strong>@L["Type"]:</strong> @question.Type.ToString()
+                            </p>
+                            @if (question.Options?.Any() == true)
+                            {
+                                <strong>@L["Options"]:</strong>
+                                <ul class="mt-2">
+                                    @foreach (var option in question.Options)
+                                    {
+                                        <li>@option.Label <span class="text-muted">(@option.Type)</span></li>
+                                    }
+                                </ul>
+                            }
+                        </CardBody>
+                    </Card>
+                }
+            }
+
             <div class="mt-3">
                 <Button Color="Color.Primary" Clicked="Edit">
                     @L["Edit"]
@@ -70,11 +102,11 @@
     [Parameter]
     public Guid Id { get; set; }
 
-    private SurveyDto Survey { get; set; }
+    private SurveyWithQuestionsDto Survey { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        Survey = await SurveyService.GetAsync(Id);
+        Survey = await SurveyService.GetWithQuestionAsync(Id);
     }
 
     private void Back()

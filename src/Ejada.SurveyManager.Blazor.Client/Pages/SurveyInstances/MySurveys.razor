@@ -1,0 +1,133 @@
+@page "/my-surveys"
+@using Volo.Abp.Application.Dtos
+@using Ejada.SurveyManager.SurveyInstances
+@using Ejada.SurveyManager.SurveyInstances.Dtos
+@using Ejada.SurveyManager.SurveyInstances.Enums
+@using Ejada.SurveyManager.Localization
+@using Ejada.SurveyManager.Permissions
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(SurveyManagerPermissions.SurveyInstances.ViewOwn)]
+@inject NavigationManager NavigationManager
+@inject ISurveyInstanceAppService SurveyInstanceService
+@inject Volo.Abp.AspNetCore.Components.Web.AbpBlazorMessageLocalizerHelper<SurveyManagerResource> LH
+
+@inherits AbpCrudPageBase<ISurveyInstanceAppService, SurveyInstanceDto, Guid, PagedAndSortedResultRequestDto, CreateSurveyInstanceDto, UpdateSurveyInstanceDto>
+
+<Card>
+    <CardHeader>
+        <h2>@L["MyAssignedSurveys"]</h2>
+    </CardHeader>
+
+    <CardBody>
+        <DataGrid TItem="SurveyInstanceDto"
+                  Data="Entities"
+                  ReadData="OnDataGridReadAsync"
+                  TotalItems="TotalCount"
+                  ShowPager="true"
+                  PageSize="PageSize"
+                  Striped="true">
+            <DataGridColumns>
+                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.SurveyName)" Caption="@L["Survey"]" />
+                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.DueDate)" Caption="@L["DueDate"]">
+                    <DisplayTemplate Context="context">
+                        @if (context.DueDate.HasValue)
+                        {
+                            var daysLeft = (context.DueDate.Value - DateTime.UtcNow).TotalDays;
+                            @if (daysLeft < 0)
+                            {
+                                <span class="text-danger">@context.DueDate.Value.ToString("yyyy-MM-dd HH:mm") (@L["Overdue"])</span>
+                            }
+                            else if (daysLeft < 1)
+                            {
+                                <span class="text-warning">@context.DueDate.Value.ToString("yyyy-MM-dd HH:mm") (@L["DueSoon"])</span>
+                            }
+                            else
+                            {
+                                @context.DueDate.Value.ToString("yyyy-MM-dd HH:mm")
+                            }
+                        }
+                        else
+                        {
+                            <span class="text-muted">@L["NoDueDate"]</span>
+                        }
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.Status)" Caption="@L["Status"]">
+                    <DisplayTemplate Context="context">
+                        @switch (context.Status)
+                        {
+                            case SurveyInstanceStatus.Assigned:
+                                <span class="badge bg-info">@L["NotStarted"]</span>
+                                break;
+                            case SurveyInstanceStatus.InProgress:
+                                <span class="badge bg-warning">@L["Draft"]</span>
+                                break;
+                            case SurveyInstanceStatus.Submitted:
+                                <span class="badge bg-success">@L["Submitted"]</span>
+                                break;
+                            case SurveyInstanceStatus.Expired:
+                                <span class="badge bg-danger">@L["Expired"]</span>
+                                break;
+                        }
+                    </DisplayTemplate>
+                </DataGridColumn>
+
+                <DataGridEntityActionsColumn TItem="SurveyInstanceDto" @ref="@EntityActionsColumn" Caption="@L["Actions"]">
+                    <DisplayTemplate Context="context">
+                        <EntityActions TItem="SurveyInstanceDto" EntityActionsColumn="@EntityActionsColumn">
+                            <EntityAction TItem="SurveyInstanceDto"
+                                          Text="@(context.Status == SurveyInstanceStatus.Submitted ? L["ViewResponses"] : L["AnswerSurvey"])"
+                                          Clicked="() => GoToAnswerPage(context.Id)" />
+                        </EntityActions>
+                    </DisplayTemplate>
+                </DataGridEntityActionsColumn>
+            </DataGridColumns>
+        </DataGrid>
+    </CardBody>
+</Card>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        
+        // Filter to show only surveys assigned to current user
+        await GetEntitiesAsync();
+    }
+
+    protected override async Task OnDataGridReadAsync(DataGridReadDataEventArgs<SurveyInstanceDto> e)
+    {
+        CurrentSorting = e.Columns
+            .Where(c => c.SortDirection != SortDirection.Default)
+            .Select(c => c.Field + (c.SortDirection == SortDirection.Descending ? " DESC" : ""))
+            .JoinAsString(",");
+        CurrentPage = e.Page;
+
+        await GetEntitiesAsync();
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    protected override async Task GetEntitiesAsync()
+    {
+        try
+        {
+            await UpdateGetListInputAsync();
+            // Use the dedicated method for employees to get their own surveys
+            var result = await AppService.GetMyAssignedSurveysAsync(GetListInput);
+            
+            Entities = result.Items.ToList();
+            TotalCount = (int)result.TotalCount;
+        }
+        catch (Exception ex)
+        {
+            await HandleErrorAsync(ex);
+        }
+    }
+
+    private void GoToAnswerPage(Guid id)
+    {
+        NavigationManager.NavigateTo($"/answer-survey/{id}");
+    }
+}
+

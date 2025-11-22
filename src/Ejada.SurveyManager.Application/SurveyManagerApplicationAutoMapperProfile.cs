@@ -1,8 +1,12 @@
 using AutoMapper;
+using Ejada.SurveyManager.Indicators;
+using Ejada.SurveyManager.Indicators.Dtos;
 using Ejada.SurveyManager.SurveyInstances;
 using Ejada.SurveyManager.SurveyInstances.Dtos;
 using Ejada.SurveyManager.Surveys;
 using Ejada.SurveyManager.Surveys.Dtos;
+
+//using Ejada.SurveyManager.Surveys.Dtos;
 using System;
 
 namespace Ejada.SurveyManager;
@@ -11,35 +15,34 @@ public class SurveyManagerApplicationAutoMapperProfile : Profile
 {
     public SurveyManagerApplicationAutoMapperProfile()
     {
+        // Survey mappings
         CreateMap<Survey, SurveyDto>()
             .ForMember(d => d.CreatedByUserId, opt => opt.MapFrom(s => s.CreatedByUserId));
         CreateMap<Survey, SurveyWithQuestionsDto>();
-        CreateMap<SurveyDto, UpdateSurveyDto>();
-        CreateMap<SurveyDto, CreateSurveyDto>();
-
-        // Question (Domain -> DTO)
+        
+        // UpdateSurveyDto -> Survey: Required by base class, but actual mapping done in MapToEntity override
+        CreateMap<UpdateSurveyDto, Survey>()
+            .ForAllMembers(opt => opt.Ignore());
+        
+        // Question mappings
         CreateMap<Question, QuestionDto>();
-
-        // Question (Create DTO -> Domain)
-        CreateMap<CreateQuestionDto, Question>()
-            .ConstructUsing(src =>
-                Question.Create(
-                    Guid.NewGuid(),
-                    src.Text,
-                    src.Type
-                ));
-
-        // Question (Update DTO -> Domain)
-        CreateMap<UpdateQuestionDto, Question>()
-            .ForAllMembers(opts =>
-                opts.Condition((src, dest, srcMember) => srcMember != null));
-
         CreateMap<Option, OptionDto>();
+        
+        // CreateQuestionDto -> Question: Required by base class, but actual mapping done in MapToEntityAsync override
+        CreateMap<CreateQuestionDto, Question>()
+            .ForAllMembers(opt => opt.Ignore());
+        
+        // UpdateQuestionDto -> Question: Required by base class, but actual mapping done in UpdateAsync override
+        CreateMap<UpdateQuestionDto, Question>()
+            .ForAllMembers(opt => opt.Ignore());
 
+        // SurveyInstance mappings
         CreateMap<SurveyInstance, SurveyInstanceDto>();
         CreateMap<Response, ResponseDto>();
-        /* You can configure your AutoMapper mapping configuration here.
-         * Alternatively, you can split your mapping configurations
-         * into multiple profile classes for a better organization. */
+
+        // Indicator mappings
+        CreateMap<Indicator, IndicatorDto>()
+            .ForMember(d => d.CreatedByUserId, opt => opt.MapFrom(s => s.CreatedByUserId))
+            .ForMember(d => d.QuestionIds, opt => opt.Ignore()); // Loaded separately in AppService
     }
 }

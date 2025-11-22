@@ -9,12 +9,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Ejada.SurveyManager.Blazor.Client.Navigation;
 using Localization.Resources.AbpUi;
+using Volo.Abp.AspNetCore.Components.Web;
 using Volo.Abp.Localization;
 using Ejada.SurveyManager.Localization;
 using OpenIddict.Abstractions;
 using Volo.Abp.AspNetCore.Components.Web.Theming.Routing;
 using Volo.Abp.Autofac.WebAssembly;
 using Volo.Abp.AutoMapper;
+using Volo.Abp.Http.Client;
 using Volo.Abp.Modularity;
 using Volo.Abp.UI.Navigation;
 using Volo.Abp.AspNetCore.Mvc.UI.Bundling;
@@ -59,6 +61,9 @@ public class SurveyManagerBlazorClientModule : AbpModule
             options.Resources
                 .Get<SurveyManagerResource>()
                 .AddBaseTypes(typeof(AbpUiResource));
+            
+            // Set default culture to English
+            options.DefaultResourceType = typeof(SurveyManagerResource);
         });
     }
 

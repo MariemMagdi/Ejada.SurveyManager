@@ -1,0 +1,140 @@
+@page "/questions/{Id:guid}/details"
+@using System.Linq
+@using Ejada.SurveyManager.Surveys
+@using Ejada.SurveyManager.Surveys.Dtos
+@using Ejada.SurveyManager.Indicators
+@using Ejada.SurveyManager.Indicators.Dtos
+@using Ejada.SurveyManager.Localization
+@using Volo.Abp.Application.Dtos
+@inject NavigationManager NavigationManager
+@inject IQuestionAppService QuestionService
+@inject IIndicatorAppService IndicatorAppService
+@inject Volo.Abp.AspNetCore.Components.Web.AbpBlazorMessageLocalizerHelper<SurveyManagerResource> LH
+
+@inherits AbpCrudPageBase<IQuestionAppService, QuestionDto, Guid, PagedAndSortedResultRequestDto, CreateQuestionDto, UpdateQuestionDto>
+
+<Card>
+    <CardHeader>
+        <Row class="justify-content-between">
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <h2>@L["QuestionDetails"]</h2>
+            </Column>
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <Button Color="Color.Secondary" Clicked="Back">
+                    @L["Back"]
+                </Button>
+            </Column>
+        </Row>
+    </CardHeader>
+
+    <CardBody>
+        @if (Question == null)
+        {
+            <p>@L["Loading"]...</p>
+        }
+        else
+        {
+            <div class="mb-3">
+                <h4>@Question.Text</h4>
+            </div>
+            <dl class="row">
+                <dt class="col-sm-3">@L["QuestionType"]</dt>
+                <dd class="col-sm-9">@Question.Type</dd>
+            </dl>
+
+            @if (Question.Options != null && Question.Options.Any())
+            {
+                <div class="mt-3">
+                    <h5>@L["Options"]</h5>
+                    <ul>
+                        @foreach (var option in Question.Options)
+                        {
+                            <li>
+                                <strong>@option.Type:</strong> @option.Label
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">@L["QuestionHasNoOptions"]</p>
+            }
+
+            <div class="mt-3">
+                <h5>@L["LinkedIndicators"]</h5>
+                @if (LinkedIndicators != null && LinkedIndicators.Any())
+                {
+                    <ul>
+                        @foreach (var indicator in LinkedIndicators)
+                        {
+                            <li>
+                                <strong>@indicator.Name</strong>
+                                @if (!string.IsNullOrEmpty(indicator.Description))
+                                {
+                                    <span class="text-muted"> - @indicator.Description</span>
+                                }
+                                @if (indicator.IsActive)
+                                {
+                                    <Badge Color="Color.Success" class="ms-2">@L["Active"]</Badge>
+                                }
+                                else
+                                {
+                                    <Badge Color="Color.Secondary" class="ms-2">@L["Inactive"]</Badge>
+                                }
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-muted">@L["NoIndicatorsLinked"]</p>
+                }
+            </div>
+
+            <div class="mt-3">
+                <Button Color="Color.Primary" Clicked="Edit">
+                    @L["Edit"]
+                </Button>
+                <Button Color="Color.Secondary" Clicked="Back" class="ms-2">
+                    @L["Back"]
+                </Button>
+            </div>
+        }
+    </CardBody>
+</Card>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private QuestionDto? Question { get; set; }
+    private List<IndicatorDto> LinkedIndicators { get; set; } = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Question = await QuestionService.GetAsync(Id);
+        
+        // Load linked indicators
+        if (Question.IndicatorIds != null && Question.IndicatorIds.Any())
+        {
+            var allIndicators = await IndicatorAppService.GetListAsync(new PagedAndSortedResultRequestDto { MaxResultCount = 1000 });
+            LinkedIndicators = allIndicators.Items.Where(i => Question.IndicatorIds.Contains(i.Id)).ToList();
+        }
+        else
+        {
+            LinkedIndicators = new List<IndicatorDto>();
+        }
+    }
+
+    private void Back()
+    {
+        NavigationManager.NavigateTo("/questions");
+    }
+
+    private void Edit()
+    {
+        NavigationManager.NavigateTo($"/questions/{Id}/edit");
+    }
+}
+

@@ -1,0 +1,149 @@
+@page "/survey-instances/create"
+@using Volo.Abp.Application.Dtos
+@using Ejada.SurveyManager.SurveyInstances
+@using Ejada.SurveyManager.SurveyInstances.Dtos
+@using Ejada.SurveyManager.Surveys
+@using Ejada.SurveyManager.Surveys.Dtos
+@using Ejada.SurveyManager.Localization
+@using Volo.Abp.Identity
+@inject NavigationManager NavigationManager
+@inject ISurveyInstanceAppService SurveyInstanceService
+@inject ISurveyAppService SurveyService
+@inject IIdentityUserAppService UserService
+@inject Volo.Abp.AspNetCore.Components.Web.AbpBlazorMessageLocalizerHelper<SurveyManagerResource> LH
+
+@inherits AbpComponentBase
+
+<Card>
+    <CardHeader>
+        <Row class="justify-content-between">
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <h2>@L["CreateSurveyInstance"]</h2>
+            </Column>
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <Button Color="Color.Secondary" Clicked="Back">
+                    @L["Back"]
+                </Button>
+            </Column>
+        </Row>
+    </CardHeader>
+
+    <CardBody>
+        <Form>
+            <Validations @ref="@CreateValidationsRef"
+                         Model="@NewEntity"
+                         ValidateOnLoad="false">
+                <Validation MessageLocalizer="@LH.Localize">
+                    <Field>
+                        <FieldLabel>@L["Survey"]</FieldLabel>
+                        <Select TValue="Guid" @bind-SelectedValue="NewEntity.SurveyId">
+                            <SelectItem Value="Guid.Empty">-- @L["SelectSurvey"] --</SelectItem>
+                            @foreach (var survey in Surveys)
+                            {
+                                <SelectItem Value="@survey.Id">@survey.Name</SelectItem>
+                            }
+                        </Select>
+                    </Field>
+                </Validation>
+
+                <Validation MessageLocalizer="@LH.Localize">
+                    <Field>
+                        <FieldLabel>@L["AssignToEmployee"]</FieldLabel>
+                        <Select TValue="Guid" @bind-SelectedValue="NewEntity.AssigneeUserId">
+                            <SelectItem Value="Guid.Empty">-- @L["SelectEmployee"] --</SelectItem>
+                            @foreach (var user in Users)
+                            {
+                                <SelectItem Value="@user.Id">@user.UserName (@user.Email)</SelectItem>
+                            }
+                        </Select>
+                    </Field>
+                </Validation>
+
+                <Field>
+                    <FieldLabel>@L["DueDate"] (@L["Optional"])</FieldLabel>
+                    <DateEdit TValue="DateTime?" @bind-Date="NewEntity.DueDate" />
+                    <FieldHelp>@L["LeaveDueDateEmpty"]</FieldHelp>
+                </Field>
+            </Validations>
+
+            <div class="mt-3">
+                <Button Color="Color.Secondary" Clicked="Back">
+                    @L["Cancel"]
+                </Button>
+
+                <Button Color="Color.Primary"
+                        Type="@ButtonType.Submit"
+                        PreventDefaultOnSubmit="true"
+                        Clicked="CreateSurveyInstanceAsync">
+                    @L["Assign"]
+                </Button>
+            </div>
+        </Form>
+    </CardBody>
+</Card>
+
+@code {
+    private Validations? CreateValidationsRef;
+    private CreateSurveyInstanceDto NewEntity { get; set; } = new();
+    private List<SurveyDto> Surveys { get; set; } = new();
+    private List<IdentityUserDto> Users { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSurveysAsync();
+        await LoadUsersAsync();
+    }
+
+    private async Task LoadSurveysAsync()
+    {
+        var result = await SurveyService.GetListAsync(new PagedAndSortedResultRequestDto { MaxResultCount = 1000 });
+        Surveys = result.Items.Where(s => s.IsActive).ToList();
+    }
+
+    private async Task LoadUsersAsync()
+    {
+        var result = await UserService.GetListAsync(new GetIdentityUsersInput { MaxResultCount = 1000 });
+        
+        // Filter to only show users with "Employee" role
+        var allUsers = result.Items.ToList();
+        Users = new List<IdentityUserDto>();
+        
+        foreach (var user in allUsers)
+        {
+            var roles = await UserService.GetRolesAsync(user.Id);
+            if (roles.Items.Any(r => r.Name == "Employee"))
+            {
+                Users.Add(user);
+            }
+        }
+    }
+
+    private async Task CreateSurveyInstanceAsync()
+    {
+        if (CreateValidationsRef != null && !await CreateValidationsRef.ValidateAll())
+        {
+            return;
+        }
+
+        if (NewEntity.SurveyId == Guid.Empty)
+        {
+            // Show error message
+            return;
+        }
+
+        if (NewEntity.AssigneeUserId == Guid.Empty)
+        {
+            // Show error message
+            return;
+        }
+
+        await SurveyInstanceService.CreateAsync(NewEntity);
+        NavigationManager.NavigateTo("/survey-instances");
+    }
+
+    private void Back()
+    {
+        NavigationManager.NavigateTo("/survey-instances");
+    }
+}
+

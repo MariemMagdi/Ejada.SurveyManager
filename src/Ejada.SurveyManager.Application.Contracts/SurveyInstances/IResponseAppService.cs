@@ -37,5 +37,11 @@ namespace Ejada.SurveyManager.SurveyInstances
         Task SubmitSurveyInstanceAsync(Guid surveyInstanceId);
         Task SaveAndSubmitResponsesBulkAsync(SaveResponsesBulkDto input);
 
+        /// <summary>
+        /// Get all responses for a specific question (for admin/auditor to view indicator statistics).
+        /// Returns responses across all survey instances.
+        /// </summary>
+        Task<List<QuestionResponseSummaryDto>> GetResponsesByQuestionIdAsync(Guid questionId);
+
     }
 }

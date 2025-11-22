@@ -14,6 +14,8 @@ namespace Ejada.SurveyManager.Surveys.Dtos
         public string Text { get; set; } = string.Empty;
         public QuestionType Type { get;  set; }
         public List<OptionDto> Options { get; set; } = new();
+        public bool IsLinkedToSurvey { get; set; }
+        public List<Guid> IndicatorIds { get; set; } = new();
     }
 
     public class CreateQuestionDto
@@ -23,7 +25,8 @@ namespace Ejada.SurveyManager.Surveys.Dtos
         public string Text { get; set; } = string.Empty;
         [Required]
         public QuestionType Type { get;  set; }
-        public List<CreateOptionDto>? Options { get; set; } 
+        public List<CreateOptionDto>? Options { get; set; }
+        public List<Guid> IndicatorIds { get; set; } = new();
     }
 
     public class UpdateQuestionDto
@@ -34,5 +37,6 @@ namespace Ejada.SurveyManager.Surveys.Dtos
         [Required]
         public QuestionType Type { get; set; }
         public List<UpdateOptionDto>? Options { get; set; }
+        public List<Guid> IndicatorIds { get; set; } = new();
     }
 }

@@ -1,4 +1,6 @@
-﻿using Ejada.SurveyManager.Surveys.Dtos;
+﻿using Ejada.SurveyManager.Permissions;
+using Ejada.SurveyManager.Surveys.Dtos;
+using Ejada.SurveyManager.Surveys.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,14 +40,17 @@ namespace Ejada.SurveyManager.Surveys
             _surveyQuestionRepository = surveyQuestionRepository;
             _optionRepository = optionRepository;
 
-            //GetPolicyName = "Surveys.Default";
-            //GetListPolicyName = "Surveys.Default";
+            GetPolicyName = SurveyManagerPermissions.Surveys.Default;
+            GetListPolicyName = SurveyManagerPermissions.Surveys.Default;
+            CreatePolicyName = SurveyManagerPermissions.Surveys.Create;
+            UpdatePolicyName = SurveyManagerPermissions.Surveys.Edit;
+            DeletePolicyName = SurveyManagerPermissions.Surveys.Delete;
             //CreatePolicyName = "Surveys.Create";
             //UpdatePolicyName = "Surveys.Update";
             //DeletePolicyName = "Surveys.Delete";
         }
 
-        protected override async Task<Survey> MapToEntityAsync(CreateSurveyDto createInput)
+        protected override Task<Survey> MapToEntityAsync(CreateSurveyDto createInput)
         {
             //if (CurrentUser == null || CurrentUser.Id == null)
             //    throw new BusinessException("Survey.CreatorId.MissingUser");
@@ -56,25 +61,68 @@ namespace Ejada.SurveyManager.Surveys
                 createInput.TargetAudience,
                 createInput.IsActive);
 
-            return survey;
+            return Task.FromResult(survey);
+        }
+
+        protected override void MapToEntity(UpdateSurveyDto updateInput, Survey entity)
+        {
+            entity.SetName(updateInput.Name);
+            entity.SetPurpose(updateInput.Purpose ?? string.Empty);
+            entity.SetTargetAudience(updateInput.TargetAudience ?? string.Empty);
+            if (updateInput.IsActive)
+                entity.Activate();
+            else
+                entity.Deactivate();
         }
 
         public override async Task<SurveyDto> CreateAsync(CreateSurveyDto input)
         {
+            // First create the survey
             var surveyDto = await base.CreateAsync(input);
+            var questionIdsToLink = new List<Guid>();
 
+            // Handle existing questions
             if(input.ExistingQuestionIds!=null && input.ExistingQuestionIds.Any())
             {
-                var links = input.ExistingQuestionIds
+                questionIdsToLink.AddRange(input.ExistingQuestionIds.Distinct());
+            }
+
+            // Handle new inline questions
+            if(input.NewQuestions != null && input.NewQuestions.Any())
+            {
+                foreach(var newQ in input.NewQuestions)
+                {
+                    // Create and insert question
+                    var questionId = GuidGenerator.Create();
+                    var question = Question.Create(questionId, newQ.Text, newQ.Type);
+                    
+                    await _questionRepository.InsertAsync(question, autoSave: true);
+                    
+                    // Handle options for choice-type questions
+                    if(newQ.Options != null && newQ.Options.Any() && 
+                       (newQ.Type == QuestionType.SingleChoice || newQ.Type == QuestionType.MultiChoice))
+                    {
+                        var options = newQ.Options.Select(o => 
+                            Option.Create(GuidGenerator.Create(), questionId, o.Label, o.Type)
+                        ).ToList();
+                        
+                        await _optionRepository.InsertManyAsync(options, autoSave: true);
+                    }
+                    
+                    questionIdsToLink.Add(questionId);
+                }
+            }
+
+            // Link all questions to survey
+            if(questionIdsToLink.Any())
+            {
+                var links = questionIdsToLink
                     .Distinct()
                     .Select(qId => new SurveyQuestion(
                         GuidGenerator.Create(), surveyDto.Id, qId))
                     .ToList();
 
-                if (links.Any())
-                {
-                    await _surveyQuestionRepository.InsertManyAsync(links, autoSave: true);
-                }
+                await _surveyQuestionRepository.InsertManyAsync(links, autoSave: true);
             }
 
             return surveyDto;
@@ -83,6 +131,7 @@ namespace Ejada.SurveyManager.Surveys
         public override async Task<SurveyDto> UpdateAsync(Guid id, UpdateSurveyDto input)
         {
             var surveyDto = await base.UpdateAsync(id, input);
+            var questionIdsToAttach = new List<Guid>();
 
             //Handle detaching questions (remove links)
             if(input.DetachQuestionIds != null && input.DetachQuestionIds.Any())
@@ -98,17 +147,81 @@ namespace Ejada.SurveyManager.Surveys
                 }
             }
 
-            //Handle attaching questions (add links if not already linked)
+            //Handle attaching existing questions
             if(input.AttachQuestionIds != null && input.AttachQuestionIds.Any())
             {
-                var attachIds = input.AttachQuestionIds.Distinct().ToList();
+                questionIdsToAttach.AddRange(input.AttachQuestionIds.Distinct());
+            }
 
+            // Handle new inline questions
+            if(input.NewQuestions != null && input.NewQuestions.Any())
+            {
+                foreach(var newQ in input.NewQuestions)
+                {
+                    var questionId = GuidGenerator.Create();
+                    var question = Question.Create(questionId, newQ.Text, newQ.Type);
+                    
+                    await _questionRepository.InsertAsync(question, autoSave: true);
+                    
+                    // Handle options for choice-type questions
+                    if(newQ.Options != null && newQ.Options.Any() && 
+                       (newQ.Type == QuestionType.SingleChoice || newQ.Type == QuestionType.MultiChoice))
+                    {
+                        var options = newQ.Options.Select(o => 
+                            Option.Create(GuidGenerator.Create(), questionId, o.Label, o.Type)
+                        ).ToList();
+                        
+                        await _optionRepository.InsertManyAsync(options, autoSave: true);
+                    }
+                    
+                    questionIdsToAttach.Add(questionId);
+                }
+            }
+
+            // Handle updating existing questions (creates new question entity with updated data)
+            if(input.UpdateQuestions != null && input.UpdateQuestions.Any())
+            {
+                foreach(var updateQ in input.UpdateQuestions)
+                {
+                    // Create a NEW question with the updated data
+                    var newQuestionId = GuidGenerator.Create();
+                    var newQuestion = Question.Create(newQuestionId, updateQ.Text, updateQ.Type);
+                    
+                    await _questionRepository.InsertAsync(newQuestion, autoSave: true);
+                    
+                    // Handle options
+                    if(updateQ.Options != null && updateQ.Options.Any() && 
+                       (updateQ.Type == QuestionType.SingleChoice || updateQ.Type == QuestionType.MultiChoice))
+                    {
+                        var options = updateQ.Options.Select(o => 
+                            Option.Create(GuidGenerator.Create(), newQuestionId, o.Label, o.Type)
+                        ).ToList();
+                        
+                        await _optionRepository.InsertManyAsync(options, autoSave: true);
+                    }
+                    
+                    // Detach old question
+                    var oldLink = await _surveyQuestionRepository.FirstOrDefaultAsync(
+                        sq => sq.SurveyId == id && sq.QuestionId == updateQ.Id);
+                    if(oldLink != null)
+                    {
+                        await _surveyQuestionRepository.DeleteAsync(oldLink, autoSave: true);
+                    }
+                    
+                    // Attach new question
+                    questionIdsToAttach.Add(newQuestionId);
+                }
+            }
+
+            // Attach all new/updated questions
+            if(questionIdsToAttach.Any())
+            {
                 //Finding existing links
                 var existingLinks = await _surveyQuestionRepository.GetListAsync(
-                    sq => sq.SurveyId == id && attachIds.Contains(sq.QuestionId));
+                    sq => sq.SurveyId == id && questionIdsToAttach.Contains(sq.QuestionId));
                 var alreadyLinkedIds = existingLinks.Select(sq => sq.QuestionId).ToHashSet();
 
-                var newLinks = attachIds
+                var newLinks = questionIdsToAttach
                     .Where(qId => !alreadyLinkedIds.Contains(qId))
                     .Select(qId => new SurveyQuestion(
                         GuidGenerator.Create(), id, qId))

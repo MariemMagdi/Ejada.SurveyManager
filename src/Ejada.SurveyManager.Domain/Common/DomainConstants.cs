@@ -14,5 +14,7 @@ namespace Ejada.SurveyManager.Common
         public const int QuestionTextMaxLength = 1024;
         public const int OptionLabelMaxLength = 256;
 
+        public const int IndicatorNameMaxLength = 200;
+        public const int IndicatorDescriptionMaxLength = 1000;
     }
 }

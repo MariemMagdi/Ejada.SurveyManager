@@ -16,5 +16,6 @@ namespace Ejada.SurveyManager.Surveys
         CreateQuestionDto, 
         UpdateQuestionDto>
     {
+        Task<List<string>> GetLinkedSurveyNamesAsync(Guid questionId);
     }
 }

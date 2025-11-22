@@ -1,0 +1,253 @@
+@page "/questions/create"
+@using System.Collections.Generic
+@using Ejada.SurveyManager.Surveys
+@using Ejada.SurveyManager.Surveys.Dtos
+@using Ejada.SurveyManager.Surveys.Enums
+@using Ejada.SurveyManager.Indicators
+@using Ejada.SurveyManager.Indicators.Dtos
+@using Ejada.SurveyManager.Localization
+@using Volo.Abp.Application.Dtos
+@inject NavigationManager NavigationManager
+@inject IQuestionAppService QuestionService
+@inject IIndicatorAppService IndicatorAppService
+@inject Volo.Abp.AspNetCore.Components.Web.AbpBlazorMessageLocalizerHelper<SurveyManagerResource> LH
+
+@inherits AbpCrudPageBase<IQuestionAppService, QuestionDto, Guid, PagedAndSortedResultRequestDto, CreateQuestionDto, UpdateQuestionDto>
+
+<Card>
+    <CardHeader>
+        <Row class="justify-content-between">
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <h2>@L["NewQuestion"]</h2>
+            </Column>
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <Button Color="Color.Secondary" Clicked="Back">
+                    @L["Back"]
+                </Button>
+            </Column>
+        </Row>
+    </CardHeader>
+
+    <CardBody>
+        <Form>
+            <Validations @ref="@CreateValidationsRef"
+                         Model="@NewEntity"
+                         ValidateOnLoad="false"
+                         @key="NewEntity">
+                <Validation MessageLocalizer="@LH.Localize">
+                    <Field>
+                        <FieldLabel>@L["QuestionText"]</FieldLabel>
+                        <TextEdit @bind-Text="NewEntity.Text">
+                            <Feedback>
+                                <ValidationError />
+                            </Feedback>
+                        </TextEdit>
+                    </Field>
+                </Validation>
+
+                <Field>
+                    <FieldLabel>@L["QuestionType"]</FieldLabel>
+                    <InputSelect TValue="QuestionType"
+                                 Value="NewEntity.Type"
+                                 ValueChanged="@(EventCallback.Factory.Create<QuestionType>(this, OnCreateTypeChanged))"
+                                 ValueExpression="() => NewEntity.Type"
+                                 class="form-select">
+                        @foreach (var type in QuestionTypes)
+                        {
+                            <option value="@type">@type</option>
+                        }
+                    </InputSelect>
+                </Field>
+
+                @if (CreateRequiresOptions)
+                {
+                    <Field>
+                        <FieldLabel>@L["Options"]</FieldLabel>
+                        <div class="mb-2">
+                            @for (var i = 0; i < CreateOptionInputs.Count; i++)
+                            {
+                                var option = CreateOptionInputs[i];
+                                var currentIndex = i; // Capture the index in a local variable
+                                <Row class="align-items-end mb-2" @key="option">
+                                    <Column>
+                                        <TextEdit @bind-Text="option.Label"
+                                                  Placeholder="@L["OptionLabel"]" />
+                                    </Column>
+                                    <Column ColumnSize="ColumnSize.IsAuto">
+                                        <InputSelect @bind-Value="option.Type" class="form-select">
+                                            @foreach (var dataType in OptionDataTypes)
+                                            {
+                                                <option value="@dataType">@dataType</option>
+                                            }
+                                        </InputSelect>
+                                    </Column>
+                                    <Column ColumnSize="ColumnSize.IsAuto">
+                                        <Button Color="Color.Danger"
+                                                Disabled="@(CreateOptionInputs.Count <= 1)"
+                                                Clicked="@(() => RemoveCreateOption(currentIndex))">
+                                            @L["Remove"]
+                                        </Button>
+                                    </Column>
+                                </Row>
+                            }
+                        </div>
+                        <Button Color="Color.Secondary" Clicked="AddCreateOption">
+                            @L["AddOption"]
+                        </Button>
+                    </Field>
+                }
+
+                <Field>
+                    <FieldLabel>@L["LinkedIndicators"]</FieldLabel>
+                    @if (AllIndicators != null && AllIndicators.Any())
+                    {
+                        <div style="max-height: 200px; overflow-y: auto; border: 1px solid #dee2e6; padding: 10px; border-radius: 4px;">
+                            @foreach (var indicator in AllIndicators)
+                            {
+                                <Check TValue="bool" 
+                                       Checked="@NewEntity.IndicatorIds.Contains(indicator.Id)"
+                                       CheckedChanged="@((bool isChecked) => OnIndicatorSelectionChanged(indicator.Id, isChecked))">
+                                    <strong>@indicator.Name</strong>
+                                    @if (!string.IsNullOrEmpty(indicator.Description))
+                                    {
+                                        <span class="text-muted"> - @indicator.Description</span>
+                                    }
+                                </Check>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <Alert Color="Color.Info" Visible>
+                            @L["NoIndicatorsAvailable"]
+                        </Alert>
+                    }
+                </Field>
+            </Validations>
+
+            <div class="mt-3">
+                <Button Color="Color.Secondary" Clicked="Back">
+                    @L["Cancel"]
+                </Button>
+
+                <Button Color="Color.Primary"
+                        Type="@ButtonType.Submit"
+                        PreventDefaultOnSubmit="true"
+                        Clicked="CreateQuestionAsync">
+                    @L["Save"]
+                </Button>
+            </div>
+        </Form>
+    </CardBody>
+</Card>
+
+@code {
+    private List<CreateOptionDto> CreateOptionInputs { get; set; } = new();
+    private List<IndicatorDto> AllIndicators { get; set; } = new();
+
+    private static IEnumerable<QuestionType> QuestionTypes => Enum.GetValues<QuestionType>();
+    private static IEnumerable<OptionDataType> OptionDataTypes => Enum.GetValues<OptionDataType>();
+
+    private bool CreateRequiresOptions => RequiresOptionsForType(NewEntity?.Type ?? QuestionType.SingleChoice);
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        if (NewEntity != null && !Enum.IsDefined(typeof(QuestionType), NewEntity.Type))
+        {
+            NewEntity.Type = QuestionType.SingleChoice;
+        }
+        EnsureCreateOptionDefaults();
+        await LoadAllIndicatorsAsync();
+    }
+
+    private async Task LoadAllIndicatorsAsync()
+    {
+        var result = await IndicatorAppService.GetListAsync(new PagedAndSortedResultRequestDto { MaxResultCount = 1000 });
+        AllIndicators = result.Items.ToList();
+    }
+
+    private void OnIndicatorSelectionChanged(Guid indicatorId, bool isChecked)
+    {
+        if (isChecked)
+        {
+            if (!NewEntity.IndicatorIds.Contains(indicatorId))
+            {
+                NewEntity.IndicatorIds.Add(indicatorId);
+            }
+        }
+        else
+        {
+            NewEntity.IndicatorIds.Remove(indicatorId);
+        }
+    }
+
+    private static bool RequiresOptionsForType(QuestionType type)
+    {
+        return type == QuestionType.SingleChoice || type == QuestionType.MultiChoice;
+    }
+
+    private void EnsureCreateOptionDefaults()
+    {
+        if (CreateRequiresOptions && CreateOptionInputs.Count == 0)
+        {
+            CreateOptionInputs.Add(new CreateOptionDto());
+        }
+
+        if (!CreateRequiresOptions && CreateOptionInputs.Count > 0)
+        {
+            CreateOptionInputs.Clear();
+        }
+
+        if (NewEntity != null)
+        {
+            NewEntity.Options = CreateRequiresOptions ? CreateOptionInputs : null;
+        }
+    }
+
+    private Task OnCreateTypeChanged(QuestionType newType)
+    {
+        if (NewEntity != null)
+        {
+            NewEntity.Type = newType;
+        }
+        EnsureCreateOptionDefaults();
+        return Task.CompletedTask;
+    }
+
+    private void AddCreateOption()
+    {
+        CreateOptionInputs.Add(new CreateOptionDto());
+        EnsureCreateOptionDefaults();
+    }
+
+    private void RemoveCreateOption(int index)
+    {
+        if (index >= 0 && index < CreateOptionInputs.Count)
+        {
+            CreateOptionInputs.RemoveAt(index);
+        }
+        EnsureCreateOptionDefaults();
+    }
+
+    private async Task CreateQuestionAsync()
+    {
+        EnsureCreateOptionDefaults();
+        await CreateEntityAsync();
+    }
+
+    protected override Task OnCreatedEntityAsync()
+    {
+        CreateValidationsRef?.ClearAll();
+        NewEntity = new CreateQuestionDto();
+        CreateOptionInputs = new List<CreateOptionDto> { new CreateOptionDto() };
+        NavigationManager.NavigateTo("/questions");
+        return Task.CompletedTask;
+    }
+
+    private void Back()
+    {
+        NavigationManager.NavigateTo("/questions");
+    }
+}
+

@@ -45,7 +45,7 @@ public class SurveyManagerDomainSharedModule : AbpModule
         Configure<AbpLocalizationOptions>(options =>
         {
             options.Resources
-                .Add<SurveyManagerResource>("ar")
+                .Add<SurveyManagerResource>("en")
                 .AddBaseTypes(typeof(AbpValidationResource))
                 .AddVirtualJson("/Localization/SurveyManager");
 

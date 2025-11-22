@@ -1,0 +1,104 @@
+@page "/questions"
+@using Volo.Abp.Application.Dtos
+@using Ejada.SurveyManager.Surveys
+@using Ejada.SurveyManager.Surveys.Dtos
+@using Ejada.SurveyManager.Localization
+@inject NavigationManager NavigationManager
+@inject IQuestionAppService QuestionService
+@inject Volo.Abp.AspNetCore.Components.Web.AbpBlazorMessageLocalizerHelper<SurveyManagerResource> LH
+
+@inherits AbpCrudPageBase<IQuestionAppService, QuestionDto, Guid, PagedAndSortedResultRequestDto, CreateQuestionDto, UpdateQuestionDto>
+
+<Card>
+    <CardHeader>
+        <Row class="justify-content-between">
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <h2>@L["Questions"]</h2>
+            </Column>
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <Button Color="Color.Primary"
+                        Clicked="GoToCreatePage">
+                    @L["NewQuestion"]
+                </Button>
+            </Column>
+        </Row>
+    </CardHeader>
+
+    <CardBody>
+        <DataGrid TItem="QuestionDto"
+                  Data="Entities"
+                  ReadData="OnDataGridReadAsync"
+                  TotalItems="TotalCount"
+                  ShowPager="true"
+                  PageSize="PageSize"
+                  ShowFilterRow="true"
+                  Striped="true">
+            <DataGridColumns>
+                <DataGridColumn TItem="QuestionDto" Field="@nameof(QuestionDto.Text)" Caption="@L["QuestionText"]" />
+                <DataGridColumn TItem="QuestionDto" Caption="@L["QuestionType"]">
+                    <DisplayTemplate Context="context">
+                        @context.Type.ToString()
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridColumn TItem="QuestionDto" Caption="@L["Options"]">
+                    <DisplayTemplate Context="context">
+                        @(context.Options?.Count ?? 0)
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridColumn TItem="QuestionDto" Caption="@L["Status"]">
+                    <DisplayTemplate Context="context">
+                        @if (context.IsLinkedToSurvey)
+                        {
+                            <span class="badge bg-warning">@L["LinkedToSurvey"]</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">@L["Editable"]</span>
+                        }
+                    </DisplayTemplate>
+                </DataGridColumn>
+
+                <DataGridEntityActionsColumn TItem="QuestionDto" @ref="@EntityActionsColumn" Caption="@L["Actions"]">
+                    <DisplayTemplate Context="context">
+                        <EntityActions TItem="QuestionDto" EntityActionsColumn="@EntityActionsColumn">
+                            <EntityAction TItem="QuestionDto"
+                                          Text="@L["Edit"]"
+                                          Visible="@(!context.IsLinkedToSurvey)"
+                                          Clicked="() => GoToEditPage(context.Id)" />
+                            <EntityAction TItem="QuestionDto"
+                                          Text="@L["ViewDetails"]"
+                                          Clicked="() => GoToDetailsPage(context.Id)" />
+                            <EntityAction TItem="QuestionDto"
+                                          Text="@L["Delete"]"
+                                          Visible="@(!context.IsLinkedToSurvey)"
+                                          Clicked="() => DeleteEntityAsync(context)"
+                                          ConfirmationMessage="() => GetDeleteConfirmationMessage(context)" />
+                        </EntityActions>
+                    </DisplayTemplate>
+                </DataGridEntityActionsColumn>
+            </DataGridColumns>
+        </DataGrid>
+    </CardBody>
+</Card>
+
+@code {
+    private void GoToCreatePage()
+    {
+        NavigationManager.NavigateTo("/questions/create");
+    }
+
+    private void GoToEditPage(Guid id)
+    {
+        NavigationManager.NavigateTo($"/questions/{id}/edit");
+    }
+
+    private void GoToDetailsPage(Guid id)
+    {
+        NavigationManager.NavigateTo($"/questions/{id}/details");
+    }
+
+    protected override string GetDeleteConfirmationMessage(QuestionDto entity)
+    {
+        return string.Format(L["QuestionDeletionConfirmationMessage"], entity.Text);
+    }
+}

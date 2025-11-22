@@ -31,9 +31,21 @@ namespace Ejada.SurveyManager.Surveys.Dtos
     public class CreateQuestionInSurveyDto
     {
         [Required]
+        [StringLength(1024)]
         public string Text { get; set; } = string.Empty;
 
         [Required]
         public QuestionType Type { get; set; }
+        
+        public List<CreateOptionInQuestionDto>? Options { get; set; }
+    }
+    
+    public class CreateOptionInQuestionDto
+    {
+        [Required]
+        [StringLength(256)]
+        public string Label { get; set; } = string.Empty;
+        
+        public OptionDataType Type { get; set; } = OptionDataType.String;
     }
 }

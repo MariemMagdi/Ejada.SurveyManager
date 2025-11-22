@@ -1,4 +1,5 @@
-﻿using Ejada.SurveyManager.Surveys;
+﻿using Ejada.SurveyManager.EntityFrameworkCore.Helpers;
+using Ejada.SurveyManager.Surveys;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
@@ -13,13 +14,20 @@ namespace Ejada.SurveyManager.EntityConfigurations
     {
         public void Configure(EntityTypeBuilder<SurveyQuestion> builder) 
         {
-            builder.ToTable("SurveyQuestions");
+            builder.ToTable(NamingHelper.ToPascalSnakeCase(nameof(SurveyQuestion)));
 
             builder.HasKey(sq => sq.Id);
 
-            builder.Property(sq => sq.SurveyId).IsRequired();
+            builder.Property(sq => sq.Id)
+                .HasColumnName(NamingHelper.ToPascalSnakeCase(nameof(SurveyQuestion.Id)));
 
-            builder.Property(sq => sq.QuestionId).IsRequired();
+            builder.Property(sq => sq.SurveyId)
+                .IsRequired()
+                .HasColumnName(NamingHelper.ToPascalSnakeCase(nameof(SurveyQuestion.SurveyId)));
+
+            builder.Property(sq => sq.QuestionId)
+                .IsRequired()
+                .HasColumnName(NamingHelper.ToPascalSnakeCase(nameof(SurveyQuestion.QuestionId)));
 
             builder.HasIndex(sq => new { sq.SurveyId, sq.QuestionId })
                 .IsUnique();

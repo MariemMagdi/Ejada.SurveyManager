@@ -1,8 +1,10 @@
-﻿using Ejada.SurveyManager.SurveyInstances.Dtos;
+﻿using Ejada.SurveyManager.Permissions;
+using Ejada.SurveyManager.SurveyInstances.Dtos;
 using Ejada.SurveyManager.SurveyInstances.Enums;
 using Ejada.SurveyManager.Surveys;
 using Ejada.SurveyManager.Surveys.Dtos;
 using Ejada.SurveyManager.Surveys.Enums;
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,13 +47,9 @@ namespace Ejada.SurveyManager.SurveyInstances
             _surveyQuestionRepository = surveyQuestionRepository;
             _optionRepository = optionRepository;
             _responseOptionRepository = responseOptionRepository;
-            // GetPolicyName = "Response.Default";
-            // GetListPolicyName = "Response.Default";
-            // CreatePolicyName = "Response.Create";
-            // UpdatePolicyName = "Response.Update";
-            // DeletePolicyName = "Response.Delete";
         }
 
+        [Authorize(SurveyManagerPermissions.Responses.Answer)]
         public async Task SaveResponsesBulkAsync(SaveResponsesBulkDto input)
         {
             //load instance 
@@ -137,6 +135,7 @@ namespace Ejada.SurveyManager.SurveyInstances
             }
         }
 
+        [Authorize(SurveyManagerPermissions.Responses.ViewAll)]
         public virtual async Task<List<ResponseDto>> GetResponsesForInstanceAsync(Guid surveyInstanceId) 
         {
             var instance = await _surveyInstanceRepository.GetAsync(surveyInstanceId);
@@ -176,6 +175,7 @@ namespace Ejada.SurveyManager.SurveyInstances
             return dtos;
         }
 
+        [Authorize(SurveyManagerPermissions.Responses.ViewAll)]
         public virtual async Task<ResponseDto> GetResponseAsync(Guid id) 
         {
             var response = await _responseRepository.GetAsync(id);
@@ -207,6 +207,7 @@ namespace Ejada.SurveyManager.SurveyInstances
             return dto;
         }
 
+        [Authorize(SurveyManagerPermissions.Responses.ViewOwn)]
         public virtual async Task<SurveyInstanceForAnsweringDto> GetSurveyInstanceForAnsweringAsync(Guid surveyInstanceId) 
         {
             var instance = await _surveyInstanceRepository.GetAsync(surveyInstanceId);
@@ -303,6 +304,7 @@ namespace Ejada.SurveyManager.SurveyInstances
             return result;
         }
 
+        [Authorize(SurveyManagerPermissions.Responses.Submit)]
         public async Task SubmitSurveyInstanceAsync(Guid surveyInstanceId)
         {
             // 1) Load instance and quick checks
@@ -413,6 +415,7 @@ namespace Ejada.SurveyManager.SurveyInstances
             await _surveyInstanceRepository.UpdateAsync(instance, autoSave: true);
         }
 
+        [Authorize(SurveyManagerPermissions.Responses.Submit)]
         [UnitOfWork] // ensures both save + submit happen in a single transaction
         public virtual async Task SaveAndSubmitResponsesBulkAsync(SaveResponsesBulkDto input)
         {
@@ -543,6 +546,43 @@ namespace Ejada.SurveyManager.SurveyInstances
                     .WithData("ProvidedOptionCount", optionIds.Count)
                     .WithData("ValidOptionCount", options.Count);
             }
+        }
+
+        [Authorize(SurveyManagerPermissions.Indicators.ViewAll)]
+        public async Task<List<QuestionResponseSummaryDto>> GetResponsesByQuestionIdAsync(Guid questionId)
+        {
+            // Get all responses for this question
+            var responses = await _responseRepository.GetListAsync(r => r.QuestionId == questionId);
+
+            if (!responses.Any())
+            {
+                return new List<QuestionResponseSummaryDto>();
+            }
+
+            // Get survey instance IDs to check their status
+            var surveyInstanceIds = responses.Select(r => r.SurveyInstanceId).Distinct().ToList();
+            var surveyInstances = await _surveyInstanceRepository.GetListAsync(si => surveyInstanceIds.Contains(si.Id));
+            var instanceStatusMap = surveyInstances.ToDictionary(si => si.Id, si => si.Status);
+
+            // Get response options for multi-choice questions
+            var responseIds = responses.Select(r => r.Id).ToList();
+            var responseOptions = await _responseOptionRepository.GetListAsync(ro => responseIds.Contains(ro.ResponseId));
+            var responseOptionsMap = responseOptions.GroupBy(ro => ro.ResponseId)
+                .ToDictionary(g => g.Key, g => g.Select(ro => ro.OptionId).ToList());
+
+            // Build summary DTOs
+            var summaries = responses.Select(r => new QuestionResponseSummaryDto
+            {
+                ResponseId = r.Id,
+                SurveyInstanceId = r.SurveyInstanceId,
+                AnswerValue = r.AnswerValue,
+                SelectedOptionIds = responseOptionsMap.ContainsKey(r.Id) ? responseOptionsMap[r.Id] : new List<Guid>(),
+                IsSubmitted = instanceStatusMap.ContainsKey(r.SurveyInstanceId) && 
+                              instanceStatusMap[r.SurveyInstanceId] == SurveyInstanceStatus.Submitted,
+                CreationTime = r.CreationTime
+            }).ToList();
+
+            return summaries;
         }
     }
 }

@@ -34,18 +34,18 @@
                   ShowFilterRow="true"
                   Striped="true">
             <DataGridColumns>
-                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.Name)" Caption="@L["Name"]" />
+                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.Name)" Caption="@L["SurveyName"]" />
                 <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.Purpose)" Caption="@L["Purpose"]" />
                 <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.TargetAudience)" Caption="@L["TargetAudience"]" />
-                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.IsActive)" Caption="@L["Active"]">
+                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.IsActive)" Caption="@L["IsActive"]">
                     <DisplayTemplate Context="context">
                         @if (context.IsActive)
                         {
-                            <span class="badge bg-success">Active</span>
+                            <span class="badge bg-success">@L["Active"]</span>
                         }
                         else
                         {
-                            <span class="badge bg-secondary">Inactive</span>
+                            <span class="badge bg-secondary">@L["Inactive"]</span>
                         }
                     </DisplayTemplate>
                 </DataGridColumn>
@@ -57,8 +57,12 @@
                                           Text="@L["Edit"]"
                                           Clicked="() => GoToEditPage(context.Id)" />
                             <EntityAction TItem="SurveyDto"
-                                          Text="@L["Details"]"
+                                          Text="@L["ViewDetails"]"
                                           Clicked="() => GoToDetailsPage(context.Id)" />
+                            <EntityAction TItem="SurveyDto"
+                                          Text="@L["Delete"]"
+                                          Clicked="() => DeleteEntityAsync(context)"
+                                          ConfirmationMessage="() => GetDeleteConfirmationMessage(context)" />
                         </EntityActions>
                     </DisplayTemplate>
                 </DataGridEntityActionsColumn>
@@ -68,8 +72,7 @@
 </Card>
 
 @code {
-
-private void GoToCreatePage()
+    private void GoToCreatePage()
     {
         NavigationManager.NavigateTo("/surveys/create");
     }
@@ -82,5 +85,10 @@ private void GoToCreatePage()
     private void GoToDetailsPage(Guid id)
     {
         NavigationManager.NavigateTo($"/surveys/{id}/details");
+    }
+
+    protected override string GetDeleteConfirmationMessage(SurveyDto entity)
+    {
+        return string.Format(L["SurveyDeletionConfirmationMessage"], entity.Name);
     }
 }

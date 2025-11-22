@@ -1,0 +1,243 @@
+@page "/indicators/{Id:guid}/details"
+@using Ejada.SurveyManager.Indicators
+@using Ejada.SurveyManager.Indicators.Dtos
+@using Ejada.SurveyManager.Surveys
+@using Ejada.SurveyManager.Surveys.Dtos
+@using Ejada.SurveyManager.SurveyInstances
+@using Ejada.SurveyManager.SurveyInstances.Dtos
+@using Ejada.SurveyManager.Surveys.Enums
+@using Ejada.SurveyManager.Localization
+@using Ejada.SurveyManager.Permissions
+@using Microsoft.AspNetCore.Authorization
+@using Volo.Abp.Application.Dtos
+@inject IIndicatorAppService IndicatorAppService
+@inject IQuestionAppService QuestionAppService
+@inject IResponseAppService ResponseAppService
+@inject NavigationManager NavigationManager
+@inject Volo.Abp.AspNetCore.Components.Web.AbpBlazorMessageLocalizerHelper<SurveyManagerResource> LH
+
+@inherits AbpComponentBase
+@attribute [Authorize(SurveyManagerPermissions.Indicators.ViewAll)]
+
+<Card>
+    <CardHeader>
+        <Row Class="justify-content-between">
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <h2>@L["IndicatorDetails"]</h2>
+            </Column>
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <Button Color="Color.Secondary" Clicked="Back">
+                    @L["Back"]
+                </Button>
+            </Column>
+        </Row>
+    </CardHeader>
+
+    <CardBody>
+        @if (Indicator == null)
+        {
+            <p>@L["Loading"]...</p>
+        }
+        else
+        {
+            <Card Margin="Margin.Is3.FromBottom">
+                <CardBody>
+                    <h4>@Indicator.Name</h4>
+                    
+                    @if (!string.IsNullOrEmpty(Indicator.Description))
+                    {
+                        <p class="text-muted">@Indicator.Description</p>
+                    }
+                    
+                    <div class="mt-2">
+                        @if (Indicator.IsActive)
+                        {
+                            <Badge Color="Color.Success">@L["Active"]</Badge>
+                        }
+                        else
+                        {
+                            <Badge Color="Color.Secondary">@L["Inactive"]</Badge>
+                        }
+                    </div>
+                </CardBody>
+            </Card>
+
+            <h4 class="mt-4">@L["LinkedQuestions"]</h4>
+            
+            @if (LinkedQuestions == null || !LinkedQuestions.Any())
+            {
+                <Alert Color="Color.Info" Visible>
+                    @L["NoQuestionsLinkedToIndicator"]
+                </Alert>
+            }
+            else
+            {
+                @foreach (var question in LinkedQuestions)
+                {
+                    <Card Margin="Margin.Is3.FromBottom">
+                        <CardHeader>
+                            <Row>
+                                <Column>
+                                    <h5>@question.Text</h5>
+                                    <Badge Color="Color.Secondary">@question.Type</Badge>
+                                </Column>
+                            </Row>
+                        </CardHeader>
+                        <CardBody>
+                            @if (question.Options != null && question.Options.Any())
+                            {
+                                <div class="mb-3">
+                                    <strong>@L["Options"]:</strong>
+                                    <ul class="mt-2">
+                                        @foreach (var option in question.Options)
+                                        {
+                                            <li>@option.Label (@option.Type)</li>
+                                        }
+                                    </ul>
+                                </div>
+                            }
+
+                            @if (QuestionResponses.ContainsKey(question.Id))
+                            {
+                                var responses = QuestionResponses[question.Id];
+                                
+                                <div class="mt-3">
+                                    <h6>@L["ResponseStatistics"]</h6>
+                                    
+                                    @if (!responses.Any())
+                                    {
+                                        <p class="text-muted">@L["NoResponsesYet"]</p>
+                                    }
+                                    else
+                                    {
+                                        <div class="table-responsive">
+                                            <table class="table table-sm table-bordered">
+                                                <thead>
+                                                    <tr>
+                                                        <th>@L["TotalResponses"]</th>
+                                                        <th>@L["SubmittedResponses"]</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>@responses.Count</td>
+                                                        <td>@responses.Count(r => r.IsSubmitted)</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        @if (question.Type == QuestionType.Likert1To5 || question.Type == QuestionType.Likert1To7)
+                                        {
+                                            var submittedResponses = responses.Where(r => r.IsSubmitted && r.AnswerValue.HasValue).ToList();
+                                            if (submittedResponses.Any())
+                                            {
+                                                var average = submittedResponses.Average(r => r.AnswerValue.Value);
+                                                var maxValue = question.Type == QuestionType.Likert1To5 ? 5 : 7;
+                                                
+                                                <div class="mt-2">
+                                                    <strong>@L["AverageRating"]:</strong> @average.ToString("F2") / @maxValue
+                                                </div>
+                                            }
+                                        }
+                                        else if (question.Options != null && question.Options.Any())
+                                        {
+                                            var submittedResponses = responses.Where(r => r.IsSubmitted).ToList();
+                                            if (submittedResponses.Any())
+                                            {
+                                                <div class="mt-3">
+                                                    <strong>@L["OptionDistribution"]:</strong>
+                                                    <div class="table-responsive mt-2">
+                                                        <table class="table table-sm table-bordered">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>@L["Option"]</th>
+                                                                    <th>@L["Count"]</th>
+                                                                    <th>@L["Percentage"]</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                @foreach (var option in question.Options)
+                                                                {
+                                                                    var count = submittedResponses.Count(r => r.SelectedOptionIds.Contains(option.Id));
+                                                                    var percentage = submittedResponses.Count > 0 ? (count * 100.0 / submittedResponses.Count) : 0;
+                                                                    
+                                                                    <tr>
+                                                                        <td>@option.Label</td>
+                                                                        <td>@count</td>
+                                                                        <td>@percentage.ToString("F1")%</td>
+                                                                    </tr>
+                                                                }
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                    }
+                                </div>
+                            }
+                        </CardBody>
+                    </Card>
+                }
+            }
+        }
+    </CardBody>
+</Card>
+
+@code {
+    [Parameter]
+    public Guid Id { get; set; }
+
+    private IndicatorDto? Indicator { get; set; }
+    private List<QuestionDto> LinkedQuestions { get; set; } = new();
+    private Dictionary<Guid, List<QuestionResponseSummaryDto>> QuestionResponses { get; set; } = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadIndicatorAsync();
+        await LoadLinkedQuestionsAsync();
+        await LoadResponsesAsync();
+    }
+
+    private async Task LoadIndicatorAsync()
+    {
+        Indicator = await IndicatorAppService.GetAsync(Id);
+    }
+
+    private async Task LoadLinkedQuestionsAsync()
+    {
+        if (Indicator == null || Indicator.QuestionIds == null || !Indicator.QuestionIds.Any())
+        {
+            LinkedQuestions = new List<QuestionDto>();
+            return;
+        }
+
+        var allQuestions = await QuestionAppService.GetListAsync(new PagedAndSortedResultRequestDto { MaxResultCount = 1000 });
+        LinkedQuestions = allQuestions.Items.Where(q => Indicator.QuestionIds.Contains(q.Id)).ToList();
+    }
+
+    private async Task LoadResponsesAsync()
+    {
+        QuestionResponses = new Dictionary<Guid, List<QuestionResponseSummaryDto>>();
+
+        foreach (var question in LinkedQuestions)
+        {
+            try
+            {
+                var responses = await ResponseAppService.GetResponsesByQuestionIdAsync(question.Id);
+                QuestionResponses[question.Id] = responses;
+            }
+            catch
+            {
+                QuestionResponses[question.Id] = new List<QuestionResponseSummaryDto>();
+            }
+        }
+    }
+
+    private void Back()
+    {
+        NavigationManager.NavigateTo("/indicators");
+    }
+}
+
