@@ -615,35 +615,6 @@ The following enhancements are planned for future releases:
 - API rate limiting and throttling
 - Audit trail for all operations
 
-## Screenshots
-
-_Screenshots will be added here to showcase the application's user interface and key features._
-
-### Dashboard
-_Add screenshot of the main dashboard showing statistics and overview_
-
-### Survey Management
-_Add screenshot of the surveys list page_
-
-### Question Creation
-_Add screenshot of the question creation form_
-
-### Survey Assignment
-_Add screenshot of assigning a survey to an employee_
-
-### Survey Response
-_Add screenshot of an employee answering a survey_
-
-### Response Statistics
-_Add screenshot of response analytics and statistics_
-
----
-
-## License
-
-[Specify your license here]
-
-## Contributing
 
 [Add contribution guidelines if applicable]
 
