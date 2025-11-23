@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Volo.Abp;
 using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
+using Volo.Abp.Authorization;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.ObjectMapping;
 using Volo.Abp.Uow;
@@ -30,6 +31,8 @@ namespace Ejada.SurveyManager.SurveyInstances
         private readonly IRepository<SurveyQuestion, Guid> _surveyQuestionRepository;
         private readonly IRepository<Option, Guid> _optionRepository;
         private readonly IRepository<ResponseOption, Guid> _responseOptionRepository;
+        private readonly IAuthorizationService _authorizationService;
+        
         public ResponseAppService(
             IRepository<Survey, Guid> surveyRepository,
             IRepository<SurveyInstance, Guid> surveyInstanceRepository,
@@ -38,7 +41,8 @@ namespace Ejada.SurveyManager.SurveyInstances
             IRepository<Question,Guid> questionRepository,
             IRepository<SurveyQuestion, Guid> surveyQuestionRepository,
             IRepository<Option, Guid> optionRepository,
-            IRepository<ResponseOption, Guid> responseOptionRepository)
+            IRepository<ResponseOption, Guid> responseOptionRepository,
+            IAuthorizationService authorizationService)
         {
             _surveyRepository = surveyRepository;
             _surveyInstanceRepository = surveyInstanceRepository;
@@ -47,6 +51,7 @@ namespace Ejada.SurveyManager.SurveyInstances
             _surveyQuestionRepository = surveyQuestionRepository;
             _optionRepository = optionRepository;
             _responseOptionRepository = responseOptionRepository;
+            _authorizationService = authorizationService;
         }
 
         [Authorize(SurveyManagerPermissions.Responses.Answer)]
@@ -207,18 +212,32 @@ namespace Ejada.SurveyManager.SurveyInstances
             return dto;
         }
 
-        [Authorize(SurveyManagerPermissions.Responses.ViewOwn)]
+        [Authorize]
         public virtual async Task<SurveyInstanceForAnsweringDto> GetSurveyInstanceForAnsweringAsync(Guid surveyInstanceId) 
         {
             var instance = await _surveyInstanceRepository.GetAsync(surveyInstanceId);
             var callerId = CurrentUser.GetId();
-
-            if (instance.AssigneeUserId != callerId && instance.Status != SurveyInstanceStatus.Submitted)
+            var isAssignee = instance.AssigneeUserId == callerId;
+            
+            // If user is the assignee, always allow access (they can answer their own survey)
+            if (!isAssignee)
             {
-                throw new BusinessException("SurveyInstance.View.NotAllowed")
-                    .WithData("SurveyInstanceId", surveyInstanceId)
-                    .WithData("CurrentUserId", callerId)
-                    .WithData("Status", instance.Status.ToString());
+                // User is not the assignee - must have ViewAll permission
+                var hasViewAllPermission = await _authorizationService.IsGrantedAsync(SurveyManagerPermissions.Responses.ViewAll);
+                
+                if (!hasViewAllPermission)
+                {
+                    throw new AbpAuthorizationException("You do not have permission to view this survey instance.");
+                }
+                
+                // User has ViewAll permission but is not assignee - only allow if submitted
+                if (instance.Status != SurveyInstanceStatus.Submitted)
+                {
+                    throw new BusinessException("SurveyInstance.View.NotAllowed.Unsubmitted")
+                        .WithData("SurveyInstanceId", surveyInstanceId)
+                        .WithData("CurrentUserId", callerId)
+                        .WithData("Status", instance.Status.ToString());
+                }
             }
 
             var survey = await _surveyRepository.GetAsync(s => s.Id == instance.SurveyId);

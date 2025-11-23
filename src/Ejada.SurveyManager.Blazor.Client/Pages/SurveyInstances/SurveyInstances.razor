@@ -4,11 +4,14 @@
 @using Ejada.SurveyManager.SurveyInstances.Dtos
 @using Ejada.SurveyManager.SurveyInstances.Enums
 @using Ejada.SurveyManager.Localization
+@using Ejada.SurveyManager.Permissions
+@using Microsoft.AspNetCore.Authorization
 @using Volo.Abp.Identity
 @inject NavigationManager NavigationManager
 @inject ISurveyInstanceAppService SurveyInstanceService
 @inject IIdentityUserAppService UserService
 @inject Volo.Abp.AspNetCore.Components.Web.AbpBlazorMessageLocalizerHelper<SurveyManagerResource> LH
+@inject IAuthorizationService AuthorizationService
 
 @inherits AbpCrudPageBase<ISurveyInstanceAppService, SurveyInstanceDto, Guid, PagedAndSortedResultRequestDto, CreateSurveyInstanceDto, UpdateSurveyInstanceDto>
 
@@ -117,7 +120,7 @@
                             <EntityAction TItem="SurveyInstanceDto"
                                           Text="@L["View Responses"]"
                                           Icon="IconName.Eye"
-                                          Visible="@(context.Status == SurveyInstanceStatus.Submitted)"
+                                          Visible="@(context.Status == SurveyInstanceStatus.Submitted && HasViewAllPermission)"
                                           Clicked="() => GoToDetailsPage(context.Id)" />
                             <EntityAction TItem="SurveyInstanceDto"
                                           Text="@L["Mark as Expired"]"
@@ -142,10 +145,12 @@
 
 @code {
     private Dictionary<Guid, string> UserEmails = new Dictionary<Guid, string>();
+    private bool HasViewAllPermission { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+        HasViewAllPermission = await AuthorizationService.IsGrantedAsync(SurveyManagerPermissions.Responses.ViewAll);
         await LoadUsersAsync();
     }
 
