@@ -181,10 +181,82 @@
                                                     var opt = NewQuestionOptions[i];
                                                     <Row class="align-items-end mb-2" @key="opt">
                                                         <Column>
-                                                            <TextEdit @bind-Text="opt.Label" Placeholder="@L["Option Label"]" />
+                                                            @if (opt.Type == OptionDataType.String)
+                                                            {
+                                                                <TextEdit Text="@opt.Label" 
+                                                                         TextChanged="@((string value) => OnNewQuestionOptionLabelChanged(opt, value))"
+                                                                         Placeholder="@L["Option Label"]"
+                                                                         Color="@(IsNewQuestionOptionLabelValid(opt) ? null : Color.Danger)" />
+                                                                @if (!IsNewQuestionOptionLabelValid(opt) && !string.IsNullOrWhiteSpace(opt.Label))
+                                                                {
+                                                                    <small class="text-danger d-block mt-1">@GetNewQuestionOptionValidationMessage(opt)</small>
+                                                                }
+                                                            }
+                                                            else if (opt.Type == OptionDataType.Int)
+                                                            {
+                                                                <TextEdit Text="@opt.Label"
+                                                                          TextChanged="@((string value) => OnNewQuestionOptionLabelChanged(opt, value))"
+                                                                          Type="TextInputType.Number"
+                                                                          Placeholder="@L["Enter whole number"]"
+                                                                          Color="@(IsNewQuestionOptionLabelValid(opt) ? null : Color.Danger)" />
+                                                                @if (!IsNewQuestionOptionLabelValid(opt) && !string.IsNullOrWhiteSpace(opt.Label))
+                                                                {
+                                                                    <small class="text-danger d-block mt-1">@GetNewQuestionOptionValidationMessage(opt)</small>
+                                                                }
+                                                            }
+                                                            else if (opt.Type == OptionDataType.Decimal)
+                                                            {
+                                                                <TextEdit Text="@opt.Label"
+                                                                          TextChanged="@((string value) => OnNewQuestionOptionLabelChanged(opt, value))"
+                                                                          Type="TextInputType.Number"
+                                                                          Step="0.01"
+                                                                          Placeholder="@L["Enter decimal number"]"
+                                                                          Color="@(IsNewQuestionOptionLabelValid(opt) ? null : Color.Danger)" />
+                                                                @if (!IsNewQuestionOptionLabelValid(opt) && !string.IsNullOrWhiteSpace(opt.Label))
+                                                                {
+                                                                    <small class="text-danger d-block mt-1">@GetNewQuestionOptionValidationMessage(opt)</small>
+                                                                }
+                                                            }
+                                                            else if (opt.Type == OptionDataType.Bool)
+                                                            {
+                                                                <Select TValue="string" SelectedValue="@opt.Label"
+                                                                        SelectedValueChanged="@((string value) => OnNewQuestionOptionLabelChanged(opt, value))"
+                                                                        Color="@(IsNewQuestionOptionLabelValid(opt) ? null : Color.Danger)">
+                                                                    <SelectItem Value="true">True</SelectItem>
+                                                                    <SelectItem Value="false">False</SelectItem>
+                                                                </Select>
+                                                                @if (!IsNewQuestionOptionLabelValid(opt) && !string.IsNullOrWhiteSpace(opt.Label))
+                                                                {
+                                                                    <small class="text-danger d-block mt-1">@GetNewQuestionOptionValidationMessage(opt)</small>
+                                                                }
+                                                            }
+                                                            else if (opt.Type == OptionDataType.Date)
+                                                            {
+                                                                <DateEdit TValue="DateTime?" 
+                                                                          Date="@GetDateFromNewQuestionOption(opt)"
+                                                                          DateChanged="@((DateTime? date) => { SetDateToNewQuestionOption(opt, date); OnNewQuestionOptionLabelChanged(opt, opt.Label); })"
+                                                                          DisplayFormat="yyyy-MM-dd" />
+                                                                @if (!IsNewQuestionOptionLabelValid(opt) && !string.IsNullOrWhiteSpace(opt.Label))
+                                                                {
+                                                                    <small class="text-danger d-block mt-1">@GetNewQuestionOptionValidationMessage(opt)</small>
+                                                                }
+                                                            }
+                                                            else if (opt.Type == OptionDataType.DateTime)
+                                                            {
+                                                                <DateEdit TValue="DateTime?" 
+                                                                          Date="@GetDateTimeFromNewQuestionOption(opt)"
+                                                                          DateChanged="@((DateTime? date) => { SetDateTimeToNewQuestionOption(opt, date); OnNewQuestionOptionLabelChanged(opt, opt.Label); })"
+                                                                          InputMode="DateInputMode.DateTime"
+                                                                          DisplayFormat="yyyy-MM-dd HH:mm" />
+                                                                @if (!IsNewQuestionOptionLabelValid(opt) && !string.IsNullOrWhiteSpace(opt.Label))
+                                                                {
+                                                                    <small class="text-danger d-block mt-1">@GetNewQuestionOptionValidationMessage(opt)</small>
+                                                                }
+                                                            }
                                                         </Column>
                                                         <Column ColumnSize="ColumnSize.IsAuto">
-                                                            <Select TValue="OptionDataType" @bind-SelectedValue="opt.Type">
+                                                            <Select TValue="OptionDataType" SelectedValue="@opt.Type"
+                                                                    SelectedValueChanged="@((OptionDataType newType) => OnNewQuestionOptionTypeChanged(opt, newType))">
                                                                 @foreach (var dataType in OptionDataTypes)
                                                                 {
                                                                     <SelectItem Value="@dataType">@dataType.ToString()</SelectItem>
@@ -360,6 +432,28 @@
 
     private async Task SaveSurveyAsync()
     {
+        // Validate all new question options before submitting
+        var hasInvalidOptions = NewQuestionOptions.Any(opt => !string.IsNullOrWhiteSpace(opt.Label) && !IsNewQuestionOptionLabelValid(opt));
+        if (hasInvalidOptions)
+        {
+            StateHasChanged();
+            return;
+        }
+
+        // Validate all attached questions' options
+        foreach (var attachedQuestion in AttachedQuestions)
+        {
+            if (attachedQuestion.NewQuestionDto?.Options != null)
+            {
+                var hasInvalid = attachedQuestion.NewQuestionDto.Options.Any(opt => !string.IsNullOrWhiteSpace(opt.Label) && !IsLabelValidForType(opt.Label, opt.Type));
+                if (hasInvalid)
+                {
+                    StateHasChanged();
+                    return;
+                }
+            }
+        }
+
         var existingIds = AttachedQuestions
             .Where(q => q.ExistingQuestionId != null)
             .Select(q => q.ExistingQuestionId!.Value)
@@ -387,5 +481,118 @@
     private void Back()
     {
         NavigationManager.NavigateTo("/surveys");
+    }
+
+    private DateTime? GetDateFromNewQuestionOption(CreateOptionInQuestionDto option)
+    {
+        if (string.IsNullOrWhiteSpace(option.Label))
+            return null;
+        
+        if (DateTime.TryParseExact(option.Label, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out var date))
+            return date;
+        
+        if (DateTime.TryParse(option.Label, out var parsedDate))
+            return parsedDate.Date;
+        
+        return null;
+    }
+
+    private void SetDateToNewQuestionOption(CreateOptionInQuestionDto option, DateTime? date)
+    {
+        option.Label = date?.ToString("yyyy-MM-dd") ?? string.Empty;
+    }
+
+    private DateTime? GetDateTimeFromNewQuestionOption(CreateOptionInQuestionDto option)
+    {
+        if (string.IsNullOrWhiteSpace(option.Label))
+            return null;
+        
+        if (DateTime.TryParse(option.Label, out var dateTime))
+            return dateTime;
+        
+        return null;
+    }
+
+    private void SetDateTimeToNewQuestionOption(CreateOptionInQuestionDto option, DateTime? dateTime)
+    {
+        option.Label = dateTime?.ToString("yyyy-MM-ddTHH:mm:ss") ?? string.Empty;
+    }
+
+    private void OnNewQuestionOptionLabelChanged(CreateOptionInQuestionDto option, string value)
+    {
+        option.Label = value;
+        StateHasChanged();
+    }
+
+    private void OnNewQuestionOptionTypeChanged(CreateOptionInQuestionDto option, OptionDataType newType)
+    {
+        // If the current label is not valid for the new type, clear it
+        if (!string.IsNullOrWhiteSpace(option.Label) && !IsLabelValidForType(option.Label, newType))
+        {
+            option.Label = string.Empty;
+        }
+        option.Type = newType;
+        StateHasChanged();
+    }
+
+    private bool IsNewQuestionOptionLabelValid(CreateOptionInQuestionDto option)
+    {
+        if (string.IsNullOrWhiteSpace(option.Label))
+            return true; // Empty is valid (optional field)
+        
+        return IsLabelValidForType(option.Label, option.Type);
+    }
+
+    private string GetNewQuestionOptionValidationMessage(CreateOptionInQuestionDto option)
+    {
+        if (string.IsNullOrWhiteSpace(option.Label))
+            return string.Empty;
+
+        return option.Type switch
+        {
+            OptionDataType.String => L["Please enter text (not numbers only)"],
+            OptionDataType.Int => L["Please enter a valid whole number"],
+            OptionDataType.Decimal => L["Please enter a valid decimal number"],
+            OptionDataType.Bool => L["Please select True or False"],
+            OptionDataType.Date => L["Please enter a valid date"],
+            OptionDataType.DateTime => L["Please enter a valid date and time"],
+            _ => string.Empty
+        };
+    }
+
+    private bool IsLabelValidForType(string label, OptionDataType type)
+    {
+        if (string.IsNullOrWhiteSpace(label))
+            return true;
+
+        try
+        {
+            return type switch
+            {
+                OptionDataType.String => !IsPureNumber(label.Trim()), // String should not be a pure number
+                OptionDataType.Int => int.TryParse(label.Trim(), System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out _),
+                OptionDataType.Decimal => decimal.TryParse(label.Trim(), System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.InvariantCulture, out _),
+                OptionDataType.Bool => bool.TryParse(label.Trim(), out _) || label.Trim() == "0" || label.Trim() == "1",
+                OptionDataType.Date => DateTime.TryParseExact(label.Trim(), "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _) ||
+                                      DateTime.TryParse(label.Trim(), out _),
+                OptionDataType.DateTime => DateTime.TryParseExact(label.Trim(), "o", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.None, out _) ||
+                                          DateTime.TryParse(label.Trim(), out _),
+                _ => true
+            };
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private bool IsPureNumber(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return false;
+        
+        // Check if the value is a pure number (int or decimal)
+        return int.TryParse(value, System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out _) ||
+               decimal.TryParse(value, System.Globalization.NumberStyles.Number, System.Globalization.CultureInfo.InvariantCulture, out _);
     }
 }

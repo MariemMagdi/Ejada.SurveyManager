@@ -174,7 +174,16 @@ namespace Ejada.SurveyManager.Surveys
                 return await GetAsync(questionDto.Id);
             }
 
-            var optionEntites = input.Options.Select(o => Option.Create(
+            // Filter out options with empty labels before creating
+            var validOptions = input.Options.Where(o => !string.IsNullOrWhiteSpace(o.Label)).ToList();
+            
+            if (!validOptions.Any())
+            {
+                throw new BusinessException("Question.Options.RequiredForChoiceType")
+                    .WithData("QuestionType", input.Type.ToString());
+            }
+
+            var optionEntites = validOptions.Select(o => Option.Create(
                 GuidGenerator.Create(),
                 questionDto.Id,
                 o.Label,
@@ -242,12 +251,22 @@ namespace Ejada.SurveyManager.Surveys
             }
 
             //options are not null
+            // Filter out options with empty labels
+            var validOptions = input.Options.Where(o => !string.IsNullOrWhiteSpace(o.Label)).ToList();
+            
+            if (!validOptions.Any())
+            {
+                throw new BusinessException("Question.Options.RequiredForChoiceType")
+                        .WithData("QuestionId", id)
+                        .WithData("QuestionType", input.Type.ToString());
+            }
+
             var existingList = await _optionRepository.GetListAsync(o => o.QuestionId == id);
             var existingDict = existingList.ToDictionary(o => o.Id, o => o);
 
             var incomingIds = new HashSet<Guid>();
 
-            foreach(var oDto in input.Options)
+            foreach(var oDto in validOptions)
             {
                 if(oDto.Id != Guid.Empty && existingDict.TryGetValue(oDto.Id, out var existingOption))
                 {

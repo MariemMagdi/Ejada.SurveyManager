@@ -42,7 +42,8 @@ namespace Ejada.SurveyManager.Surveys
         public Option SetType(OptionDataType newType)
         {
             if (newType == Type) return this;
-            if (!IsLabelParsableToType(Label, newType))
+            // Allow type change if label is null or empty (during initial creation)
+            if (!string.IsNullOrWhiteSpace(Label) && !IsLabelParsableToType(Label, newType))
             {
                 throw new BusinessException("Option.ChangeType.IncompatibleWithLabel")
                     .WithData("OptionId", Id)
