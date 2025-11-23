@@ -44,13 +44,22 @@ public class SurveyManagerMenuContributor : IMenuContributor
         var administration = context.Menu.GetAdministration();
         administration.Order = 6;
 
+        // Dashboard - visible to authenticated users
+        context.Menu.AddItem(new ApplicationMenuItem(
+            SurveyManagerMenus.Dashboard,
+            l["Menu:Dashboard"],
+            "/dashboard",
+            icon: "fas fa-chart-pie",
+            order: 1
+        ).RequireAuthenticated());
+
         // Home - visible to everyone
         context.Menu.AddItem(new ApplicationMenuItem(
             SurveyManagerMenus.Home,
             l["Menu:Home"],
             "/",
             icon: "fas fa-home",
-            order: 1
+            order: 2
         ));
 
         // Surveys - Admin only (requires permission to view/manage surveys)
@@ -59,7 +68,7 @@ public class SurveyManagerMenuContributor : IMenuContributor
             l["Menu:Surveys"],
             "/surveys",
             icon: "fas fa-poll",
-            order: 2,
+            order: 3,
             requiredPermissionName: SurveyManagerPermissions.Surveys.Default
         ));
 
@@ -69,7 +78,7 @@ public class SurveyManagerMenuContributor : IMenuContributor
             l["Menu:Questions"],
             "/questions",
             icon: "fas fa-question-circle",
-            order: 3,
+            order: 4,
             requiredPermissionName: SurveyManagerPermissions.Questions.Default
         ));
 
@@ -79,7 +88,7 @@ public class SurveyManagerMenuContributor : IMenuContributor
             l["Menu:Indicators"],
             "/indicators",
             icon: "fas fa-chart-line",
-            order: 4,
+            order: 5,
             requiredPermissionName: SurveyManagerPermissions.Indicators.ViewAll
         ));
 
@@ -89,7 +98,7 @@ public class SurveyManagerMenuContributor : IMenuContributor
             l["Menu:SurveyInstances"],
             "/survey-instances",
             icon: "fas fa-clipboard-list",
-            order: 5,
+            order: 6,
             requiredPermissionName: SurveyManagerPermissions.SurveyInstances.ViewAll
         ));
 
@@ -99,7 +108,7 @@ public class SurveyManagerMenuContributor : IMenuContributor
             l["Menu:MySurveys"],
             "/my-surveys",
             icon: "fas fa-tasks",
-            order: 6,
+            order: 7,
             requiredPermissionName: SurveyManagerPermissions.SurveyInstances.ViewOwn
         ));
 

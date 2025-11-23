@@ -13,149 +13,228 @@
 
 @inherits AbpComponentBase
 
-<Card>
-    <CardHeader>
-        <Row class="justify-content-between">
+<Card Class="shadow-sm">
+    <CardHeader Class="bg-white border-bottom">
+        <Row Class="align-items-center justify-content-between g-3">
             <Column ColumnSize="ColumnSize.IsAuto">
-                <h2>@L["SurveyInstanceDetails"]</h2>
+                <div class="d-flex align-items-center">
+                    <Icon Name="IconName.Eye" Class="text-primary me-2" Size="IconSize.Large" />
+                    <div>
+                        <h4 class="mb-0 fw-bold">@L["SurveyInstanceDetails"]</h4>
+                        <small class="text-muted">@L["ViewSurveyResponses"]</small>
+                    </div>
+                </div>
             </Column>
             <Column ColumnSize="ColumnSize.IsAuto">
-                <Button Color="Color.Secondary" Clicked="Back">
+                <Button Color="Color.Secondary" Outline Clicked="Back">
+                    <Icon Name="IconName.ArrowLeft" />
                     @L["Back"]
                 </Button>
             </Column>
         </Row>
     </CardHeader>
 
-    <CardBody>
+    <CardBody Class="p-4">
         @if (SurveyInstanceData == null)
         {
-            <p>@L["Loading"]...</p>
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">@L["Loading"]</span>
+                </div>
+                <p class="mt-3 text-muted">@L["Loading"]</p>
+            </div>
         }
         else
         {
-            <Card class="mb-3">
+            <!-- Instance Information -->
+            <Card Class="mb-4 border-0 shadow-sm">
+                <CardHeader Class="bg-light">
+                    <h5 class="mb-0 fw-semibold d-flex align-items-center">
+                        <Icon Name="IconName.InfoCircle" Class="text-primary me-2" />
+                        @L["AssignmentInformation"]
+                    </h5>
+                </CardHeader>
                 <CardBody>
-                    <Row>
-                        <Column>
-                            <strong>@L["Survey"]:</strong> @SurveyInstanceData.SurveyName
+                    <Row Class="g-3">
+                        <Column ColumnSize="ColumnSize.Is6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small text-uppercase fw-semibold">@L["Survey"]</label>
+                                <div class="d-flex align-items-center">
+                                    <Icon Name="IconName.Poll" Class="text-primary me-2" />
+                                    <strong>@SurveyInstanceData.SurveyName</strong>
+                                </div>
+                            </div>
                         </Column>
-                        <Column>
-                            <strong>@L["Status"]:</strong>
-                            @switch (SurveyInstanceData.Status)
-                            {
-                                case SurveyInstanceStatus.Assigned:
-                                    <span class="badge bg-info">@L["Assigned"]</span>
-                                    break;
-                                case SurveyInstanceStatus.InProgress:
-                                    <span class="badge bg-warning">@L["InProgress"]</span>
-                                    break;
-                                case SurveyInstanceStatus.Submitted:
-                                    <span class="badge bg-success">@L["Submitted"]</span>
-                                    break;
-                                case SurveyInstanceStatus.Expired:
-                                    <span class="badge bg-danger">@L["Expired"]</span>
-                                    break;
-                            }
+                        <Column ColumnSize="ColumnSize.Is6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small text-uppercase fw-semibold">@L["Status"]</label>
+                                <div>
+                                    @switch (SurveyInstanceData.Status)
+                                    {
+                                        case SurveyInstanceStatus.Assigned:
+                                            <Badge Color="Color.Info">
+                                                <Icon Name="IconName.Clock" />
+                                                @L["Assigned"]
+                                            </Badge>
+                                            break;
+                                        case SurveyInstanceStatus.InProgress:
+                                            <Badge Color="Color.Warning">
+                                                <Icon Name="IconName.Sync" />
+                                                @L["InProgress"]
+                                            </Badge>
+                                            break;
+                                        case SurveyInstanceStatus.Submitted:
+                                            <Badge Color="Color.Success">
+                                                <Icon Name="IconName.Check" />
+                                                @L["Submitted"]
+                                            </Badge>
+                                            break;
+                                        case SurveyInstanceStatus.Expired:
+                                            <Badge Color="Color.Danger">
+                                                <Icon Name="IconName.ExclamationTriangle" />
+                                                @L["Expired"]
+                                            </Badge>
+                                            break;
+                                    }
+                                </div>
+                            </div>
                         </Column>
-                    </Row>
-                    <Row class="mt-2">
-                        <Column>
-                            <strong>@L["AssignedTo"]:</strong> @AssigneeUserEmail
+                        <Column ColumnSize="ColumnSize.Is6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small text-uppercase fw-semibold">@L["AssignedTo"]</label>
+                                <div class="d-flex align-items-center">
+                                    <Icon Name="IconName.User" Class="text-info me-2" />
+                                    <span>@AssigneeUserEmail</span>
+                                </div>
+                            </div>
                         </Column>
-                        <Column>
-                            <strong>@L["DueDate"]:</strong>
-                            @if (SurveyInstanceData.DueDate.HasValue)
-                            {
-                                @SurveyInstanceData.DueDate.Value.ToString("yyyy-MM-dd HH:mm")
-                            }
-                            else
-                            {
-                                <span class="text-muted">@L["NoDueDate"]</span>
-                            }
+                        <Column ColumnSize="ColumnSize.Is6">
+                            <div class="mb-3">
+                                <label class="form-label text-muted small text-uppercase fw-semibold">@L["DueDate"]</label>
+                                <div class="d-flex align-items-center">
+                                    <Icon Name="IconName.Calendar" Class="text-warning me-2" />
+                                    @if (SurveyInstanceData.DueDate.HasValue)
+                                    {
+                                        <span>@SurveyInstanceData.DueDate.Value.ToString("yyyy-MM-dd HH:mm")</span>
+                                    }
+                                    else
+                                    {
+                                        <Badge Color="Color.Secondary">@L["NoDueDate"]</Badge>
+                                    }
+                                </div>
+                            </div>
                         </Column>
                     </Row>
                 </CardBody>
             </Card>
 
-            <h4>@L["Responses"]</h4>
+            <!-- Responses Section -->
+            <Card Class="mb-4 border-0 shadow-sm">
+                <CardHeader Class="bg-light">
+                    <h5 class="mb-0 fw-semibold d-flex align-items-center">
+                        <Icon Name="IconName.Clipboard" Class="text-primary me-2" />
+                        @L["Responses"]
+                    </h5>
+                </CardHeader>
+                <CardBody>
 
-            @if (!SurveyInstanceData.Questions.Any())
-            {
-                <Alert Color="Color.Info" Visible="true">
-                    @L["NoQuestionsInSurvey"]
-                </Alert>
-            }
-            else if (SurveyInstanceData.Status == SurveyInstanceStatus.Assigned)
-            {
-                <Alert Color="Color.Warning" Visible="true">
-                    @L["EmployeeHasNotStarted"]
-                </Alert>
-            }
-            else
-            {
-                @foreach (var question in SurveyInstanceData.Questions)
-                {
-                    <Card class="mb-3">
-                        <CardBody>
-                            <h5>@question.Text</h5>
-                            <p class="text-muted">@L["Type"]: @question.Type.ToString()</p>
+                    @if (!SurveyInstanceData.Questions.Any())
+                    {
+                        <Alert Color="Color.Info" Visible="true">
+                            <Icon Name="IconName.InfoCircle" Class="me-2" />
+                            @L["NoQuestionsInSurvey"]
+                        </Alert>
+                    }
+                    else if (SurveyInstanceData.Status == SurveyInstanceStatus.Assigned)
+                    {
+                        <Alert Color="Color.Warning" Visible="true">
+                            <Icon Name="IconName.ExclamationTriangle" Class="me-2" />
+                            @L["EmployeeHasNotStarted"]
+                        </Alert>
+                    }
+                    else
+                    {
+                        <div class="row g-3">
+                            @foreach (var question in SurveyInstanceData.Questions)
+                            {
+                                <Column ColumnSize="ColumnSize.Is12" @key="question">
+                                    <Card Class="h-100 border">
+                                        <CardBody>
+                                            <div class="d-flex align-items-start mb-3">
+                                                <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                                    <span class="fw-bold text-primary">@(SurveyInstanceData.Questions.IndexOf(question) + 1)</span>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <h6 class="mb-2 fw-semibold">@question.Text</h6>
+                                                    <Badge Color="Color.Secondary">@question.Type.ToString()</Badge>
+                                                </div>
+                                            </div>
 
-                            @if (question.Type == QuestionType.Likert1To5 || question.Type == QuestionType.Likert1To7)
-                            {
-                                @if (question.AnswerValue.HasValue)
-                                {
-                                    <div class="alert alert-success">
-                                        <strong>@L["Answer"]:</strong> @question.AnswerValue.Value / @(question.Type == QuestionType.Likert1To5 ? 5 : 7)
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="alert alert-secondary">
-                                        @L["NotAnswered"]
-                                    </div>
-                                }
-                            }
-                            else if (question.Type == QuestionType.SingleChoice || question.Type == QuestionType.MultiChoice)
-                            {
-                                @if (question.SelectedOptionIds.Any())
-                                {
-                                    <div class="alert alert-success">
-                                        <strong>@L["SelectedOptions"]:</strong>
-                                        <ul class="mb-0">
-                                            @foreach (var optionId in question.SelectedOptionIds)
+                                            @if (question.Type == QuestionType.Likert1To5 || question.Type == QuestionType.Likert1To7)
                                             {
-                                                var option = question.Options.FirstOrDefault(o => o.Id == optionId);
-                                                if (option != null)
+                                                @if (question.AnswerValue.HasValue)
                                                 {
-                                                    <li>@option.Label</li>
+                                                    <Alert Color="Color.Success" Visible>
+                                                        <Icon Name="IconName.Check" Class="me-2" />
+                                                        <strong>@L["Answer"]:</strong> @question.AnswerValue.Value / @(question.Type == QuestionType.Likert1To5 ? 5 : 7)
+                                                    </Alert>
+                                                }
+                                                else
+                                                {
+                                                    <Alert Color="Color.Secondary" Visible>
+                                                        <Icon Name="IconName.Times" Class="me-2" />
+                                                        @L["NotAnswered"]
+                                                    </Alert>
                                                 }
                                             }
-                                        </ul>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="alert alert-secondary">
-                                        @L["NotAnswered"]
-                                    </div>
-                                }
+                                            else if (question.Type == QuestionType.SingleChoice || question.Type == QuestionType.MultiChoice)
+                                            {
+                                                @if (question.SelectedOptionIds.Any())
+                                                {
+                                                    <Alert Color="Color.Success" Visible>
+                                                        <Icon Name="IconName.Check" Class="me-2" />
+                                                        <strong>@L["SelectedOptions"]:</strong>
+                                                        <ul class="mb-0 mt-2">
+                                                            @foreach (var optionId in question.SelectedOptionIds)
+                                                            {
+                                                                var option = question.Options.FirstOrDefault(o => o.Id == optionId);
+                                                                if (option != null)
+                                                                {
+                                                                    <li>@option.Label</li>
+                                                                }
+                                                            }
+                                                        </ul>
+                                                    </Alert>
+                                                }
+                                                else
+                                                {
+                                                    <Alert Color="Color.Secondary" Visible>
+                                                        <Icon Name="IconName.Times" Class="me-2" />
+                                                        @L["NotAnswered"]
+                                                    </Alert>
+                                                }
 
-                                @if (question.Options.Any())
-                                {
-                                    <p class="text-muted mt-2">@L["AvailableOptions"]:</p>
-                                    <ul>
-                                        @foreach (var option in question.Options)
-                                        {
-                                            <li>@option.Label</li>
-                                        }
-                                    </ul>
-                                }
+                                                @if (question.Options.Any())
+                                                {
+                                                    <div class="mt-3">
+                                                        <small class="text-muted d-block mb-2">@L["AvailableOptions"]:</small>
+                                                        <ul class="small">
+                                                            @foreach (var option in question.Options)
+                                                            {
+                                                                <li>@option.Label</li>
+                                                            }
+                                                        </ul>
+                                                    </div>
+                                                }
+                                            }
+                                        </CardBody>
+                                    </Card>
+                                </Column>
                             }
-                        </CardBody>
-                    </Card>
-                }
-            }
+                        </div>
+                    }
+                </CardBody>
+            </Card>
         }
     </CardBody>
 </Card>

@@ -5,6 +5,7 @@ public class SurveyManagerMenus
     private const string Prefix = "SurveyManager";
 
     public const string Home = Prefix + ".Home";
+    public const string Dashboard = Prefix + ".Dashboard";
     public const string Surveys = Prefix + ".Surveys";
     public const string Questions = Prefix + ".Questions";
     public const string Indicators = Prefix + ".Indicators";

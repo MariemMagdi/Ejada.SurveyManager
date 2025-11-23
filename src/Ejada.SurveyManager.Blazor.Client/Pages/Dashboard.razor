@@ -1,0 +1,417 @@
+@page "/dashboard"
+@using Volo.Abp.Application.Dtos
+@using Ejada.SurveyManager.Surveys
+@using Ejada.SurveyManager.Surveys.Dtos
+@using Ejada.SurveyManager.SurveyInstances
+@using Ejada.SurveyManager.SurveyInstances.Dtos
+@using Ejada.SurveyManager.SurveyInstances.Enums
+@using Ejada.SurveyManager.Indicators
+@using Ejada.SurveyManager.Indicators.Dtos
+@using Ejada.SurveyManager.Localization
+@using Volo.Abp.Identity
+@inject ISurveyAppService SurveyService
+@inject ISurveyInstanceAppService SurveyInstanceService
+@inject IIndicatorAppService IndicatorService
+@inject IIdentityUserAppService UserService
+@inject NavigationManager NavigationManager
+@inherits SurveyManagerComponentBase
+
+<PageTitle>@L["Dashboard"]</PageTitle>
+
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1 fw-bold">
+                <Icon Name="IconName.Dashboard" Class="text-primary me-2" />
+                @L["Dashboard"]
+            </h2>
+            <p class="text-muted mb-0">@L["WelcomeToSurveyManager"]</p>
+        </div>
+    </div>
+
+    @if (IsLoading)
+    {
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">@L["Loading"]</span>
+            </div>
+            <p class="mt-3 text-muted">@L["Loading"]</p>
+        </div>
+    }
+    else
+    {
+        <!-- Statistics Cards -->
+        <Row Class="g-4 mb-4">
+            <Column ColumnSize="ColumnSize.Is3">
+                <Card Class="shadow-sm border-0 h-100">
+                    <CardBody Class="p-4">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <p class="text-muted mb-2 small text-uppercase fw-semibold">@L["TotalSurveys"]</p>
+                                <h3 class="mb-0 fw-bold text-primary">@TotalSurveys</h3>
+                            </div>
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
+                                <Icon Name="IconName.Poll" Size="IconSize.ExtraLarge" Class="text-primary" />
+                            </div>
+                        </div>
+                    </CardBody>
+                </Card>
+            </Column>
+            <Column ColumnSize="ColumnSize.Is3">
+                <Card Class="shadow-sm border-0 h-100">
+                    <CardBody Class="p-4">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <p class="text-muted mb-2 small text-uppercase fw-semibold">@L["ActiveSurveys"]</p>
+                                <h3 class="mb-0 fw-bold text-success">@ActiveSurveys</h3>
+                            </div>
+                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
+                                <Icon Name="IconName.CheckCircle" Size="IconSize.ExtraLarge" Class="text-success" />
+                            </div>
+                        </div>
+                    </CardBody>
+                </Card>
+            </Column>
+            <Column ColumnSize="ColumnSize.Is3">
+                <Card Class="shadow-sm border-0 h-100">
+                    <CardBody Class="p-4">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <p class="text-muted mb-2 small text-uppercase fw-semibold">@L["TotalAssignments"]</p>
+                                <h3 class="mb-0 fw-bold text-info">@TotalAssignments</h3>
+                            </div>
+                            <div class="bg-info bg-opacity-10 rounded-circle p-3">
+                                <Icon Name="IconName.Clipboard" Size="IconSize.ExtraLarge" Class="text-info" />
+                            </div>
+                        </div>
+                    </CardBody>
+                </Card>
+            </Column>
+            <Column ColumnSize="ColumnSize.Is3">
+                <Card Class="shadow-sm border-0 h-100">
+                    <CardBody Class="p-4">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <p class="text-muted mb-2 small text-uppercase fw-semibold">@L["TotalIndicators"]</p>
+                                <h3 class="mb-0 fw-bold text-warning">@TotalIndicators</h3>
+                            </div>
+                            <div class="bg-warning bg-opacity-10 rounded-circle p-3">
+                                <Icon Name="IconName.ChartLine" Size="IconSize.ExtraLarge" Class="text-warning" />
+                            </div>
+                        </div>
+                    </CardBody>
+                </Card>
+            </Column>
+        </Row>
+
+        <!-- Status Breakdown -->
+        <Row Class="g-4 mb-4">
+            <Column ColumnSize="ColumnSize.Is6">
+                <Card Class="shadow-sm border-0">
+                    <CardHeader Class="bg-white border-bottom">
+                        <h5 class="mb-0 fw-bold">
+                            <Icon Name="IconName.ChartPie" Class="text-primary me-2" />
+                            @L["AssignmentStatusBreakdown"]
+                        </h5>
+                    </CardHeader>
+                    <CardBody>
+                        <div class="d-flex flex-column gap-3">
+                            <div class="d-flex align-items-center justify-content-between p-3 bg-info bg-opacity-10 rounded">
+                                <div class="d-flex align-items-center">
+                                    <Badge Color="Color.Info" Class="me-3">
+                                        <Icon Name="IconName.Clock" />
+                                    </Badge>
+                                    <span class="fw-semibold">@L["Assigned"]</span>
+                                </div>
+                                <h5 class="mb-0 fw-bold text-info">@AssignedCount</h5>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between p-3 bg-warning bg-opacity-10 rounded">
+                                <div class="d-flex align-items-center">
+                                    <Badge Color="Color.Warning" Class="me-3">
+                                        <Icon Name="IconName.Sync" />
+                                    </Badge>
+                                    <span class="fw-semibold">@L["InProgress"]</span>
+                                </div>
+                                <h5 class="mb-0 fw-bold text-warning">@InProgressCount</h5>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between p-3 bg-success bg-opacity-10 rounded">
+                                <div class="d-flex align-items-center">
+                                    <Badge Color="Color.Success" Class="me-3">
+                                        <Icon Name="IconName.Check" />
+                                    </Badge>
+                                    <span class="fw-semibold">@L["Submitted"]</span>
+                                </div>
+                                <h5 class="mb-0 fw-bold text-success">@SubmittedCount</h5>
+                            </div>
+                            <div class="d-flex align-items-center justify-content-between p-3 bg-danger bg-opacity-10 rounded">
+                                <div class="d-flex align-items-center">
+                                    <Badge Color="Color.Danger" Class="me-3">
+                                        <Icon Name="IconName.ExclamationTriangle" />
+                                    </Badge>
+                                    <span class="fw-semibold">@L["Expired"]</span>
+                                </div>
+                                <h5 class="mb-0 fw-bold text-danger">@ExpiredCount</h5>
+                            </div>
+                        </div>
+                    </CardBody>
+                </Card>
+            </Column>
+            <Column ColumnSize="ColumnSize.Is6">
+                <Card Class="shadow-sm border-0">
+                    <CardHeader Class="bg-white border-bottom">
+                        <h5 class="mb-0 fw-bold">
+                            <Icon Name="IconName.Clock" Class="text-primary me-2" />
+                            @L["RecentlyCreatedSurveys"]
+                        </h5>
+                    </CardHeader>
+                    <CardBody>
+                        @if (RecentSurveys != null && RecentSurveys.Any())
+                        {
+                            <div class="list-group list-group-flush">
+                                @foreach (var survey in RecentSurveys.Take(5))
+                                {
+                                    <div class="list-group-item border-0 px-0 py-3">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <div class="d-flex align-items-center">
+                                                <Icon Name="IconName.Poll" Class="text-primary me-3" />
+                                                <div>
+                                                    <h6 class="mb-1 fw-semibold">@survey.Name</h6>
+                                                    <small class="text-muted">@survey.CreationTime.ToString("MMM dd, yyyy")</small>
+                                                </div>
+                                            </div>
+                                            @if (survey.IsActive)
+                                            {
+                                                <Badge Color="Color.Success">@L["Active"]</Badge>
+                                            }
+                                            else
+                                            {
+                                                <Badge Color="Color.Secondary">@L["Inactive"]</Badge>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-4 text-muted">
+                                <Icon Name="IconName.Inbox" Size="IconSize.ExtraLarge" Class="mb-2 opacity-50" />
+                                <p class="mb-0">@L["NoRecentSurveys"]</p>
+                            </div>
+                        }
+                    </CardBody>
+                </Card>
+            </Column>
+        </Row>
+
+        <!-- Latest Assignments -->
+        <Row Class="g-4">
+            <Column ColumnSize="ColumnSize.Is12">
+                <Card Class="shadow-sm border-0">
+                    <CardHeader Class="bg-white border-bottom">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <h5 class="mb-0 fw-bold">
+                                <Icon Name="IconName.List" Class="text-primary me-2" />
+                                @L["LatestSurveyAssignments"]
+                            </h5>
+                            <Button Color="Color.Primary" Outline Clicked="NavigateToSurveyInstances">
+                                @L["ViewAll"]
+                                <Icon Name="IconName.ArrowRight" />
+                            </Button>
+                        </div>
+                    </CardHeader>
+                    <CardBody Class="p-0">
+                        @if (LatestAssignments != null && LatestAssignments.Any())
+                        {
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>@L["Survey"]</th>
+                                            <th>@L["Assignee"]</th>
+                                            <th>@L["Status"]</th>
+                                            <th>@L["DueDate"]</th>
+                                            <th>@L["Created"]</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var assignment in LatestAssignments.Take(10))
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <Icon Name="IconName.Poll" Class="text-primary me-2" />
+                                                        <strong>@assignment.SurveyName</strong>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <Icon Name="IconName.User" Class="text-info me-2" />
+                                                        <span>@GetUserEmail(assignment.AssigneeUserId)</span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    @switch (assignment.Status)
+                                                    {
+                                                        case SurveyInstanceStatus.Assigned:
+                                                            <Badge Color="Color.Info">
+                                                                <Icon Name="IconName.Clock" />
+                                                                @L["Assigned"]
+                                                            </Badge>
+                                                            break;
+                                                        case SurveyInstanceStatus.InProgress:
+                                                            <Badge Color="Color.Warning">
+                                                                <Icon Name="IconName.Sync" />
+                                                                @L["InProgress"]
+                                                            </Badge>
+                                                            break;
+                                                        case SurveyInstanceStatus.Submitted:
+                                                            <Badge Color="Color.Success">
+                                                                <Icon Name="IconName.Check" />
+                                                                @L["Submitted"]
+                                                            </Badge>
+                                                            break;
+                                                        case SurveyInstanceStatus.Expired:
+                                                            <Badge Color="Color.Danger">
+                                                                <Icon Name="IconName.ExclamationTriangle" />
+                                                                @L["Expired"]
+                                                            </Badge>
+                                                            break;
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @if (assignment.DueDate.HasValue)
+                                                    {
+                                                        <span>@assignment.DueDate.Value.ToString("MMM dd, yyyy")</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <Badge Color="Color.Secondary">@L["NoDueDate"]</Badge>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    <small class="text-muted">@assignment.CreationTime.ToString("MMM dd, yyyy")</small>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-5 text-muted">
+                                <Icon Name="IconName.Inbox" Size="IconSize.ExtraLarge" Class="mb-2 opacity-50" />
+                                <p class="mb-0">@L["NoAssignments"]</p>
+                            </div>
+                        }
+                    </CardBody>
+                </Card>
+            </Column>
+        </Row>
+    }
+</div>
+
+@code {
+    private bool IsLoading = true;
+    private int TotalSurveys = 0;
+    private int ActiveSurveys = 0;
+    private int TotalAssignments = 0;
+    private int TotalIndicators = 0;
+    private int AssignedCount = 0;
+    private int InProgressCount = 0;
+    private int SubmittedCount = 0;
+    private int ExpiredCount = 0;
+    private List<SurveyDto> RecentSurveys = new List<SurveyDto>();
+    private List<SurveyInstanceDto> LatestAssignments = new List<SurveyInstanceDto>();
+    private Dictionary<Guid, string> UserEmails = new Dictionary<Guid, string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDashboardDataAsync();
+    }
+
+    private async Task LoadDashboardDataAsync()
+    {
+        try
+        {
+            IsLoading = true;
+
+            // Load surveys
+            var surveysResult = await SurveyService.GetListAsync(new PagedAndSortedResultRequestDto 
+            { 
+                MaxResultCount = 1000,
+                Sorting = "CreationTime DESC"
+            });
+            TotalSurveys = (int)surveysResult.TotalCount;
+            ActiveSurveys = surveysResult.Items.Count(s => s.IsActive);
+            RecentSurveys = surveysResult.Items.Take(5).ToList();
+
+            // Load survey instances
+            var instancesResult = await SurveyInstanceService.GetListAsync(new PagedAndSortedResultRequestDto 
+            { 
+                MaxResultCount = 1000,
+                Sorting = "CreationTime DESC"
+            });
+            TotalAssignments = (int)instancesResult.TotalCount;
+            AssignedCount = instancesResult.Items.Count(i => i.Status == SurveyInstanceStatus.Assigned);
+            InProgressCount = instancesResult.Items.Count(i => i.Status == SurveyInstanceStatus.InProgress);
+            SubmittedCount = instancesResult.Items.Count(i => i.Status == SurveyInstanceStatus.Submitted);
+            ExpiredCount = instancesResult.Items.Count(i => i.Status == SurveyInstanceStatus.Expired);
+            LatestAssignments = instancesResult.Items.Take(10).ToList();
+            
+            // Load user emails for assignments
+            await LoadUserEmailsAsync();
+
+            // Load indicators
+            var indicatorsResult = await IndicatorService.GetListAsync(new PagedAndSortedResultRequestDto 
+            { 
+                MaxResultCount = 1000
+            });
+            TotalIndicators = (int)indicatorsResult.TotalCount;
+        }
+        catch (Exception ex)
+        {
+            // Handle error - could show a message to user
+            Console.WriteLine($"Error loading dashboard data: {ex.Message}");
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private async Task LoadUserEmailsAsync()
+    {
+        // Get unique user IDs from latest assignments
+        var userIds = LatestAssignments.Select(a => a.AssigneeUserId).Distinct().ToList();
+        
+        // Load user details for each ID
+        foreach (var userId in userIds)
+        {
+            if (!UserEmails.ContainsKey(userId))
+            {
+                try
+                {
+                    var user = await UserService.GetAsync(userId);
+                    UserEmails[userId] = user.Email ?? user.UserName;
+                }
+                catch
+                {
+                    UserEmails[userId] = "Unknown User";
+                }
+            }
+        }
+    }
+
+    private string GetUserEmail(Guid userId)
+    {
+        return UserEmails.TryGetValue(userId, out var email) ? email : "Loading...";
+    }
+
+    private void NavigateToSurveyInstances()
+    {
+        NavigationManager.NavigateTo("/survey-instances");
+    }
+}
+

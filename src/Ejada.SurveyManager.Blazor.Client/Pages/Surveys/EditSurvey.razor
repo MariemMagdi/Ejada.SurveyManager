@@ -13,191 +13,237 @@
 
 @inherits AbpCrudPageBase<ISurveyAppService, SurveyDto, Guid, PagedAndSortedResultRequestDto, CreateSurveyDto, UpdateSurveyDto>
 
-<Card>
-    <CardHeader>
-        <Row Class="justify-content-between">
+<Card Class="shadow-sm">
+    <CardHeader Class="bg-white border-bottom">
+        <Row Class="align-items-center justify-content-between g-3">
             <Column ColumnSize="ColumnSize.IsAuto">
-                <h2>@L["Edit"]</h2>
+                <div class="d-flex align-items-center">
+                    <Icon Name="IconName.Edit" Class="text-primary me-2" Size="IconSize.Large" />
+                    <div>
+                        <h4 class="mb-0 fw-bold">@L["EditSurvey"]</h4>
+                        <small class="text-muted">@L["EditSurveyDescription"]</small>
+                    </div>
+                </div>
             </Column>
             <Column ColumnSize="ColumnSize.IsAuto">
-                <Button Color="Color.Secondary" Clicked="Back">
+                <Button Color="Color.Secondary" Outline Clicked="Back">
+                    <Icon Name="IconName.ArrowLeft" />
                     @L["Back"]
                 </Button>
             </Column>
         </Row>
     </CardHeader>
 
-    <CardBody>
+    <CardBody Class="p-4">
         <Form>
             <Validations @ref="@EditValidationsRef" Model="@EditingEntity" ValidateOnLoad="false" @key="EditingEntity">
-                <Validation MessageLocalizer="@LH.Localize">
-                    <Field>
-                        <FieldLabel>@L["Name"]</FieldLabel>
-                        <TextEdit @bind-Text="@EditingEntity.Name">
-                            <Feedback>
-                                <ValidationError />
-                            </Feedback>
-                        </TextEdit>
-                    </Field>
-                </Validation>
+                <!-- General Information Section -->
+                <Card Class="mb-4 border-0 shadow-sm">
+                    <CardHeader Class="bg-light">
+                        <h5 class="mb-0 fw-semibold d-flex align-items-center">
+                            <Icon Name="IconName.InfoCircle" Class="text-primary me-2" />
+                            @L["GeneralInformation"]
+                        </h5>
+                    </CardHeader>
+                    <CardBody>
+                        <Validation MessageLocalizer="@LH.Localize">
+                            <Field>
+                                <FieldLabel>@L["Name"] *</FieldLabel>
+                                <TextEdit @bind-Text="@EditingEntity.Name" Placeholder="@L["EnterSurveyName"]">
+                                    <Feedback>
+                                        <ValidationError />
+                                    </Feedback>
+                                </TextEdit>
+                            </Field>
+                        </Validation>
 
-                <Field>
-                    <FieldLabel>@L["Purpose"]</FieldLabel>
-                    <TextEdit @bind-Text="EditingEntity.Purpose" />
-                </Field>
+                        <Field>
+                            <FieldLabel>@L["Purpose"]</FieldLabel>
+                            <MemoEdit @bind-Text="EditingEntity.Purpose" Rows="3" Placeholder="@L["EnterSurveyPurpose"]" />
+                        </Field>
 
-                <Field>
-                    <FieldLabel>@L["TargetAudience"]</FieldLabel>
-                    <TextEdit @bind-Text="EditingEntity.TargetAudience" />
-                </Field>
+                        <Field>
+                            <FieldLabel>@L["TargetAudience"]</FieldLabel>
+                            <TextEdit @bind-Text="EditingEntity.TargetAudience" Placeholder="@L["EnterTargetAudience"]" />
+                        </Field>
 
-                <Field>
-                    <FieldLabel>@L["Active"]</FieldLabel>
-                    <InputCheckbox @bind-Value="@EditingEntity.IsActive" />
-                </Field>
+                        <Field>
+                            <Check TValue="bool" @bind-Checked="@EditingEntity.IsActive">
+                                @L["Active"]
+                            </Check>
+                            <FieldHelp>@L["ActiveSurveyDescription"]</FieldHelp>
+                        </Field>
+                    </CardBody>
+                </Card>
+
+                <!-- Questions Section -->
+                <Card Class="mb-4 border-0 shadow-sm">
+                    <CardHeader Class="bg-light">
+                        <h5 class="mb-0 fw-semibold d-flex align-items-center">
+                            <Icon Name="IconName.QuestionCircle" Class="text-primary me-2" />
+                            @L["CurrentQuestions"]
+                        </h5>
+                    </CardHeader>
+                    <CardBody>
+                        @if (!CurrentQuestions.Any())
+                        {
+                            <Alert Color="Color.Info" Visible>
+                                <Icon Name="IconName.InfoCircle" Class="me-2" />
+                                @L["NoQuestionsAttached"]
+                            </Alert>
+                        }
+                        else
+                        {
+                            <div class="list-group list-group-flush">
+                                @foreach (var q in CurrentQuestions)
+                                {
+                                    <div class="list-group-item px-0" @key="q">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <Icon Name="IconName.File" Class="text-info me-2" />
+                                                    <strong>@q.Text</strong>
+                                                    <Badge Color="Color.Secondary" Class="ms-2">@q.Type</Badge>
+                                                </div>
+                                                @if (q.Options?.Any() == true)
+                                                {
+                                                    <div class="ms-4">
+                                                        <small class="text-muted d-block mb-1">@L["Options"]:</small>
+                                                        <ul class="mb-0 small">
+                                                            @foreach (var opt in q.Options)
+                                                            {
+                                                                <li>@opt.Label <Badge Color="Color.Info" Class="ms-1">@opt.Type</Badge></li>
+                                                            }
+                                                        </ul>
+                                                    </div>
+                                                }
+                                            </div>
+                                            <Button Color="Color.Danger" Size="Size.Small" Outline Clicked="@(() => DetachQuestion(q.Id))">
+                                                                <Icon Name="IconName.Delete" />
+                                                @L["Remove"]
+                                            </Button>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        <hr class="my-4" />
+
+                        @* Section 1: Select from Existing Questions *@
+                        <Accordion>
+                            <Collapse Visible="@ShowExistingQuestionsSection">
+                                <CollapseHeader>
+                                    <Heading Size="HeadingSize.Is5">
+                                        <AccordionToggle Clicked="@(() => ShowExistingQuestionsSection = !ShowExistingQuestionsSection)">
+                                            <Icon Name="IconName.List" /> @L["AddMoreQuestions"]
+                                        </AccordionToggle>
+                                    </Heading>
+                                </CollapseHeader>
+                                <CollapseBody>
+                                    <Field>
+                                        <FieldLabel>@L["AvailableQuestions"]</FieldLabel>
+                                        <Select TValue="Guid?" @bind-SelectedValue="SelectedQuestionId">
+                                            <SelectItem Value="@((Guid?)null)">-- @L["SelectQuestion"] --</SelectItem>
+                                            @foreach (var q in FilteredAvailableQuestions)
+                                            {
+                                                <SelectItem Value="@((Guid?)q.Id)">@q.Text</SelectItem>
+                                            }
+                                        </Select>
+                                        <Button Color="Color.Success" Clicked="AttachExistingQuestion" Class="mt-2">
+                                            <Icon Name="IconName.Add" />
+                                            @L["AddQuestion"]
+                                        </Button>
+                                    </Field>
+                                </CollapseBody>
+                            </Collapse>
+                        </Accordion>
+
+                        @* Section 2: Create New Question Inline *@
+                        <Accordion>
+                            <Collapse Visible="@ShowNewQuestionSection">
+                                <CollapseHeader>
+                                    <Heading Size="HeadingSize.Is5">
+                                        <AccordionToggle Clicked="@(() => ShowNewQuestionSection = !ShowNewQuestionSection)">
+                                            <Icon Name="IconName.Add" /> @L["CreateNewQuestion"]
+                                        </AccordionToggle>
+                                    </Heading>
+                                </CollapseHeader>
+                                <CollapseBody>
+                                    <Field>
+                                        <FieldLabel>@L["QuestionText"]</FieldLabel>
+                                        <TextEdit @bind-Text="NewQuestionText" Placeholder="@L["EnterQuestionText"]" />
+                                    </Field>
+                                    <Field>
+                                        <FieldLabel>@L["QuestionType"]</FieldLabel>
+                                        <Select TValue="QuestionType" @bind-SelectedValue="NewQuestionType">
+                                            @foreach (var type in QuestionTypes)
+                                            {
+                                                <SelectItem Value="@type">@type.ToString()</SelectItem>
+                                            }
+                                        </Select>
+                                    </Field>
+
+                                    @if (NewQuestionRequiresOptions)
+                                    {
+                                        <Field>
+                                            <FieldLabel>@L["Options"]</FieldLabel>
+                                            <div class="border rounded p-3 bg-light">
+                                                @for (var i = 0; i < NewQuestionOptions.Count; i++)
+                                                {
+                                                    var idx = i;
+                                                    var opt = NewQuestionOptions[i];
+                                                    <Row class="align-items-end mb-2" @key="opt">
+                                                        <Column>
+                                                            <TextEdit @bind-Text="opt.Label" Placeholder="@L["OptionLabel"]" />
+                                                        </Column>
+                                                        <Column ColumnSize="ColumnSize.IsAuto">
+                                                            <Select TValue="OptionDataType" @bind-SelectedValue="opt.Type">
+                                                                @foreach (var dataType in OptionDataTypes)
+                                                                {
+                                                                    <SelectItem Value="@dataType">@dataType.ToString()</SelectItem>
+                                                                }
+                                                            </Select>
+                                                        </Column>
+                                                        <Column ColumnSize="ColumnSize.IsAuto">
+                                                            <Button Color="Color.Danger" Size="Size.Small" Outline Clicked="@(() => RemoveNewQuestionOption(idx))">
+                                                                <Icon Name="IconName.Delete" />
+                                                            </Button>
+                                                        </Column>
+                                                    </Row>
+                                                }
+                                                <Button Color="Color.Secondary" Outline Clicked="AddNewQuestionOption">
+                                                    <Icon Name="IconName.Add" />
+                                                    @L["AddOption"]
+                                                </Button>
+                                            </div>
+                                        </Field>
+                                    }
+
+                                    <Button Color="Color.Primary" Clicked="AddNewQuestion" Class="mt-2">
+                                        <Icon Name="IconName.Add" />
+                                        @L["AddNewQuestionToSurvey"]
+                                    </Button>
+                                </CollapseBody>
+                            </Collapse>
+                        </Accordion>
+                    </CardBody>
+                </Card>
             </Validations>
 
-            <hr class="my-4" />
-
-            @* Section 1: Select from Existing Questions *@
-            <Accordion>
-                <Collapse Visible="@ShowExistingQuestionsSection">
-                    <CollapseHeader>
-                        <Heading Size="HeadingSize.Is5">
-                            <AccordionToggle Clicked="@(() => ShowExistingQuestionsSection = !ShowExistingQuestionsSection)">
-                                <Icon Name="IconName.Add" /> @L["AddMoreQuestions"]
-                            </AccordionToggle>
-                        </Heading>
-                    </CollapseHeader>
-                    <CollapseBody>
-                        <Field>
-                            <FieldLabel>@L["AvailableQuestions"]</FieldLabel>
-                            <Select TValue="Guid?" @bind-SelectedValue="SelectedQuestionId">
-                                <SelectItem Value="@((Guid?)null)">-- @L["SelectQuestion"] --</SelectItem>
-                                @foreach (var q in FilteredAvailableQuestions)
-                                {
-                                    <SelectItem Value="@((Guid?)q.Id)">@q.Text</SelectItem>
-                                }
-                            </Select>
-                            <Button Color="Color.Success" Clicked="AttachExistingQuestion" class="mt-2">
-                                @L["AddQuestion"]
-                            </Button>
-                        </Field>
-                    </CollapseBody>
-                </Collapse>
-            </Accordion>
-
-            @* Section 2: Create New Question Inline *@
-            <Accordion>
-                <Collapse Visible="@ShowNewQuestionSection">
-                    <CollapseHeader>
-                        <Heading Size="HeadingSize.Is5">
-                            <AccordionToggle Clicked="@(() => ShowNewQuestionSection = !ShowNewQuestionSection)">
-                                <Icon Name="IconName.Add" /> @L["CreateNewQuestion"]
-                            </AccordionToggle>
-                        </Heading>
-                    </CollapseHeader>
-                    <CollapseBody>
-            <Field>
-                <FieldLabel>@L["QuestionText"]</FieldLabel>
-                <TextEdit @bind-Text="NewQuestionText" Placeholder="@L["EnterQuestionText"]" />
-            </Field>
-            <Field>
-                <FieldLabel>@L["QuestionType"]</FieldLabel>
-                <Select TValue="QuestionType" @bind-SelectedValue="NewQuestionType">
-                    @foreach (var type in QuestionTypes)
-                    {
-                        <SelectItem Value="@type">@type.ToString()</SelectItem>
-                    }
-                </Select>
-            </Field>
-
-            @if (NewQuestionRequiresOptions)
-            {
-                <Field>
-                    <FieldLabel>@L["Options"]</FieldLabel>
-                    @for (var i = 0; i < NewQuestionOptions.Count; i++)
-                    {
-                        var idx = i;
-                        var opt = NewQuestionOptions[i];
-                        <Row class="align-items-end mb-2" @key="opt">
-                            <Column>
-                                <TextEdit @bind-Text="opt.Label" Placeholder="@L["OptionLabel"]" />
-                            </Column>
-                            <Column ColumnSize="ColumnSize.IsAuto">
-                                <Select TValue="OptionDataType" @bind-SelectedValue="opt.Type">
-                                    @foreach (var dataType in OptionDataTypes)
-                                    {
-                                        <SelectItem Value="@dataType">@dataType.ToString()</SelectItem>
-                                    }
-                                </Select>
-                            </Column>
-                            <Column ColumnSize="ColumnSize.IsAuto">
-                                <Button Color="Color.Danger" Clicked="@(() => RemoveNewQuestionOption(idx))">
-                                    @L["Remove"]
-                                </Button>
-                            </Column>
-                        </Row>
-                    }
-                    <Button Color="Color.Secondary" Clicked="AddNewQuestionOption">
-                        @L["AddOption"]
-                    </Button>
-                </Field>
-            }
-
-                        <Button Color="Color.Info" Clicked="AddNewQuestion" class="mt-2">
-                            @L["AddNewQuestionToSurvey"]
-                        </Button>
-                    </CollapseBody>
-                </Collapse>
-            </Accordion>
-
-            @* Section 3: Currently Attached Questions *@
-            <hr class="my-4" />
-            <h5>@L["CurrentQuestions"]</h5>
-            @if (!CurrentQuestions.Any())
-            {
-                <p class="text-muted">@L["NoQuestionsAttached"]</p>
-            }
-            else
-            {
-                @foreach (var q in CurrentQuestions)
-                {
-                    <Card class="mb-2" @key="q">
-                        <CardBody>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <strong>@q.Text</strong> (@q.Type)
-                                    @if (q.Options?.Any() == true)
-                                    {
-                                        <ul class="mt-2">
-                                            @foreach (var opt in q.Options)
-                                            {
-                                                <li>@opt.Label (@opt.Type)</li>
-                                            }
-                                        </ul>
-                                    }
-                                </div>
-                                <div>
-                                    <Button Color="Color.Danger" Size="Size.Small" Clicked="@(() => DetachQuestion(q.Id))">
-                                        @L["Remove"]
-                                    </Button>
-                                </div>
-                            </div>
-                        </CardBody>
-                    </Card>
-                }
-            }
-
-            <div class="mt-3">
-                <Button Color="Color.Secondary" Clicked="Back">
+            <!-- Action Buttons -->
+            <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                <Button Color="Color.Secondary" Outline Clicked="Back">
+                    <Icon Name="IconName.Times" />
                     @L["Cancel"]
                 </Button>
 
                 <Button Color="Color.Primary"
                         Type="@ButtonType.Submit"
                         PreventDefaultOnSubmit="true"
-                        Clicked="SaveSurveyAsync">
+                        Clicked="SaveSurveyAsync"
+                        Class="px-5">
+                    <Icon Name="IconName.Save" />
                     @L["Save"]
                 </Button>
             </div>
