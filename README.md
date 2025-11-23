@@ -67,8 +67,7 @@ The Survey Management System is an enterprise-grade application designed to stre
 - Create questions with multiple types:
   - **Single Choice**: One option selection
   - **Multi Choice**: Multiple option selection
-  - **Likert Scale**: Predefined 5-point scale
-  - **Text**: Free-form text input
+  - **Likert Scale**: Predefined 5-point or 7-point scale
 - Define options with typed values (String, Int, Decimal, Bool, Date, DateTime)
 - Link questions to indicators for analytics
 - Reusable question library
