@@ -12,22 +12,30 @@
 
 @inherits AbpCrudPageBase<ISurveyInstanceAppService, SurveyInstanceDto, Guid, PagedAndSortedResultRequestDto, CreateSurveyInstanceDto, UpdateSurveyInstanceDto>
 
-<Card>
-    <CardHeader>
-        <Row class="justify-content-between">
+<Card Class="shadow-sm">
+    <CardHeader Class="bg-white border-bottom">
+        <Row Class="align-items-center justify-content-between g-3">
             <Column ColumnSize="ColumnSize.IsAuto">
-                <h2>@L["SurveyInstances"]</h2>
+                <div class="d-flex align-items-center">
+                    <Icon Name="IconName.Clipboard" Class="text-primary me-2" Size="IconSize.Large" />
+                    <div>
+                        <h4 class="mb-0 fw-bold">@L["SurveyInstances"]</h4>
+                        <small class="text-muted">@L["ManageSurveyAssignments"]</small>
+                    </div>
+                </div>
             </Column>
             <Column ColumnSize="ColumnSize.IsAuto">
                 <Button Color="Color.Primary"
-                        Clicked="GoToCreatePage">
+                        Clicked="GoToCreatePage"
+                        Class="px-4">
+                    <Icon Name="IconName.UserPlus" />
                     @L["AssignSurvey"]
                 </Button>
             </Column>
         </Row>
     </CardHeader>
 
-    <CardBody>
+    <CardBody Class="p-0">
         <DataGrid TItem="SurveyInstanceDto"
                   Data="Entities"
                   ReadData="OnDataGridReadAsync"
@@ -35,60 +43,93 @@
                   ShowPager="true"
                   PageSize="PageSize"
                   ShowFilterRow="true"
-                  Striped="true">
+                  Striped="true"
+                  Hoverable="true"
+                  Responsive="true"
+                  Class="border-0">
             <DataGridColumns>
-                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.SurveyName)" Caption="@L["Survey"]" />
-                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.AssigneeUserId)" Caption="@L["AssigneeUser"]">
+                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.SurveyName)" Caption="@L["Survey"]" Sortable="true">
                     <DisplayTemplate Context="context">
-                        @GetUserEmail(context.AssigneeUserId)
+                        <div class="d-flex align-items-center">
+                            <Icon Name="IconName.Poll" Class="text-primary me-2" />
+                            <strong>@context.SurveyName</strong>
+                        </div>
                     </DisplayTemplate>
                 </DataGridColumn>
-                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.DueDate)" Caption="@L["DueDate"]">
+                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.AssigneeUserId)" Caption="@L["AssigneeUser"]" Sortable="true">
+                    <DisplayTemplate Context="context">
+                        <div class="d-flex align-items-center">
+                            <Icon Name="IconName.User" Class="text-info me-2" />
+                            <span>@GetUserEmail(context.AssigneeUserId)</span>
+                        </div>
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.DueDate)" Caption="@L["DueDate"]" Sortable="true">
                     <DisplayTemplate Context="context">
                         @if (context.DueDate.HasValue)
                         {
-                            @context.DueDate.Value.ToString("yyyy-MM-dd HH:mm")
+                            <div class="d-flex align-items-center">
+                                <Icon Name="IconName.Calendar" Class="text-warning me-2" />
+                                <span>@context.DueDate.Value.ToString("yyyy-MM-dd HH:mm")</span>
+                            </div>
                         }
                         else
                         {
-                            <span class="text-muted">@L["NoDueDate"]</span>
+                            <Badge Color="Color.Secondary">@L["NoDueDate"]</Badge>
                         }
                     </DisplayTemplate>
                 </DataGridColumn>
-                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.Status)" Caption="@L["Status"]">
+                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.Status)" Caption="@L["Status"]" Sortable="true">
                     <DisplayTemplate Context="context">
                         @switch (context.Status)
                         {
                             case SurveyInstanceStatus.Assigned:
-                                <span class="badge bg-info">@L["Assigned"]</span>
+                                <Badge Color="Color.Info">
+                                    <Icon Name="IconName.Clock" />
+                                    @L["Assigned"]
+                                </Badge>
                                 break;
                             case SurveyInstanceStatus.InProgress:
-                                <span class="badge bg-warning">@L["InProgress"]</span>
+                                <Badge Color="Color.Warning">
+                                    <Icon Name="IconName.Sync" />
+                                    @L["InProgress"]
+                                </Badge>
                                 break;
                             case SurveyInstanceStatus.Submitted:
-                                <span class="badge bg-success">@L["Submitted"]</span>
+                                <Badge Color="Color.Success">
+                                    <Icon Name="IconName.Check" />
+                                    @L["Submitted"]
+                                </Badge>
                                 break;
                             case SurveyInstanceStatus.Expired:
-                                <span class="badge bg-danger">@L["Expired"]</span>
+                                <Badge Color="Color.Danger">
+                                    <Icon Name="IconName.ExclamationTriangle" />
+                                    @L["Expired"]
+                                </Badge>
                                 break;
                         }
                     </DisplayTemplate>
                 </DataGridColumn>
 
-                <DataGridEntityActionsColumn TItem="SurveyInstanceDto" @ref="@EntityActionsColumn" Caption="@L["Actions"]">
+                <DataGridEntityActionsColumn TItem="SurveyInstanceDto" @ref="@EntityActionsColumn" Caption="@L["Actions"]" Width="200px">
                     <DisplayTemplate Context="context">
                         <EntityActions TItem="SurveyInstanceDto" EntityActionsColumn="@EntityActionsColumn">
                             <EntityAction TItem="SurveyInstanceDto"
                                           Text="@L["ViewResponses"]"
+                                          Icon="IconName.Eye"
                                           Visible="@(context.Status == SurveyInstanceStatus.Submitted)"
                                           Clicked="() => GoToDetailsPage(context.Id)" />
                             <EntityAction TItem="SurveyInstanceDto"
                                           Text="@L["MarkExpired"]"
+                                          Icon="IconName.Ban"
+                                          Color="Color.Warning"
                                           Visible="@(context.Status != SurveyInstanceStatus.Submitted && context.Status != SurveyInstanceStatus.Expired)"
                                           Clicked="() => MarkExpiredAsync(context.Id)"
                                           ConfirmationMessage="@(() => L["MarkExpiredConfirmation"])" />
                             <EntityAction TItem="SurveyInstanceDto"
                                           Text="@L["Delete"]"
+                                          Icon="IconName.Trash"
+                                          Color="Color.Danger"
                                           Clicked="() => DeleteEntityAsync(context)"
                                           ConfirmationMessage="() => GetDeleteConfirmationMessage(context)" />
                         </EntityActions>

@@ -9,22 +9,30 @@
 
 @inherits AbpCrudPageBase<IQuestionAppService, QuestionDto, Guid, PagedAndSortedResultRequestDto, CreateQuestionDto, UpdateQuestionDto>
 
-<Card>
-    <CardHeader>
-        <Row class="justify-content-between">
+<Card Class="shadow-sm">
+    <CardHeader Class="bg-white border-bottom">
+        <Row Class="align-items-center justify-content-between g-3">
             <Column ColumnSize="ColumnSize.IsAuto">
-                <h2>@L["Questions"]</h2>
+                <div class="d-flex align-items-center">
+                    <Icon Name="IconName.QuestionCircle" Class="text-primary me-2" Size="IconSize.Large" />
+                    <div>
+                        <h4 class="mb-0 fw-bold">@L["Questions"]</h4>
+                        <small class="text-muted">@L["ManageYourQuestions"]</small>
+                    </div>
+                </div>
             </Column>
             <Column ColumnSize="ColumnSize.IsAuto">
                 <Button Color="Color.Primary"
-                        Clicked="GoToCreatePage">
+                        Clicked="GoToCreatePage"
+                        Class="px-4">
+                    <Icon Name="IconName.Add" />
                     @L["NewQuestion"]
                 </Button>
             </Column>
         </Row>
     </CardHeader>
 
-    <CardBody>
+    <CardBody Class="p-0">
         <DataGrid TItem="QuestionDto"
                   Data="Entities"
                   ReadData="OnDataGridReadAsync"
@@ -32,44 +40,67 @@
                   ShowPager="true"
                   PageSize="PageSize"
                   ShowFilterRow="true"
-                  Striped="true">
+                  Striped="true"
+                  Hoverable="true"
+                  Responsive="true"
+                  Class="border-0">
             <DataGridColumns>
-                <DataGridColumn TItem="QuestionDto" Field="@nameof(QuestionDto.Text)" Caption="@L["QuestionText"]" />
-                <DataGridColumn TItem="QuestionDto" Caption="@L["QuestionType"]">
+                <DataGridColumn TItem="QuestionDto" Field="@nameof(QuestionDto.Text)" Caption="@L["QuestionText"]" Sortable="true">
                     <DisplayTemplate Context="context">
-                        @context.Type.ToString()
+                        <div class="d-flex align-items-center">
+                            <Icon Name="IconName.File" Class="text-info me-2" />
+                            <span>@(context.Text?.Length > 60 ? context.Text.Substring(0, 60) + "..." : context.Text)</span>
+                        </div>
                     </DisplayTemplate>
                 </DataGridColumn>
-                <DataGridColumn TItem="QuestionDto" Caption="@L["Options"]">
+                <DataGridColumn TItem="QuestionDto" Caption="@L["QuestionType"]" Sortable="true">
                     <DisplayTemplate Context="context">
-                        @(context.Options?.Count ?? 0)
+                        <Badge Color="Color.Primary">@context.Type.ToString()</Badge>
                     </DisplayTemplate>
                 </DataGridColumn>
-                <DataGridColumn TItem="QuestionDto" Caption="@L["Status"]">
+                <DataGridColumn TItem="QuestionDto" Caption="@L["Options"]" Sortable="true">
+                    <DisplayTemplate Context="context">
+                        <Badge Color="Color.Info">
+                            <Icon Name="IconName.List" />
+                            @(context.Options?.Count ?? 0) @L["Options"]
+                        </Badge>
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridColumn TItem="QuestionDto" Caption="@L["Status"]" Sortable="true">
                     <DisplayTemplate Context="context">
                         @if (context.IsLinkedToSurvey)
                         {
-                            <span class="badge bg-warning">@L["LinkedToSurvey"]</span>
+                            <Badge Color="Color.Warning">
+                                <Icon Name="IconName.Link" />
+                                @L["LinkedToSurvey"]
+                            </Badge>
                         }
                         else
                         {
-                            <span class="badge bg-success">@L["Editable"]</span>
+                            <Badge Color="Color.Success">
+                                <Icon Name="IconName.Edit" />
+                                @L["Editable"]
+                            </Badge>
                         }
                     </DisplayTemplate>
                 </DataGridColumn>
 
-                <DataGridEntityActionsColumn TItem="QuestionDto" @ref="@EntityActionsColumn" Caption="@L["Actions"]">
+                <DataGridEntityActionsColumn TItem="QuestionDto" @ref="@EntityActionsColumn" Caption="@L["Actions"]" Width="180px">
                     <DisplayTemplate Context="context">
                         <EntityActions TItem="QuestionDto" EntityActionsColumn="@EntityActionsColumn">
                             <EntityAction TItem="QuestionDto"
+                                          Text="@L["ViewDetails"]"
+                                          Icon="IconName.Eye"
+                                          Clicked="() => GoToDetailsPage(context.Id)" />
+                            <EntityAction TItem="QuestionDto"
                                           Text="@L["Edit"]"
+                                          Icon="IconName.Edit"
                                           Visible="@(!context.IsLinkedToSurvey)"
                                           Clicked="() => GoToEditPage(context.Id)" />
                             <EntityAction TItem="QuestionDto"
-                                          Text="@L["ViewDetails"]"
-                                          Clicked="() => GoToDetailsPage(context.Id)" />
-                            <EntityAction TItem="QuestionDto"
                                           Text="@L["Delete"]"
+                                          Icon="IconName.Trash"
+                                          Color="Color.Danger"
                                           Visible="@(!context.IsLinkedToSurvey)"
                                           Clicked="() => DeleteEntityAsync(context)"
                                           ConfirmationMessage="() => GetDeleteConfirmationMessage(context)" />

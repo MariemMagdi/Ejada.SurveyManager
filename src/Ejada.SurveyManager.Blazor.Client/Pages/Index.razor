@@ -1,6 +1,13 @@
 ﻿@page "/"
 @inherits SurveyManagerComponentBase
+@inject NavigationManager NavigationManager
 
+@if (CurrentUser.IsAuthenticated)
+{
+    @* Redirect authenticated users to dashboard *@
+}
+else
+{
 <div class="row mb-3">
     <div class="col-xl-6 col-12 d-flex">
         <div class="card h-lg-100 w-100 overflow-hidden">
@@ -274,3 +281,15 @@
         </div>
     </div>
 </div>
+}
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        if (CurrentUser.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo("/dashboard");
+        }
+    }
+}

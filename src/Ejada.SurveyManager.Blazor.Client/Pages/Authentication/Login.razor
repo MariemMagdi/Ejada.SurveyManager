@@ -1,0 +1,78 @@
+@page "/authentication/login"
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Ejada.SurveyManager.Localization
+@using Microsoft.Extensions.Configuration
+@inject NavigationManager NavigationManager
+@inject IConfiguration Configuration
+@inherits SurveyManagerComponentBase
+
+<PageTitle>@L["Login"] - SurveyManager</PageTitle>
+
+<div class="min-vh-100 d-flex align-items-center justify-content-center bg-light" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5 col-lg-4">
+                <Card Class="shadow-lg border-0">
+                    <CardBody Class="p-5">
+                        <div class="text-center mb-4">
+                            <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                                <Icon Name="IconName.Poll" Size="IconSize.ExtraLarge" Class="text-primary" />
+                            </div>
+                            <h2 class="fw-bold mb-2">SurveyManager</h2>
+                            <p class="text-muted mb-0">@L["LongWelcomeMessage"]</p>
+                        </div>
+
+                        <div class="mb-4">
+                            <Button Color="Color.Primary"
+                                    Block
+                                    Size="Size.Large"
+                                    Clicked="HandleLogin"
+                                    Class="py-3 fw-semibold">
+                                <Icon Name="IconName.User" Class="me-2" />
+                                @L["Login"]
+                            </Button>
+                        </div>
+
+                        <div class="text-center">
+                            <small class="text-muted">
+                                @L["LoginDescription"]
+                            </small>
+                        </div>
+                    </CardBody>
+                </Card>
+
+                <div class="text-center mt-4">
+                    <p class="text-white small mb-0">
+                        @L["NeedHelp"]? 
+                        <a href="#" class="text-white text-decoration-underline">@L["ContactSupport"]</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private void HandleLogin()
+    {
+        // Get the return URL from query string or default to dashboard
+        var returnUrl = NavigationManager.GetUriWithQueryParameter("returnUrl", "/dashboard");
+        
+        // Build the authentication server login URL from configuration
+        var authServerUrl = Configuration["AuthServer:Authority"] ?? "https://localhost:44360";
+        var loginUrl = $"{authServerUrl}/Account/Login?returnUrl={Uri.EscapeDataString(returnUrl)}";
+        
+        // Redirect to auth server
+        NavigationManager.NavigateTo(loginUrl, forceLoad: true);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // If already authenticated, redirect to dashboard
+        if (CurrentUser.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo("/dashboard");
+        }
+    }
+}
+

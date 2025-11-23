@@ -14,62 +14,97 @@
 @inject Volo.Abp.AspNetCore.Components.Web.AbpBlazorMessageLocalizerHelper<SurveyManagerResource> LH
 @inherits AbpCrudPageBase<IIndicatorAppService, IndicatorDto, Guid, PagedAndSortedResultRequestDto, CreateIndicatorDto, UpdateIndicatorDto>
 
-<Card>
-    <CardHeader>
-        <Row Class="justify-content-between">
+<Card Class="shadow-sm">
+    <CardHeader Class="bg-white border-bottom">
+        <Row Class="align-items-center justify-content-between g-3">
             <Column ColumnSize="ColumnSize.IsAuto">
-                <h2>@L["Indicators"]</h2>
+                <div class="d-flex align-items-center">
+                    <Icon Name="IconName.ChartLine" Class="text-primary me-2" Size="IconSize.Large" />
+                    <div>
+                        <h4 class="mb-0 fw-bold">@L["Indicators"]</h4>
+                        <small class="text-muted">@L["ManageYourIndicators"]</small>
+                    </div>
+                </div>
             </Column>
             <Column ColumnSize="ColumnSize.IsAuto">
                 @if (HasCreatePermission)
                 {
-                    <Button Color="Color.Primary" Clicked="OpenCreateModalAsync">
-                        <Icon Name="IconName.Add" /> @L["CreateIndicator"]
+                    <Button Color="Color.Primary" Clicked="OpenCreateModalAsync" Class="px-4">
+                        <Icon Name="IconName.Add" />
+                        @L["CreateIndicator"]
                     </Button>
                 }
             </Column>
         </Row>
     </CardHeader>
-    <CardBody>
+    <CardBody Class="p-0">
         <DataGrid TItem="IndicatorDto"
                   Data="Entities"
                   ReadData="OnDataGridReadAsync"
                   TotalItems="TotalCount"
                   ShowPager="true"
                   PageSize="PageSize"
-                  Responsive>
+                  ShowFilterRow="true"
+                  Striped="true"
+                  Hoverable="true"
+                  Responsive="true"
+                  Class="border-0">
             <DataGridColumns>
-                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.Name)" Caption="@L["IndicatorName"]" />
-                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.Description)" Caption="@L["IndicatorDescription"]" />
-                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.IsActive)" Caption="@L["IsActive"]">
-                    <DisplayTemplate>
+                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.Name)" Caption="@L["IndicatorName"]" Sortable="true">
+                    <DisplayTemplate Context="context">
+                        <div class="d-flex align-items-center">
+                            <Icon Name="IconName.ChartBar" Class="text-primary me-2" />
+                            <strong>@context.Name</strong>
+                        </div>
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.Description)" Caption="@L["IndicatorDescription"]" Sortable="true">
+                    <DisplayTemplate Context="context">
+                        <span class="text-muted">@(context.Description?.Length > 60 ? context.Description.Substring(0, 60) + "..." : context.Description)</span>
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.IsActive)" Caption="@L["IsActive"]" Sortable="true">
+                    <DisplayTemplate Context="context">
                         @if (context.IsActive)
                         {
-                            <Badge Color="Color.Success">@L["Active"]</Badge>
+                            <Badge Color="Color.Success">
+                                <Icon Name="IconName.Check" />
+                                @L["Active"]
+                            </Badge>
                         }
                         else
                         {
-                            <Badge Color="Color.Secondary">@L["Inactive"]</Badge>
+                            <Badge Color="Color.Secondary">
+                                <Icon Name="IconName.Times" />
+                                @L["Inactive"]
+                            </Badge>
                         }
                     </DisplayTemplate>
                 </DataGridColumn>
-                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.QuestionIds)" Caption="@L["LinkedQuestions"]">
-                    <DisplayTemplate>
-                        <Badge Color="Color.Info">@context.QuestionIds.Count @L["Questions"]</Badge>
+                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.QuestionIds)" Caption="@L["LinkedQuestions"]" Sortable="true">
+                    <DisplayTemplate Context="context">
+                        <Badge Color="Color.Info">
+                            <Icon Name="IconName.Link" />
+                            @context.QuestionIds.Count @L["Questions"]
+                        </Badge>
                     </DisplayTemplate>
                 </DataGridColumn>
-                <DataGridEntityActionsColumn TItem="IndicatorDto" @ref="@EntityActionsColumn" Caption="@L["Actions"]">
+                <DataGridEntityActionsColumn TItem="IndicatorDto" @ref="@EntityActionsColumn" Caption="@L["Actions"]" Width="180px">
                     <DisplayTemplate Context="context">
                         <EntityActions TItem="IndicatorDto" EntityActionsColumn="@EntityActionsColumn">
                             <EntityAction TItem="IndicatorDto" 
-                                          Text="@L["ViewDetails"]" 
+                                          Text="@L["ViewDetails"]"
+                                          Icon="IconName.Eye"
                                           Clicked="() => NavigateToDetails(context.Id)" />
                             <EntityAction TItem="IndicatorDto" 
-                                          Text="@L["Edit"]" 
+                                          Text="@L["Edit"]"
+                                          Icon="IconName.Edit"
                                           Visible="@HasUpdatePermission" 
                                           Clicked="() => OpenEditModalAsync(context)" />
                             <EntityAction TItem="IndicatorDto" 
-                                          Text="@L["Delete"]" 
+                                          Text="@L["Delete"]"
+                                          Icon="IconName.Trash"
+                                          Color="Color.Danger"
                                           Visible="@HasDeletePermission" 
                                           Clicked="() => DeleteEntityAsync(context)" 
                                           ConfirmationMessage="() => GetDeleteConfirmationMessage(context)" />

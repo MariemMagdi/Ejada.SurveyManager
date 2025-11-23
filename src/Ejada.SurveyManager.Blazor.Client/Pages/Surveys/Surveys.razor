@@ -9,22 +9,30 @@
 
 @inherits AbpCrudPageBase<ISurveyAppService, SurveyDto, Guid, PagedAndSortedResultRequestDto, CreateSurveyDto, UpdateSurveyDto>
 
-<Card>
-    <CardHeader>
-        <Row class="justify-content-between">
+<Card Class="shadow-sm">
+    <CardHeader Class="bg-white border-bottom">
+        <Row Class="align-items-center justify-content-between g-3">
             <Column ColumnSize="ColumnSize.IsAuto">
-                <h2>@L["Surveys"]</h2>
+                <div class="d-flex align-items-center">
+                    <Icon Name="IconName.Poll" Class="text-primary me-2" Size="IconSize.Large" />
+                    <div>
+                        <h4 class="mb-0 fw-bold">@L["Surveys"]</h4>
+                        <small class="text-muted">@L["ManageYourSurveys"]</small>
+                    </div>
+                </div>
             </Column>
             <Column ColumnSize="ColumnSize.IsAuto">
                 <Button Color="Color.Primary"
-                        Clicked="GoToCreatePage">
+                        Clicked="GoToCreatePage"
+                        Class="px-4">
+                    <Icon Name="IconName.Add" />
                     @L["NewSurvey"]
                 </Button>
             </Column>
         </Row>
     </CardHeader>
 
-    <CardBody>
+    <CardBody Class="p-0">
         <DataGrid TItem="SurveyDto"
                   Data="Entities"
                   ReadData="OnDataGridReadAsync"
@@ -32,35 +40,63 @@
                   ShowPager="true"
                   PageSize="PageSize"
                   ShowFilterRow="true"
-                  Striped="true">
+                  Striped="true"
+                  Hoverable="true"
+                  Responsive="true"
+                  Class="border-0">
             <DataGridColumns>
-                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.Name)" Caption="@L["SurveyName"]" />
-                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.Purpose)" Caption="@L["Purpose"]" />
-                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.TargetAudience)" Caption="@L["TargetAudience"]" />
-                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.IsActive)" Caption="@L["IsActive"]">
+                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.Name)" Caption="@L["SurveyName"]" Sortable="true">
+                    <DisplayTemplate Context="context">
+                        <div class="d-flex align-items-center">
+                            <Icon Name="IconName.File" Class="text-primary me-2" />
+                            <strong>@context.Name</strong>
+                        </div>
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.Purpose)" Caption="@L["Purpose"]" Sortable="true">
+                    <DisplayTemplate Context="context">
+                        <span class="text-muted">@(context.Purpose?.Length > 50 ? context.Purpose.Substring(0, 50) + "..." : context.Purpose)</span>
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.TargetAudience)" Caption="@L["TargetAudience"]" Sortable="true">
+                    <DisplayTemplate Context="context">
+                        <Badge Color="Color.Info">@context.TargetAudience</Badge>
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.IsActive)" Caption="@L["IsActive"]" Sortable="true">
                     <DisplayTemplate Context="context">
                         @if (context.IsActive)
                         {
-                            <span class="badge bg-success">@L["Active"]</span>
+                            <Badge Color="Color.Success">
+                                <Icon Name="IconName.Check" />
+                                @L["Active"]
+                            </Badge>
                         }
                         else
                         {
-                            <span class="badge bg-secondary">@L["Inactive"]</span>
+                            <Badge Color="Color.Secondary">
+                                <Icon Name="IconName.Times" />
+                                @L["Inactive"]
+                            </Badge>
                         }
                     </DisplayTemplate>
                 </DataGridColumn>
 
-                <DataGridEntityActionsColumn TItem="SurveyDto" @ref="@EntityActionsColumn" Caption="@L["Actions"]">
+                <DataGridEntityActionsColumn TItem="SurveyDto" @ref="@EntityActionsColumn" Caption="@L["Actions"]" Width="180px">
                     <DisplayTemplate Context="context">
                         <EntityActions TItem="SurveyDto" EntityActionsColumn="@EntityActionsColumn">
                             <EntityAction TItem="SurveyDto"
-                                          Text="@L["Edit"]"
-                                          Clicked="() => GoToEditPage(context.Id)" />
-                            <EntityAction TItem="SurveyDto"
                                           Text="@L["ViewDetails"]"
+                                          Icon="IconName.Eye"
                                           Clicked="() => GoToDetailsPage(context.Id)" />
                             <EntityAction TItem="SurveyDto"
+                                          Text="@L["Edit"]"
+                                          Icon="IconName.Edit"
+                                          Clicked="() => GoToEditPage(context.Id)" />
+                            <EntityAction TItem="SurveyDto"
                                           Text="@L["Delete"]"
+                                          Icon="IconName.Trash"
+                                          Color="Color.Danger"
                                           Clicked="() => DeleteEntityAsync(context)"
                                           ConfirmationMessage="() => GetDeleteConfirmationMessage(context)" />
                         </EntityActions>
