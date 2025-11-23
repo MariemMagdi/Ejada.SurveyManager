@@ -218,6 +218,14 @@
     "Created": "Created",
     "Login": "Login",
     "Current Questions": "Current Questions",
-    "Add More Questions": "Add More Questions"
+    "Add More Questions": "Add More Questions",
+    "Enter whole number": "Enter whole number",
+    "Enter decimal number": "Enter decimal number",
+    "Please enter a valid whole number": "Please enter a valid whole number",
+    "Please enter a valid decimal number": "Please enter a valid decimal number",
+    "Please select True or False": "Please select True or False",
+    "Please enter a valid date": "Please enter a valid date",
+    "Please enter a valid date and time": "Please enter a valid date and time",
+    "Please enter text (not numbers only)": "Please enter text (not numbers only)"
   }
 }

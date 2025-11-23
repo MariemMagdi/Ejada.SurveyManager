@@ -102,11 +102,17 @@ namespace Ejada.SurveyManager.Surveys
                     if(newQ.Options != null && newQ.Options.Any() && 
                        (newQ.Type == QuestionType.SingleChoice || newQ.Type == QuestionType.MultiChoice))
                     {
-                        var options = newQ.Options.Select(o => 
-                            Option.Create(GuidGenerator.Create(), questionId, o.Label, o.Type)
-                        ).ToList();
+                        // Filter out options with empty labels
+                        var validOptions = newQ.Options.Where(o => !string.IsNullOrWhiteSpace(o.Label)).ToList();
                         
-                        await _optionRepository.InsertManyAsync(options, autoSave: true);
+                        if (validOptions.Any())
+                        {
+                            var options = validOptions.Select(o => 
+                                Option.Create(GuidGenerator.Create(), questionId, o.Label, o.Type)
+                            ).ToList();
+                            
+                            await _optionRepository.InsertManyAsync(options, autoSave: true);
+                        }
                     }
                     
                     questionIdsToLink.Add(questionId);
@@ -167,11 +173,17 @@ namespace Ejada.SurveyManager.Surveys
                     if(newQ.Options != null && newQ.Options.Any() && 
                        (newQ.Type == QuestionType.SingleChoice || newQ.Type == QuestionType.MultiChoice))
                     {
-                        var options = newQ.Options.Select(o => 
-                            Option.Create(GuidGenerator.Create(), questionId, o.Label, o.Type)
-                        ).ToList();
+                        // Filter out options with empty labels
+                        var validOptions = newQ.Options.Where(o => !string.IsNullOrWhiteSpace(o.Label)).ToList();
                         
-                        await _optionRepository.InsertManyAsync(options, autoSave: true);
+                        if (validOptions.Any())
+                        {
+                            var options = validOptions.Select(o => 
+                                Option.Create(GuidGenerator.Create(), questionId, o.Label, o.Type)
+                            ).ToList();
+                            
+                            await _optionRepository.InsertManyAsync(options, autoSave: true);
+                        }
                     }
                     
                     questionIdsToAttach.Add(questionId);
@@ -193,11 +205,17 @@ namespace Ejada.SurveyManager.Surveys
                     if(updateQ.Options != null && updateQ.Options.Any() && 
                        (updateQ.Type == QuestionType.SingleChoice || updateQ.Type == QuestionType.MultiChoice))
                     {
-                        var options = updateQ.Options.Select(o => 
-                            Option.Create(GuidGenerator.Create(), newQuestionId, o.Label, o.Type)
-                        ).ToList();
+                        // Filter out options with empty labels
+                        var validOptions = updateQ.Options.Where(o => !string.IsNullOrWhiteSpace(o.Label)).ToList();
                         
-                        await _optionRepository.InsertManyAsync(options, autoSave: true);
+                        if (validOptions.Any())
+                        {
+                            var options = validOptions.Select(o => 
+                                Option.Create(GuidGenerator.Create(), newQuestionId, o.Label, o.Type)
+                            ).ToList();
+                            
+                            await _optionRepository.InsertManyAsync(options, autoSave: true);
+                        }
                     }
                     
                     // Detach old question
