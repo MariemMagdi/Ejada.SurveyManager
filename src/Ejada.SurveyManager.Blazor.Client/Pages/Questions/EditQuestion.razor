@@ -22,8 +22,8 @@
                 <div class="d-flex align-items-center">
                     <Icon Name="IconName.Edit" Class="text-primary me-2" Size="IconSize.Large" />
                     <div>
-                        <h4 class="mb-0 fw-bold">@L["EditQuestion"]</h4>
-                        <small class="text-muted">@L["EditQuestionDescription"]</small>
+                        <h4 class="mb-0 fw-bold">@L["Edit Question"]</h4>
+                        <small class="text-muted">@L["Update question information"]</small>
                     </div>
                 </div>
             </Column>
@@ -42,7 +42,7 @@
             <Alert Color="Color.Warning" Visible="true" Class="mb-4">
                 <AlertMessage>
                     <Icon Name="IconName.ExclamationTriangle" Class="me-2" />
-                    <strong>@L["Warning"]:</strong> @L["QuestionLinkedToSurveys"]
+                    <strong>@L["Warning"]:</strong> @L["This question is linked to the following survey(s) and cannot be edited:"]
                 </AlertMessage>
                 <AlertDescription>
                     <ul class="mb-0 mt-2">
@@ -71,8 +71,8 @@
                     <CardBody>
                         <Validation MessageLocalizer="@LH.Localize">
                             <Field>
-                                <FieldLabel>@L["QuestionText"] *</FieldLabel>
-                                <TextEdit @bind-Text="EditingEntity.Text" Disabled="@IsLinkedToSurvey" Placeholder="@L["EnterQuestionText"]">
+                                <FieldLabel>@L["Question Text"] *</FieldLabel>
+                                <TextEdit @bind-Text="EditingEntity.Text" Disabled="@IsLinkedToSurvey" Placeholder="@L["Enter question text"]">
                                     <Feedback>
                                         <ValidationError />
                                     </Feedback>
@@ -81,7 +81,7 @@
                         </Validation>
 
                         <Field>
-                            <FieldLabel>@L["QuestionType"]</FieldLabel>
+                            <FieldLabel>@L["Question Type"]</FieldLabel>
                             <Select TValue="QuestionType"
                                     SelectedValue="EditingEntity.Type"
                                     SelectedValueChanged="@(EventCallback.Factory.Create<QuestionType>(this, OnEditTypeChanged))"
@@ -106,7 +106,7 @@
                                         <Row class="align-items-end mb-2" @key="option">
                                             <Column>
                                                 <TextEdit @bind-Text="option.Label"
-                                                          Placeholder="@L["OptionLabel"]"
+                                                          Placeholder="@L["Option Label"]"
                                                           Disabled="@IsLinkedToSurvey" />
                                             </Column>
                                             <Column ColumnSize="ColumnSize.IsAuto">
@@ -143,7 +143,7 @@
                     <CardHeader Class="bg-light">
                         <h5 class="mb-0 fw-semibold d-flex align-items-center">
                             <Icon Name="IconName.ChartLine" Class="text-primary me-2" />
-                            @L["LinkedIndicators"]
+                            @L["Linked Indicators"]
                         </h5>
                     </CardHeader>
                     <CardBody>
@@ -171,7 +171,7 @@
                         {
                             <Alert Color="Color.Info" Visible>
                                 <Icon Name="IconName.InfoCircle" Class="me-2" />
-                                @L["NoIndicatorsAvailable"]
+                                @L["No indicators available. Please create indicators first."]
                             </Alert>
                         }
                     </CardBody>

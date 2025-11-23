@@ -26,6 +26,9 @@ using Volo.Abp.SettingManagement.Blazor.WebAssembly;
 using Volo.Abp.FeatureManagement.Blazor.WebAssembly;
 using Volo.Abp.TenantManagement.Blazor.WebAssembly;
 using Volo.Abp.Identity.Blazor.WebAssembly;
+using Volo.Abp.VirtualFileSystem;
+using Volo.Abp.Validation.Localization;
+using Ejada.SurveyManager;
 
 namespace Ejada.SurveyManager.Blazor.Client;
 
@@ -36,7 +39,8 @@ namespace Ejada.SurveyManager.Blazor.Client;
     typeof(AbpIdentityBlazorWebAssemblyModule),
     typeof(AbpTenantManagementBlazorWebAssemblyModule),
     typeof(AbpAspNetCoreComponentsWebAssemblyLeptonXLiteThemeModule),
-    typeof(SurveyManagerHttpApiClientModule)
+    typeof(SurveyManagerHttpApiClientModule),
+    typeof(SurveyManagerDomainSharedModule)
 )]
 public class SurveyManagerBlazorClientModule : AbpModule
 {
@@ -58,12 +62,26 @@ public class SurveyManagerBlazorClientModule : AbpModule
     {
         Configure<AbpLocalizationOptions>(options =>
         {
-            options.Resources
-                .Get<SurveyManagerResource>()
-                .AddBaseTypes(typeof(AbpUiResource));
+            // Register the resource for Blazor WebAssembly
+            // ABP will automatically load translations from the API server
+            // when IncludeLocalizationResources is true in appsettings.json
+            // Note: We do NOT use AddVirtualJson here because files are not embedded in the client
+            // The API server (HttpApi.Host) serves the JSON files via AddVirtualJson
             
-            // Set default culture to English
-            options.DefaultResourceType = typeof(SurveyManagerResource);
+            // Try to get the resource - if it doesn't exist, add it
+            try
+            {
+                var resource = options.Resources.Get<SurveyManagerResource>();
+                // If it exists, just ensure base types
+                resource.AddBaseTypes(typeof(AbpUiResource));
+            }
+            catch
+            {
+                // Resource doesn't exist, add it
+                options.Resources
+                    .Add<SurveyManagerResource>("en")
+                    .AddBaseTypes(typeof(AbpUiResource), typeof(AbpValidationResource));
+            }
         });
     }
 
@@ -126,3 +144,4 @@ public class SurveyManagerBlazorClientModule : AbpModule
         });
     }
 }
+

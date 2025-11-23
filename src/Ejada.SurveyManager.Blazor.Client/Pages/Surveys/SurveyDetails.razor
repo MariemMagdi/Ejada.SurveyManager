@@ -16,8 +16,8 @@
                 <div class="d-flex align-items-center">
                     <Icon Name="IconName.Eye" Class="text-primary me-2" Size="IconSize.Large" />
                     <div>
-                        <h4 class="mb-0 fw-bold">@L["SurveyDetails"]</h4>
-                        <small class="text-muted">@L["ViewSurveyInformation"]</small>
+                        <h4 class="mb-0 fw-bold">@L["Survey Details"]</h4>
+                        <small class="text-muted">@L["View survey details and questions"]</small>
                     </div>
                 </div>
             </Column>
@@ -47,14 +47,14 @@
                 <CardHeader Class="bg-light">
                     <h5 class="mb-0 fw-semibold d-flex align-items-center">
                         <Icon Name="IconName.InfoCircle" Class="text-primary me-2" />
-                        @L["GeneralInformation"]
+                        @L["General Information"]
                     </h5>
                 </CardHeader>
                 <CardBody>
                     <Row Class="g-3">
                         <Column ColumnSize="ColumnSize.Is12">
                             <div class="mb-3">
-                                <label class="form-label text-muted small text-uppercase fw-semibold">@L["SurveyName"]</label>
+                                <label class="form-label text-muted small text-uppercase fw-semibold">@L["Survey Name"]</label>
                                 <div class="d-flex align-items-center">
                                     <Icon Name="IconName.Poll" Class="text-primary me-2" />
                                     <h5 class="mb-0">@Survey.Name</h5>
@@ -69,7 +69,7 @@
                         </Column>
                         <Column ColumnSize="ColumnSize.Is6">
                             <div class="mb-3">
-                                <label class="form-label text-muted small text-uppercase fw-semibold">@L["TargetAudience"]</label>
+                                <label class="form-label text-muted small text-uppercase fw-semibold">@L["Target Audience"]</label>
                                 <p class="mb-0">@(string.IsNullOrWhiteSpace(Survey.TargetAudience) ? L["NotSpecified"] : Survey.TargetAudience)</p>
                             </div>
                         </Column>
@@ -114,7 +114,7 @@
                     {
                         <Alert Color="Color.Info" Visible>
                             <Icon Name="IconName.InfoCircle" Class="me-2" />
-                            @L["NoQuestionsAttached"]
+                            @L["No questions attached"]
                         </Alert>
                     }
                     else

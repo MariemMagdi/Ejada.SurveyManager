@@ -21,8 +21,8 @@
                 <div class="d-flex align-items-center">
                     <Icon Name="IconName.Add" Class="text-primary me-2" Size="IconSize.Large" />
                     <div>
-                        <h4 class="mb-0 fw-bold">@L["NewQuestion"]</h4>
-                        <small class="text-muted">@L["CreateNewQuestionDescription"]</small>
+                        <h4 class="mb-0 fw-bold">@L["New Question"]</h4>
+                        <small class="text-muted">@L["Create a new question"]</small>
                     </div>
                 </div>
             </Column>
@@ -46,14 +46,14 @@
                     <CardHeader Class="bg-light">
                         <h5 class="mb-0 fw-semibold d-flex align-items-center">
                             <Icon Name="IconName.InfoCircle" Class="text-primary me-2" />
-                            @L["QuestionInformation"]
+                            @L["Question Information"]
                         </h5>
                     </CardHeader>
                     <CardBody>
                         <Validation MessageLocalizer="@LH.Localize">
                             <Field>
-                                <FieldLabel>@L["QuestionText"] *</FieldLabel>
-                                <TextEdit @bind-Text="NewEntity.Text" Placeholder="@L["EnterQuestionText"]">
+                                <FieldLabel>@L["Question Text"] *</FieldLabel>
+                                <TextEdit @bind-Text="NewEntity.Text" Placeholder="@L["Enter question text"]">
                                     <Feedback>
                                         <ValidationError />
                                     </Feedback>
@@ -62,7 +62,7 @@
                         </Validation>
 
                         <Field>
-                            <FieldLabel>@L["QuestionType"]</FieldLabel>
+                            <FieldLabel>@L["Question Type"]</FieldLabel>
                             <Select TValue="QuestionType"
                                     SelectedValue="NewEntity.Type"
                                     SelectedValueChanged="@(EventCallback.Factory.Create<QuestionType>(this, OnCreateTypeChanged))"
@@ -86,7 +86,7 @@
                                         <Row class="align-items-end mb-2" @key="option">
                                             <Column>
                                                 <TextEdit @bind-Text="option.Label"
-                                                          Placeholder="@L["OptionLabel"]" />
+                                                          Placeholder="@L["Option Label"]" />
                                             </Column>
                                             <Column ColumnSize="ColumnSize.IsAuto">
                                                 <Select TValue="OptionDataType" @bind-SelectedValue="option.Type">
@@ -122,7 +122,7 @@
                     <CardHeader Class="bg-light">
                         <h5 class="mb-0 fw-semibold d-flex align-items-center">
                             <Icon Name="IconName.ChartLine" Class="text-primary me-2" />
-                            @L["LinkedIndicators"]
+                            @L["Linked Indicators"]
                         </h5>
                     </CardHeader>
                     <CardBody>
@@ -149,7 +149,7 @@
                         {
                             <Alert Color="Color.Info" Visible>
                                 <Icon Name="IconName.InfoCircle" Class="me-2" />
-                                @L["NoIndicatorsAvailable"]
+                                @L["No indicators available. Please create indicators first."]
                             </Alert>
                         }
                     </CardBody>

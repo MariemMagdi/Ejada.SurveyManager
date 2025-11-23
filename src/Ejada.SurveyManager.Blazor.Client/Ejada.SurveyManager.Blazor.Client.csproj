@@ -33,6 +33,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Ejada.SurveyManager.HttpApi.Client\Ejada.SurveyManager.HttpApi.Client.csproj" />
+    <ProjectReference Include="..\..\src\Ejada.SurveyManager.Domain.Shared\Ejada.SurveyManager.Domain.Shared.csproj" />
   </ItemGroup>
 
 

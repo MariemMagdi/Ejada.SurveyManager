@@ -129,10 +129,12 @@ public class SurveyManagerHttpApiHostModule : AbpModule
             options.Languages.Add(new LanguageInfo("en", "en", "English"));
             options.Languages.Add(new LanguageInfo("ar", "ar", "العربية"));
             
-            // Ensure resources are loaded from JSON files
-            options.Resources
-                .Get<Ejada.SurveyManager.Localization.SurveyManagerResource>()
-                .AddVirtualJson("/Localization/SurveyManager");
+            // Ensure the resource is registered and AddVirtualJson is configured
+            // The resource should already be registered by SurveyManagerDomainSharedModule
+            // We ensure AddVirtualJson is called to load the JSON files
+            // It's safe to call AddVirtualJson multiple times - it won't duplicate
+            var resource = options.Resources.Get<Ejada.SurveyManager.Localization.SurveyManagerResource>();
+            resource.AddVirtualJson("/Localization/SurveyManager");
         });
     }
 
@@ -181,16 +183,22 @@ public class SurveyManagerHttpApiHostModule : AbpModule
     {
         var hostingEnvironment = context.Services.GetHostingEnvironment();
 
-        if (hostingEnvironment.IsDevelopment())
+        Configure<AbpVirtualFileSystemOptions>(options =>
         {
-            Configure<AbpVirtualFileSystemOptions>(options =>
+            if (hostingEnvironment.IsDevelopment())
             {
+                // In development, use physical files for hot-reload
                 options.FileSets.ReplaceEmbeddedByPhysical<SurveyManagerDomainSharedModule>(Path.Combine(hostingEnvironment.ContentRootPath, $"..{Path.DirectorySeparatorChar}Ejada.SurveyManager.Domain.Shared"));
                 options.FileSets.ReplaceEmbeddedByPhysical<SurveyManagerDomainModule>(Path.Combine(hostingEnvironment.ContentRootPath, $"..{Path.DirectorySeparatorChar}Ejada.SurveyManager.Domain"));
                 options.FileSets.ReplaceEmbeddedByPhysical<SurveyManagerApplicationContractsModule>(Path.Combine(hostingEnvironment.ContentRootPath, $"..{Path.DirectorySeparatorChar}Ejada.SurveyManager.Application.Contracts"));
                 options.FileSets.ReplaceEmbeddedByPhysical<SurveyManagerApplicationModule>(Path.Combine(hostingEnvironment.ContentRootPath, $"..{Path.DirectorySeparatorChar}Ejada.SurveyManager.Application"));
-            });
-        }
+            }
+            else
+            {
+                // In production, use embedded files
+                options.FileSets.AddEmbedded<SurveyManagerDomainSharedModule>();
+            }
+        });
     }
 
     private void ConfigureConventionalControllers()

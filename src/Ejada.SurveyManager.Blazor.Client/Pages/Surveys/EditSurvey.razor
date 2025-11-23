@@ -20,8 +20,8 @@
                 <div class="d-flex align-items-center">
                     <Icon Name="IconName.Edit" Class="text-primary me-2" Size="IconSize.Large" />
                     <div>
-                        <h4 class="mb-0 fw-bold">@L["EditSurvey"]</h4>
-                        <small class="text-muted">@L["EditSurveyDescription"]</small>
+                        <h4 class="mb-0 fw-bold">@L["Edit Survey"]</h4>
+                        <small class="text-muted">@L["Update survey information and questions"]</small>
                     </div>
                 </div>
             </Column>
@@ -42,14 +42,14 @@
                     <CardHeader Class="bg-light">
                         <h5 class="mb-0 fw-semibold d-flex align-items-center">
                             <Icon Name="IconName.InfoCircle" Class="text-primary me-2" />
-                            @L["GeneralInformation"]
+                            @L["General Information"]
                         </h5>
                     </CardHeader>
                     <CardBody>
                         <Validation MessageLocalizer="@LH.Localize">
                             <Field>
                                 <FieldLabel>@L["Name"] *</FieldLabel>
-                                <TextEdit @bind-Text="@EditingEntity.Name" Placeholder="@L["EnterSurveyName"]">
+                                <TextEdit @bind-Text="@EditingEntity.Name" Placeholder="@L["Enter survey name"]">
                                     <Feedback>
                                         <ValidationError />
                                     </Feedback>
@@ -59,19 +59,19 @@
 
                         <Field>
                             <FieldLabel>@L["Purpose"]</FieldLabel>
-                            <MemoEdit @bind-Text="EditingEntity.Purpose" Rows="3" Placeholder="@L["EnterSurveyPurpose"]" />
+                            <MemoEdit @bind-Text="EditingEntity.Purpose" Rows="3" Placeholder="@L["Enter survey purpose"]" />
                         </Field>
 
                         <Field>
-                            <FieldLabel>@L["TargetAudience"]</FieldLabel>
-                            <TextEdit @bind-Text="EditingEntity.TargetAudience" Placeholder="@L["EnterTargetAudience"]" />
+                            <FieldLabel>@L["Target Audience"]</FieldLabel>
+                            <TextEdit @bind-Text="EditingEntity.TargetAudience" Placeholder="@L["Enter target audience"]" />
                         </Field>
 
                         <Field>
                             <Check TValue="bool" @bind-Checked="@EditingEntity.IsActive">
                                 @L["Active"]
                             </Check>
-                            <FieldHelp>@L["ActiveSurveyDescription"]</FieldHelp>
+                            <FieldHelp>@L["Make this survey available for assignment"]</FieldHelp>
                         </Field>
                     </CardBody>
                 </Card>
@@ -81,7 +81,7 @@
                     <CardHeader Class="bg-light">
                         <h5 class="mb-0 fw-semibold d-flex align-items-center">
                             <Icon Name="IconName.QuestionCircle" Class="text-primary me-2" />
-                            @L["CurrentQuestions"]
+                            @L["Current Questions"]
                         </h5>
                     </CardHeader>
                     <CardBody>
@@ -89,7 +89,7 @@
                         {
                             <Alert Color="Color.Info" Visible>
                                 <Icon Name="IconName.InfoCircle" Class="me-2" />
-                                @L["NoQuestionsAttached"]
+                                @L["No questions attached"]
                             </Alert>
                         }
                         else
@@ -136,15 +136,15 @@
                                 <CollapseHeader>
                                     <Heading Size="HeadingSize.Is5">
                                         <AccordionToggle Clicked="@(() => ShowExistingQuestionsSection = !ShowExistingQuestionsSection)">
-                                            <Icon Name="IconName.List" /> @L["AddMoreQuestions"]
+                                            <Icon Name="IconName.List" /> @L["Add More Questions"]
                                         </AccordionToggle>
                                     </Heading>
                                 </CollapseHeader>
                                 <CollapseBody>
                                     <Field>
-                                        <FieldLabel>@L["AvailableQuestions"]</FieldLabel>
+                                        <FieldLabel>@L["Available Questions"]</FieldLabel>
                                         <Select TValue="Guid?" @bind-SelectedValue="SelectedQuestionId">
-                                            <SelectItem Value="@((Guid?)null)">-- @L["SelectQuestion"] --</SelectItem>
+                                            <SelectItem Value="@((Guid?)null)">-- @L["Select Question"] --</SelectItem>
                                             @foreach (var q in FilteredAvailableQuestions)
                                             {
                                                 <SelectItem Value="@((Guid?)q.Id)">@q.Text</SelectItem>
@@ -171,11 +171,11 @@
                                 </CollapseHeader>
                                 <CollapseBody>
                                     <Field>
-                                        <FieldLabel>@L["QuestionText"]</FieldLabel>
-                                        <TextEdit @bind-Text="NewQuestionText" Placeholder="@L["EnterQuestionText"]" />
+                                        <FieldLabel>@L["Question Text"]</FieldLabel>
+                                        <TextEdit @bind-Text="NewQuestionText" Placeholder="@L["Enter question text"]" />
                                     </Field>
                                     <Field>
-                                        <FieldLabel>@L["QuestionType"]</FieldLabel>
+                                        <FieldLabel>@L["Question Type"]</FieldLabel>
                                         <Select TValue="QuestionType" @bind-SelectedValue="NewQuestionType">
                                             @foreach (var type in QuestionTypes)
                                             {
@@ -195,7 +195,7 @@
                                                     var opt = NewQuestionOptions[i];
                                                     <Row class="align-items-end mb-2" @key="opt">
                                                         <Column>
-                                                            <TextEdit @bind-Text="opt.Label" Placeholder="@L["OptionLabel"]" />
+                                                            <TextEdit @bind-Text="opt.Label" Placeholder="@L["Option Label"]" />
                                                         </Column>
                                                         <Column ColumnSize="ColumnSize.IsAuto">
                                                             <Select TValue="OptionDataType" @bind-SelectedValue="opt.Type">
@@ -222,7 +222,7 @@
 
                                     <Button Color="Color.Primary" Clicked="AddNewQuestion" Class="mt-2">
                                         <Icon Name="IconName.Add" />
-                                        @L["AddNewQuestionToSurvey"]
+                                        @L["Add New Question to Survey"]
                                     </Button>
                                 </CollapseBody>
                             </Collapse>

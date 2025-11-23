@@ -22,7 +22,7 @@
                     <Icon Name="IconName.ChartLine" Class="text-primary me-2" Size="IconSize.Large" />
                     <div>
                         <h4 class="mb-0 fw-bold">@L["Indicators"]</h4>
-                        <small class="text-muted">@L["ManageYourIndicators"]</small>
+                        <small class="text-muted">@L["Manage your indicators"]</small>
                     </div>
                 </div>
             </Column>
@@ -31,7 +31,7 @@
                 {
                     <Button Color="Color.Primary" Clicked="OpenCreateModalAsync" Class="px-4">
                         <Icon Name="IconName.Add" />
-                        @L["CreateIndicator"]
+                        @L["Create Indicator"]
                     </Button>
                 }
             </Column>
@@ -50,7 +50,7 @@
                   Responsive="true"
                   Class="border-0">
             <DataGridColumns>
-                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.Name)" Caption="@L["IndicatorName"]" Sortable="true">
+                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.Name)" Caption="@L["Indicator Name"]" Sortable="true">
                     <DisplayTemplate Context="context">
                         <div class="d-flex align-items-center">
                             <Icon Name="IconName.ChartBar" Class="text-primary me-2" />
@@ -58,7 +58,7 @@
                         </div>
                     </DisplayTemplate>
                 </DataGridColumn>
-                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.Description)" Caption="@L["IndicatorDescription"]" Sortable="true">
+                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.Description)" Caption="@L["Description"]" Sortable="true">
                     <DisplayTemplate Context="context">
                         <span class="text-muted">@(context.Description?.Length > 60 ? context.Description.Substring(0, 60) + "..." : context.Description)</span>
                     </DisplayTemplate>
@@ -81,7 +81,7 @@
                         }
                     </DisplayTemplate>
                 </DataGridColumn>
-                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.QuestionIds)" Caption="@L["LinkedQuestions"]" Sortable="true">
+                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.QuestionIds)" Caption="@L["Linked Questions"]" Sortable="true">
                     <DisplayTemplate Context="context">
                         <Badge Color="Color.Info">
                             <Icon Name="IconName.Link" />
@@ -122,14 +122,14 @@
     <ModalContent Centered Size="ModalSize.Large">
         <Form>
             <ModalHeader>
-                <ModalTitle>@L["CreateIndicator"]</ModalTitle>
+                <ModalTitle>@L["Create Indicator"]</ModalTitle>
                 <CloseButton Clicked="CloseCreateModalAsync" />
             </ModalHeader>
             <ModalBody>
                 <Validations @ref="@CreateValidationsRef" Model="@NewEntity" ValidateOnLoad="false">
                     <Validation MessageLocalizer="@LH.Localize">
                         <Field>
-                            <FieldLabel>@L["IndicatorName"] *</FieldLabel>
+                            <FieldLabel>@L["Indicator Name"] *</FieldLabel>
                             <TextEdit @bind-Text="@NewEntity.Name">
                                 <Feedback>
                                     <ValidationError />
@@ -139,7 +139,7 @@
                     </Validation>
                     
                     <Field>
-                        <FieldLabel>@L["IndicatorDescription"]</FieldLabel>
+                        <FieldLabel>@L["Description"]</FieldLabel>
                         <MemoEdit @bind-Text="@NewEntity.Description" Rows="3" />
                     </Field>
 
@@ -148,7 +148,7 @@
                     </Field>
 
                     <Field>
-                        <FieldLabel>@L["LinkedQuestions"]</FieldLabel>
+                        <FieldLabel>@L["Linked Questions"]</FieldLabel>
                         @if (AllQuestions != null && AllQuestions.Any())
                         {
                             <div style="max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; padding: 10px; border-radius: 4px;">
@@ -165,7 +165,7 @@
                         else
                         {
                             <Alert Color="Color.Info" Visible>
-                                @L["NoQuestionsAvailable"]
+                                @L["No questions available. Please create questions first."]
                             </Alert>
                         }
                     </Field>
@@ -186,14 +186,14 @@
     <ModalContent Centered Size="ModalSize.Large">
         <Form>
             <ModalHeader>
-                <ModalTitle>@L["EditIndicator"]</ModalTitle>
+                <ModalTitle>@L["Edit Indicator"]</ModalTitle>
                 <CloseButton Clicked="CloseEditModalAsync" />
             </ModalHeader>
             <ModalBody>
                 <Validations @ref="@EditValidationsRef" Model="@EditingEntity" ValidateOnLoad="false">
                     <Validation MessageLocalizer="@LH.Localize">
                         <Field>
-                            <FieldLabel>@L["IndicatorName"] *</FieldLabel>
+                            <FieldLabel>@L["Indicator Name"] *</FieldLabel>
                             <TextEdit @bind-Text="@EditingEntity.Name">
                                 <Feedback>
                                     <ValidationError />
@@ -203,7 +203,7 @@
                     </Validation>
                     
                     <Field>
-                        <FieldLabel>@L["IndicatorDescription"]</FieldLabel>
+                        <FieldLabel>@L["Description"]</FieldLabel>
                         <MemoEdit @bind-Text="@EditingEntity.Description" Rows="3" />
                     </Field>
 
@@ -212,7 +212,7 @@
                     </Field>
 
                     <Field>
-                        <FieldLabel>@L["LinkedQuestions"]</FieldLabel>
+                        <FieldLabel>@L["Linked Questions"]</FieldLabel>
                         @if (AllQuestions != null && AllQuestions.Any())
                         {
                             <div style="max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; padding: 10px; border-radius: 4px;">
@@ -229,7 +229,7 @@
                         else
                         {
                             <Alert Color="Color.Info" Visible>
-                                @L["NoQuestionsAvailable"]
+                                @L["No questions available. Please create questions first."]
                             </Alert>
                         }
                     </Field>
@@ -374,7 +374,7 @@
 
     protected override string GetDeleteConfirmationMessage(IndicatorDto entity)
     {
-        return string.Format(L["IndicatorDeletionConfirmationMessage"], entity.Name);
+        return string.Format(L["Are you sure you want to delete the indicator '{0}'?"], entity.Name);
     }
 
     private void NavigateToDetails(Guid indicatorId)

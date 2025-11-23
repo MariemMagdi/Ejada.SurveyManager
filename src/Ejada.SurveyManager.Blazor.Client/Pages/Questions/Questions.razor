@@ -17,7 +17,7 @@
                     <Icon Name="IconName.QuestionCircle" Class="text-primary me-2" Size="IconSize.Large" />
                     <div>
                         <h4 class="mb-0 fw-bold">@L["Questions"]</h4>
-                        <small class="text-muted">@L["ManageYourQuestions"]</small>
+                        <small class="text-muted">@L["Manage your questions"]</small>
                     </div>
                 </div>
             </Column>
@@ -26,7 +26,7 @@
                         Clicked="GoToCreatePage"
                         Class="px-4">
                     <Icon Name="IconName.Add" />
-                    @L["NewQuestion"]
+                    @L["New Question"]
                 </Button>
             </Column>
         </Row>
@@ -45,7 +45,7 @@
                   Responsive="true"
                   Class="border-0">
             <DataGridColumns>
-                <DataGridColumn TItem="QuestionDto" Field="@nameof(QuestionDto.Text)" Caption="@L["QuestionText"]" Sortable="true">
+                <DataGridColumn TItem="QuestionDto" Field="@nameof(QuestionDto.Text)" Caption="@L["Question Text"]" Sortable="true">
                     <DisplayTemplate Context="context">
                         <div class="d-flex align-items-center">
                             <Icon Name="IconName.File" Class="text-info me-2" />
@@ -53,7 +53,7 @@
                         </div>
                     </DisplayTemplate>
                 </DataGridColumn>
-                <DataGridColumn TItem="QuestionDto" Caption="@L["QuestionType"]" Sortable="true">
+                <DataGridColumn TItem="QuestionDto" Caption="@L["Question Type"]" Sortable="true">
                     <DisplayTemplate Context="context">
                         <Badge Color="Color.Primary">@context.Type.ToString()</Badge>
                     </DisplayTemplate>
@@ -72,7 +72,7 @@
                         {
                             <Badge Color="Color.Warning">
                                 <Icon Name="IconName.Link" />
-                                @L["LinkedToSurvey"]
+                                @L["Linked to survey"]
                             </Badge>
                         }
                         else
@@ -130,6 +130,6 @@
 
     protected override string GetDeleteConfirmationMessage(QuestionDto entity)
     {
-        return string.Format(L["QuestionDeletionConfirmationMessage"], entity.Text);
+        return string.Format(L["Are you sure you want to delete the question '{0}'?"], entity.Text);
     }
 }

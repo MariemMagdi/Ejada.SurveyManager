@@ -18,8 +18,8 @@
                 <div class="d-flex align-items-center">
                     <Icon Name="IconName.Clipboard" Class="text-primary me-2" Size="IconSize.Large" />
                     <div>
-                        <h4 class="mb-0 fw-bold">@(SurveyInstanceData?.SurveyName ?? L["AnswerSurvey"])</h4>
-                        <small class="text-muted">@L["AnswerSurveyDescription"]</small>
+                        <h4 class="mb-0 fw-bold">@(SurveyInstanceData?.SurveyName ?? L["Answer Survey"])</h4>
+                        <small class="text-muted">@L["Answer the assigned survey questions"]</small>
                     </div>
                 </div>
             </Column>
@@ -46,14 +46,14 @@
         {
             <Alert Color="Color.Info" Visible="true" Class="mb-4">
                 <Icon Name="IconName.InfoCircle" Class="me-2" />
-                @L["SurveyIsReadOnly"]
+                @L["This survey has been submitted or expired and cannot be edited"]
             </Alert>
 
             @if (!SurveyInstanceData.Questions.Any())
             {
                 <Alert Color="Color.Info" Visible="true">
                     <Icon Name="IconName.InfoCircle" Class="me-2" />
-                    @L["NoQuestionsInSurvey"]
+                    @L["No questions in this survey"]
                 </Alert>
             }
             else
@@ -102,7 +102,7 @@
                 {
                     <Alert Color="Color.Warning" Visible="true" Class="mb-4">
                         <Icon Name="IconName.ExclamationTriangle" Class="me-2" />
-                        <strong>@L["DueSoon"]:</strong> @SurveyInstanceData.DueDate.Value.ToString("yyyy-MM-dd HH:mm")
+                        <strong>@L["Due Soon"]:</strong> @SurveyInstanceData.DueDate.Value.ToString("yyyy-MM-dd HH:mm")
                     </Alert>
                 }
             }
@@ -111,7 +111,7 @@
             {
                 <Alert Color="Color.Info" Visible="true">
                     <Icon Name="IconName.InfoCircle" Class="me-2" />
-                    @L["NoQuestionsInSurvey"]
+                    @L["No questions in this survey"]
                 </Alert>
             }
             else
@@ -172,7 +172,7 @@
                         {
                             <Icon Name="IconName.Save" Class="me-1" />
                         }
-                        @L["SaveDraft"]
+                        @L["Save Draft"]
                     </Button>
 
                     <Button Color="Color.Success"

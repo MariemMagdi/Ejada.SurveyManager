@@ -18,8 +18,8 @@
         <div class="d-flex align-items-center">
                     <Icon Name="IconName.List" Class="text-primary me-2" Size="IconSize.Large" />
             <div>
-                <h4 class="mb-0 fw-bold">@L["MyAssignedSurveys"]</h4>
-                <small class="text-muted">@L["ViewYourAssignedSurveys"]</small>
+                <h4 class="mb-0 fw-bold">@L["My Assigned Surveys"]</h4>
+                <small class="text-muted">@L["View and manage your assigned surveys"]</small>
             </div>
         </div>
     </CardHeader>
@@ -45,7 +45,7 @@
                         </div>
                     </DisplayTemplate>
                 </DataGridColumn>
-                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.DueDate)" Caption="@L["DueDate"]" Sortable="true">
+                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.DueDate)" Caption="@L["Due Date"]" Sortable="true">
                     <DisplayTemplate Context="context">
                         @if (context.DueDate.HasValue)
                         {
@@ -68,7 +68,7 @@
                         }
                         else
                         {
-                            <Badge Color="Color.Secondary">@L["NoDueDate"]</Badge>
+                            <Badge Color="Color.Secondary">@L["No Due Date"]</Badge>
                         }
                     </DisplayTemplate>
                 </DataGridColumn>
@@ -79,7 +79,7 @@
                             case SurveyInstanceStatus.Assigned:
                                 <Badge Color="Color.Info">
                                     <Icon Name="IconName.Clock" />
-                                    @L["NotStarted"]
+                                    @L["Not Started"]
                                 </Badge>
                                 break;
                             case SurveyInstanceStatus.InProgress:

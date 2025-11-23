@@ -17,7 +17,7 @@
                     <Icon Name="IconName.Poll" Class="text-primary me-2" Size="IconSize.Large" />
                     <div>
                         <h4 class="mb-0 fw-bold">@L["Surveys"]</h4>
-                        <small class="text-muted">@L["ManageYourSurveys"]</small>
+                        <small class="text-muted">@L["Manage your surveys"]</small>
                     </div>
                 </div>
             </Column>
@@ -26,7 +26,7 @@
                         Clicked="GoToCreatePage"
                         Class="px-4">
                     <Icon Name="IconName.Add" />
-                    @L["NewSurvey"]
+                    @L["New Survey"]
                 </Button>
             </Column>
         </Row>
@@ -45,7 +45,7 @@
                   Responsive="true"
                   Class="border-0">
             <DataGridColumns>
-                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.Name)" Caption="@L["SurveyName"]" Sortable="true">
+                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.Name)" Caption="@L["Survey Name"]" Sortable="true">
                     <DisplayTemplate Context="context">
                         <div class="d-flex align-items-center">
                             <Icon Name="IconName.File" Class="text-primary me-2" />
@@ -58,12 +58,12 @@
                         <span class="text-muted">@(context.Purpose?.Length > 50 ? context.Purpose.Substring(0, 50) + "..." : context.Purpose)</span>
                     </DisplayTemplate>
                 </DataGridColumn>
-                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.TargetAudience)" Caption="@L["TargetAudience"]" Sortable="true">
+                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.TargetAudience)" Caption="@L["Target Audience"]" Sortable="true">
                     <DisplayTemplate Context="context">
                         <Badge Color="Color.Info">@context.TargetAudience</Badge>
                     </DisplayTemplate>
                 </DataGridColumn>
-                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.IsActive)" Caption="@L["IsActive"]" Sortable="true">
+                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.IsActive)" Caption="@L["Is Active"]" Sortable="true">
                     <DisplayTemplate Context="context">
                         @if (context.IsActive)
                         {
@@ -86,7 +86,7 @@
                     <DisplayTemplate Context="context">
                         <EntityActions TItem="SurveyDto" EntityActionsColumn="@EntityActionsColumn">
                             <EntityAction TItem="SurveyDto"
-                                          Text="@L["ViewDetails"]"
+                                          Text="@L["View Details"]"
                                           Icon="IconName.Eye"
                                           Clicked="() => GoToDetailsPage(context.Id)" />
                             <EntityAction TItem="SurveyDto"
@@ -125,6 +125,6 @@
 
     protected override string GetDeleteConfirmationMessage(SurveyDto entity)
     {
-        return string.Format(L["SurveyDeletionConfirmationMessage"], entity.Name);
+        return string.Format(L["Are you sure you want to delete the survey '{0}'?"], entity.Name);
     }
 }

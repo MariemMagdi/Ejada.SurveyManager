@@ -6,9 +6,9 @@
 @inherits AbpComponentBase
 
 <Field>
-    <FieldLabel>@L["SelectRating"]</FieldLabel>
+    <FieldLabel>@L["Select Rating"]</FieldLabel>
     <Select TValue="int?" @bind-SelectedValue="Question.AnswerValue" Disabled="@IsReadOnly">
-        <SelectItem Value="@((int?)null)">-- @L["SelectRating"] --</SelectItem>
+        <SelectItem Value="@((int?)null)">-- @L["Select Rating"] --</SelectItem>
         @for (int i = 1; i <= MaxValue; i++)
         {
             var value = i;

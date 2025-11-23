@@ -19,8 +19,8 @@
                 <div class="d-flex align-items-center">
                     <Icon Name="IconName.Clipboard" Class="text-primary me-2" Size="IconSize.Large" />
                     <div>
-                        <h4 class="mb-0 fw-bold">@L["SurveyInstances"]</h4>
-                        <small class="text-muted">@L["ManageSurveyAssignments"]</small>
+                        <h4 class="mb-0 fw-bold">@L["Survey Instances"]</h4>
+                        <small class="text-muted">@L["Manage survey assignments"]</small>
                     </div>
                 </div>
             </Column>
@@ -29,7 +29,7 @@
                         Clicked="GoToCreatePage"
                         Class="px-4">
                     <Icon Name="IconName.UserPlus" />
-                    @L["AssignSurvey"]
+                    @L["Assign Survey"]
                 </Button>
             </Column>
         </Row>
@@ -56,7 +56,7 @@
                         </div>
                     </DisplayTemplate>
                 </DataGridColumn>
-                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.AssigneeUserId)" Caption="@L["AssigneeUser"]" Sortable="true">
+                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.AssigneeUserId)" Caption="@L["Assignee User"]" Sortable="true">
                     <DisplayTemplate Context="context">
                         <div class="d-flex align-items-center">
                             <Icon Name="IconName.User" Class="text-info me-2" />
@@ -64,7 +64,7 @@
                         </div>
                     </DisplayTemplate>
                 </DataGridColumn>
-                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.DueDate)" Caption="@L["DueDate"]" Sortable="true">
+                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.DueDate)" Caption="@L["Due Date"]" Sortable="true">
                     <DisplayTemplate Context="context">
                         @if (context.DueDate.HasValue)
                         {
@@ -75,7 +75,7 @@
                         }
                         else
                         {
-                            <Badge Color="Color.Secondary">@L["NoDueDate"]</Badge>
+                            <Badge Color="Color.Secondary">@L["No Due Date"]</Badge>
                         }
                     </DisplayTemplate>
                 </DataGridColumn>
@@ -92,7 +92,7 @@
                             case SurveyInstanceStatus.InProgress:
                                 <Badge Color="Color.Warning">
                                     <Icon Name="IconName.Sync" />
-                                    @L["InProgress"]
+                                    @L["In Progress"]
                                 </Badge>
                                 break;
                             case SurveyInstanceStatus.Submitted:
@@ -115,12 +115,12 @@
                     <DisplayTemplate Context="context">
                         <EntityActions TItem="SurveyInstanceDto" EntityActionsColumn="@EntityActionsColumn">
                             <EntityAction TItem="SurveyInstanceDto"
-                                          Text="@L["ViewResponses"]"
+                                          Text="@L["View Responses"]"
                                           Icon="IconName.Eye"
                                           Visible="@(context.Status == SurveyInstanceStatus.Submitted)"
                                           Clicked="() => GoToDetailsPage(context.Id)" />
                             <EntityAction TItem="SurveyInstanceDto"
-                                          Text="@L["MarkExpired"]"
+                                          Text="@L["Mark as Expired"]"
                                           Icon="IconName.Ban"
                                           Color="Color.Warning"
                                           Visible="@(context.Status != SurveyInstanceStatus.Submitted && context.Status != SurveyInstanceStatus.Expired)"
@@ -201,7 +201,7 @@
 
     protected override string GetDeleteConfirmationMessage(SurveyInstanceDto entity)
     {
-        return string.Format(L["SurveyInstanceDeletionConfirmation"], entity.SurveyName);
+        return string.Format(L["Are you sure you want to delete the survey instance for '{0}'?"], entity.SurveyName);
     }
 }
 

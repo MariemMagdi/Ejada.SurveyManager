@@ -21,8 +21,8 @@
                 <div class="d-flex align-items-center">
                     <Icon Name="IconName.UserPlus" Class="text-primary me-2" Size="IconSize.Large" />
                     <div>
-                        <h4 class="mb-0 fw-bold">@L["AssignSurvey"]</h4>
-                        <small class="text-muted">@L["AssignSurveyToEmployee"]</small>
+                        <h4 class="mb-0 fw-bold">@L["Assign Survey"]</h4>
+                        <small class="text-muted">@L["Assign a survey to an employee"]</small>
                     </div>
                 </div>
             </Column>
@@ -44,7 +44,7 @@
                     <CardHeader Class="bg-light">
                         <h5 class="mb-0 fw-semibold d-flex align-items-center">
                             <Icon Name="IconName.InfoCircle" Class="text-primary me-2" />
-                            @L["AssignmentDetails"]
+                            @L["Assignment Details"]
                         </h5>
                     </CardHeader>
                     <CardBody>
@@ -52,7 +52,7 @@
                             <Field>
                                 <FieldLabel>@L["Survey"] *</FieldLabel>
                                 <Select TValue="Guid" @bind-SelectedValue="NewEntity.SurveyId">
-                                    <SelectItem Value="Guid.Empty">-- @L["SelectSurvey"] --</SelectItem>
+                                    <SelectItem Value="Guid.Empty">-- @L["Select Survey"] --</SelectItem>
                                     @foreach (var survey in Surveys)
                                     {
                                         <SelectItem Value="@survey.Id">@survey.Name</SelectItem>
@@ -66,9 +66,9 @@
 
                         <Validation MessageLocalizer="@LH.Localize">
                             <Field>
-                                <FieldLabel>@L["AssignToEmployee"] *</FieldLabel>
+                                <FieldLabel>@L["Assign to Employee"] *</FieldLabel>
                                 <Select TValue="Guid" @bind-SelectedValue="NewEntity.AssigneeUserId">
-                                    <SelectItem Value="Guid.Empty">-- @L["SelectEmployee"] --</SelectItem>
+                                    <SelectItem Value="Guid.Empty">-- @L["Select Employee"] --</SelectItem>
                                     @foreach (var user in Users)
                                     {
                                         <SelectItem Value="@user.Id">@user.UserName (@user.Email)</SelectItem>
@@ -81,9 +81,9 @@
                         </Validation>
 
                         <Field>
-                            <FieldLabel>@L["DueDate"] <small class="text-muted">(@L["Optional"])</small></FieldLabel>
+                            <FieldLabel>@L["Due Date"] <small class="text-muted">(@L["Optional"])</small></FieldLabel>
                             <DateEdit TValue="DateTime?" @bind-Date="NewEntity.DueDate" />
-                            <FieldHelp>@L["LeaveDueDateEmpty"]</FieldHelp>
+                            <FieldHelp>@L["Leave empty for no due date"]</FieldHelp>
                         </Field>
                     </CardBody>
                 </Card>
