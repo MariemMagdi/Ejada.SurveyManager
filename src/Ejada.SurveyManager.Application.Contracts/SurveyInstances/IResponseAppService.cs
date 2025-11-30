@@ -43,5 +43,11 @@ namespace Ejada.SurveyManager.SurveyInstances
         /// </summary>
         Task<List<QuestionResponseSummaryDto>> GetResponsesByQuestionIdAsync(Guid questionId);
 
+        /// <summary>
+        /// Get detailed responses for a specific question with employee emails and formatted answers.
+        /// Returns responses across all survey instances with employee information.
+        /// </summary>
+        Task<List<QuestionResponseDetailDto>> GetQuestionResponseDetailsAsync(Guid questionId);
+
     }
 }

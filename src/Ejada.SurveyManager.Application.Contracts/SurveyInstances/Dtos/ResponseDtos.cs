@@ -76,4 +76,11 @@ namespace Ejada.SurveyManager.SurveyInstances.Dtos
         public DateTime CreationTime { get; set; }
     }
 
+    public class QuestionResponseDetailDto
+    {
+        public Guid QuestionId { get; set; }
+        public string EmployeeEmail { get; set; } = string.Empty;
+        public string Answer { get; set; } = string.Empty;
+    }
+
 }

@@ -16,6 +16,7 @@ using Volo.Abp.Application.Dtos;
 using Volo.Abp.Application.Services;
 using Volo.Abp.Authorization;
 using Volo.Abp.Domain.Repositories;
+using Volo.Abp.Identity;
 using Volo.Abp.ObjectMapping;
 using Volo.Abp.Uow;
 using Volo.Abp.Users;
@@ -32,6 +33,7 @@ namespace Ejada.SurveyManager.SurveyInstances
         private readonly IRepository<Option, Guid> _optionRepository;
         private readonly IRepository<ResponseOption, Guid> _responseOptionRepository;
         private readonly IAuthorizationService _authorizationService;
+        private readonly IIdentityUserRepository _identityUserRepository;
         
         public ResponseAppService(
             IRepository<Survey, Guid> surveyRepository,
@@ -42,7 +44,8 @@ namespace Ejada.SurveyManager.SurveyInstances
             IRepository<SurveyQuestion, Guid> surveyQuestionRepository,
             IRepository<Option, Guid> optionRepository,
             IRepository<ResponseOption, Guid> responseOptionRepository,
-            IAuthorizationService authorizationService)
+            IAuthorizationService authorizationService,
+            IIdentityUserRepository identityUserRepository)
         {
             _surveyRepository = surveyRepository;
             _surveyInstanceRepository = surveyInstanceRepository;
@@ -52,6 +55,7 @@ namespace Ejada.SurveyManager.SurveyInstances
             _optionRepository = optionRepository;
             _responseOptionRepository = responseOptionRepository;
             _authorizationService = authorizationService;
+            _identityUserRepository = identityUserRepository;
         }
 
         [Authorize(SurveyManagerPermissions.Responses.Answer)]
@@ -602,6 +606,111 @@ namespace Ejada.SurveyManager.SurveyInstances
             }).ToList();
 
             return summaries;
+        }
+
+        [Authorize(SurveyManagerPermissions.Indicators.ViewAll)]
+        public async Task<List<QuestionResponseDetailDto>> GetQuestionResponseDetailsAsync(Guid questionId)
+        {
+            // Get the question to understand its type
+            var question = await _questionRepository.GetAsync(questionId);
+
+            // Get all responses for this question
+            var responses = await _responseRepository.GetListAsync(r => r.QuestionId == questionId);
+
+            if (!responses.Any())
+            {
+                return new List<QuestionResponseDetailDto>();
+            }
+
+            // Get survey instance IDs and their assignee user IDs
+            var surveyInstanceIds = responses.Select(r => r.SurveyInstanceId).Distinct().ToList();
+            var surveyInstances = await _surveyInstanceRepository.GetListAsync(si => surveyInstanceIds.Contains(si.Id));
+            var instanceToAssigneeMap = surveyInstances.ToDictionary(si => si.Id, si => si.AssigneeUserId);
+
+            // Get all unique user IDs
+            var userIds = instanceToAssigneeMap.Values.Distinct().ToList();
+            
+            // Get user emails
+            var users = new List<Volo.Abp.Identity.IdentityUser>();
+            foreach (var userId in userIds)
+            {
+                try
+                {
+                    var user = await _identityUserRepository.GetAsync(userId);
+                    users.Add(user);
+                }
+                catch
+                {
+                    // User not found, skip
+                }
+            }
+            var userEmailMap = users.ToDictionary(u => u.Id, u => u.Email ?? u.UserName ?? "Unknown");
+
+            // Get response options for multi-choice questions
+            var responseIds = responses.Select(r => r.Id).ToList();
+            var responseOptions = await _responseOptionRepository.GetListAsync(ro => responseIds.Contains(ro.ResponseId));
+            var responseOptionsMap = responseOptions.GroupBy(ro => ro.ResponseId)
+                .ToDictionary(g => g.Key, g => g.Select(ro => ro.OptionId).ToList());
+
+            // Get options for the question to format answers
+            var questionOptions = await _optionRepository.GetListAsync(o => o.QuestionId == questionId);
+            var optionMap = questionOptions.ToDictionary(o => o.Id, o => o.Label);
+
+            // Build detail DTOs
+            var details = new List<QuestionResponseDetailDto>();
+
+            foreach (var response in responses)
+            {
+                if (!instanceToAssigneeMap.TryGetValue(response.SurveyInstanceId, out var assigneeUserId))
+                    continue;
+
+                if (!userEmailMap.TryGetValue(assigneeUserId, out var email))
+                    email = "Unknown User";
+
+                string answerText = FormatAnswer(question.Type, response.AnswerValue, 
+                    responseOptionsMap.ContainsKey(response.Id) ? responseOptionsMap[response.Id] : new List<Guid>(),
+                    optionMap);
+
+                details.Add(new QuestionResponseDetailDto
+                {
+                    QuestionId = questionId,
+                    EmployeeEmail = email,
+                    Answer = answerText
+                });
+            }
+
+            return details;
+        }
+
+        private string FormatAnswer(QuestionType questionType, int? answerValue, List<Guid> selectedOptionIds, Dictionary<Guid, string> optionMap)
+        {
+            switch (questionType)
+            {
+                case QuestionType.Likert1To5:
+                case QuestionType.Likert1To7:
+                    return answerValue.HasValue ? answerValue.Value.ToString() : "Not answered";
+
+                case QuestionType.SingleChoice:
+                    if (selectedOptionIds != null && selectedOptionIds.Any())
+                    {
+                        var optionId = selectedOptionIds.First();
+                        return optionMap.TryGetValue(optionId, out var label) ? label : "Unknown option";
+                    }
+                    return "Not answered";
+
+                case QuestionType.MultiChoice:
+                    if (selectedOptionIds != null && selectedOptionIds.Any())
+                    {
+                        var labels = selectedOptionIds
+                            .Select(id => optionMap.TryGetValue(id, out var label) ? label : "Unknown option")
+                            .ToList();
+                        return string.Join(", ", labels);
+                    }
+                    return "Not answered";
+
+                default:
+                    return "Unknown type";
+            }
         }
     }
 }
