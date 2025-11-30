@@ -1,0 +1,256 @@
+@page "/users"
+@using Volo.Abp.Application.Dtos
+@using Volo.Abp.Identity
+@using Ejada.SurveyManager.Localization
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@using Microsoft.Extensions.Configuration
+@using Blazorise.DataGrid
+@inject IIdentityUserAppService UserService
+@inject NavigationManager NavigationManager
+@inject Volo.Abp.AspNetCore.Components.Web.AbpBlazorMessageLocalizerHelper<SurveyManagerResource> LH
+@inject IAuthorizationService AuthorizationService
+@inject HttpClient HttpClient
+@inject IJSRuntime JSRuntime
+@inject IConfiguration Configuration
+@inject IAccessTokenProvider TokenProvider
+
+@inherits SurveyManagerComponentBase
+
+<Card Class="shadow-sm">
+    <CardHeader Class="bg-white border-bottom">
+        <Row Class="align-items-center justify-content-between g-3">
+            <Column ColumnSize="ColumnSize.IsAuto">
+                <div class="d-flex align-items-center">
+                    <Icon Name="IconName.Users" Class="text-primary me-2" Size="IconSize.Large" />
+                    <div>
+                        <h4 class="mb-0 fw-bold">@L["Users"]</h4>
+                        <small class="text-muted">@L["Manage users"]</small>
+                    </div>
+                </div>
+            </Column>
+        </Row>
+    </CardHeader>
+
+    <CardBody Class="p-0">
+        <DataGrid TItem="IdentityUserDto"
+                  Data="UserList"
+                  ReadData="OnDataGridReadAsync"
+                  TotalItems="TotalCount"
+                  ShowPager="true"
+                  PageSize="PageSize"
+                  ShowFilterRow="true"
+                  Striped="true"
+                  Hoverable="true"
+                  Responsive="true"
+                  Class="border-0">
+            <DataGridColumns>
+                <DataGridColumn TItem="IdentityUserDto" Field="@nameof(IdentityUserDto.UserName)" Caption="@L["Username"]" Sortable="true">
+                    <DisplayTemplate Context="context">
+                        <div class="d-flex align-items-center">
+                            <Icon Name="IconName.User" Class="text-primary me-2" />
+                            <strong>@context.UserName</strong>
+                        </div>
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridColumn TItem="IdentityUserDto" Field="@nameof(IdentityUserDto.Email)" Caption="@L["Email"]" Sortable="true">
+                    <DisplayTemplate Context="context">
+                        <span>@context.Email</span>
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridColumn TItem="IdentityUserDto" Field="@nameof(IdentityUserDto.Name)" Caption="@L["Name"]" Sortable="true">
+                    <DisplayTemplate Context="context">
+                        <span>@(context.Name ?? "-")</span>
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridColumn TItem="IdentityUserDto" Field="@nameof(IdentityUserDto.Surname)" Caption="@L["Surname"]" Sortable="true">
+                    <DisplayTemplate Context="context">
+                        <span>@(context.Surname ?? "-")</span>
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridColumn TItem="IdentityUserDto" Caption="@L["Roles"]">
+                    <DisplayTemplate Context="context">
+                        @if (UserRoles.ContainsKey(context.Id))
+                        {
+                            var roles = UserRoles[context.Id];
+                            @foreach (var role in roles)
+                            {
+                                <Badge Color="Color.Info" Class="me-1">@role</Badge>
+                            }
+                        }
+                        else
+                        {
+                            <span class="text-muted">-</span>
+                        }
+                    </DisplayTemplate>
+                </DataGridColumn>
+                <DataGridColumn TItem="IdentityUserDto" Caption="@L["Actions"]">
+                    <DisplayTemplate Context="context">
+                        @if (IsEmployee(context.Id))
+                        {
+                            <Button Color="Color.Primary" 
+                                    Size="Size.Small"
+                                    Clicked="@(() => ExportUserReport(context.Id, context.Email ?? context.UserName))"
+                                    Disabled="@(exportingUsers.Contains(context.Id))">
+                                @if (exportingUsers.Contains(context.Id))
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    <text>Exporting...</text>
+                                }
+                                else
+                                {
+                                    <Icon Name="IconName.FilePdf" Class="me-1" />
+                                    <text>Export Report</text>
+                                }
+                            </Button>
+                        }
+                    </DisplayTemplate>
+                </DataGridColumn>
+            </DataGridColumns>
+        </DataGrid>
+    </CardBody>
+</Card>
+
+@code {
+    private List<IdentityUserDto> UserList { get; set; } = new();
+    private int TotalCount { get; set; }
+    private int PageSize { get; set; } = 10;
+    private Dictionary<Guid, List<string>> UserRoles { get; set; } = new();
+    private HashSet<Guid> exportingUsers = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsersAsync();
+    }
+
+    private async Task OnDataGridReadAsync(DataGridReadDataEventArgs<IdentityUserDto> e)
+    {
+        await LoadUsersAsync(e);
+        await LoadUserRolesAsync();
+        StateHasChanged();
+    }
+
+    private async Task LoadUsersAsync(DataGridReadDataEventArgs<IdentityUserDto>? e = null)
+    {
+        try
+        {
+            var pageSize = e?.PageSize ?? PageSize;
+            var page = e?.Page ?? 1;
+            var skipCount = (page - 1) * pageSize;
+            
+            // Get sorting from columns
+            string sorting = "UserName";
+            if (e?.Columns != null && e.Columns.Any(c => c.SortDirection != SortDirection.Default))
+            {
+                var sortColumn = e.Columns.FirstOrDefault(c => c.SortDirection != SortDirection.Default);
+                if (sortColumn != null)
+                {
+                    sorting = sortColumn.Field + (sortColumn.SortDirection == SortDirection.Descending ? " DESC" : "");
+                }
+            }
+            
+            var input = new GetIdentityUsersInput
+            {
+                MaxResultCount = pageSize,
+                SkipCount = skipCount,
+                Sorting = sorting
+            };
+
+            var result = await UserService.GetListAsync(input);
+            UserList = result.Items.ToList();
+            TotalCount = (int)result.TotalCount;
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Error loading users: {ex.Message}");
+        }
+    }
+
+    private async Task LoadUserRolesAsync()
+    {
+        foreach (var user in UserList)
+        {
+            if (!UserRoles.ContainsKey(user.Id))
+            {
+                try
+                {
+                    var roles = await UserService.GetRolesAsync(user.Id);
+                    UserRoles[user.Id] = roles.Items.Select(r => r.Name).ToList();
+                }
+                catch
+                {
+                    UserRoles[user.Id] = new List<string>();
+                }
+            }
+        }
+    }
+
+    private bool IsEmployee(Guid userId)
+    {
+        if (UserRoles.TryGetValue(userId, out var roles))
+        {
+            return roles.Any(r => r == "Employee");
+        }
+        return false;
+    }
+
+    private async Task ExportUserReport(Guid userId, string userEmail)
+    {
+        if (exportingUsers.Contains(userId))
+            return;
+
+        exportingUsers.Add(userId);
+        StateHasChanged();
+
+        try
+        {
+            // Get the API base URL from RemoteServices configuration
+            var apiBaseUrl = Configuration["RemoteServices:Default:BaseUrl"]?.TrimEnd('/') 
+                ?? "https://localhost:44360";
+            var apiUrl = $"{apiBaseUrl}/api/app/user/{userId}/export-report-pdf";
+
+            // Get access token
+            var tokenResult = await TokenProvider.RequestAccessToken();
+            if (tokenResult.TryGetToken(out var token))
+            {
+                // Create request with authentication header
+                var request = new HttpRequestMessage(HttpMethod.Get, apiUrl);
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token.Value);
+
+                var response = await HttpClient.SendAsync(request);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsByteArrayAsync();
+                    var fileName = $"UserReport_{userEmail.Replace("@", "_").Replace(" ", "_")}_{DateTime.Now:yyyyMMdd_HHmm}.pdf";
+                    fileName = System.Text.RegularExpressions.Regex.Replace(fileName, @"[^\w\-_\.]", "_");
+
+                    // Convert to base64 for reliable transfer to JavaScript
+                    var base64Content = Convert.ToBase64String(content);
+                    
+                    // Download the file using JavaScript
+                    await JSRuntime.InvokeVoidAsync("downloadFile", fileName, base64Content, "application/pdf");
+                }
+                else
+                {
+                    var errorMessage = await response.Content.ReadAsStringAsync();
+                    await JSRuntime.InvokeVoidAsync("alert", $"Failed to export user report: {errorMessage}");
+                }
+            }
+            else
+            {
+                await JSRuntime.InvokeVoidAsync("alert", "Failed to get access token. Please try logging in again.");
+            }
+        }
+        catch (Exception ex)
+        {
+            await JSRuntime.InvokeVoidAsync("alert", $"Error exporting user report: {ex.Message}");
+        }
+        finally
+        {
+            exportingUsers.Remove(userId);
+            StateHasChanged();
+        }
+    }
+}
+

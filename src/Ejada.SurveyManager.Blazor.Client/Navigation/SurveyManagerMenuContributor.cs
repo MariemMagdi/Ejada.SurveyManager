@@ -112,6 +112,16 @@ public class SurveyManagerMenuContributor : IMenuContributor
             requiredPermissionName: SurveyManagerPermissions.SurveyInstances.ViewOwn
         ));
 
+        // Users - Admin only (requires permission to view users)
+        context.Menu.AddItem(new ApplicationMenuItem(
+            SurveyManagerMenus.Users,
+            l["Menu:Users"],
+            "/users",
+            icon: "fas fa-users",
+            order: 8,
+            requiredPermissionName: "AbpIdentity.Users"
+        ));
+
         if (MultiTenancyConsts.IsEnabled)
         {
             administration.SetSubItemOrder(TenantManagementMenuNames.GroupName, 1);

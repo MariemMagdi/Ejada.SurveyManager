@@ -18,4 +18,7 @@ public class SurveyManagerMenus
     
     // Auditor menus (same as admin but read-only)
     public const string AuditSurveyInstances = Prefix + ".AuditSurveyInstances";
+    
+    // Users menu
+    public const string Users = Prefix + ".Users";
 }
