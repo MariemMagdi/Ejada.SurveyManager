@@ -26,7 +26,7 @@
                         Clicked="GoToCreatePage"
                         Class="px-4">
                     <Icon Name="IconName.Add" />
-                    @L["New Survey"]
+                     @LH.Localize("Actions")
                 </Button>
             </Column>
         </Row>
@@ -86,7 +86,7 @@
                     <DisplayTemplate Context="context">
                         <EntityActions TItem="SurveyDto" EntityActionsColumn="@EntityActionsColumn">
                             <EntityAction TItem="SurveyDto"
-                                          Text="@L["View Details"]"
+                                          Text="@LH.Localize("ViewDetails")"
                                           Icon="IconName.Eye"
                                           Clicked="() => GoToDetailsPage(context.Id)" />
                             <EntityAction TItem="SurveyDto"

@@ -129,7 +129,7 @@
     "Is Active": "نشط",
     "Menu:SurveyAssignments": "تكليفات الاستبيان",
     "New Question": "سؤال جديد",
-    "New Survey": "استبيان جديد",
+    "NewSurvey": "استبيان جديد",
     "Option": "خيار",
     "Option Label": "اسم الخيار",
     "Options": "الخيارات",
@@ -146,7 +146,7 @@
     "Target Audience": "الفئة المستهدفة",
     "Warning": "تحذير",
 
-    "View Details": "عرض التفاصيل",
+    "ViewDetails": "عرض التفاصيل",
     "Indicator Details": "تفاصيل المؤشر",
     "No questions are linked to this indicator.": "لا توجد أسئلة مرتبطة بهذا المؤشر.",
     "Response Statistics": "إحصائيات الردود",

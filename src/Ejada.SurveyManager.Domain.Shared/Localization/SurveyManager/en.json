@@ -138,7 +138,7 @@
     "Is Active": "Is Active",
     "Menu:SurveyAssignments": "Survey Assignments",
     "New Question": "New Question",
-    "New Survey": "New Survey",
+    "NewSurvey": "New Survey",
     "Option": "Option",
     "Option Label": "Option Label",
     "Options": "Options",
@@ -155,7 +155,7 @@
     "Target Audience": "Target Audience",
     "Warning": "Warning",
 
-    "View Details": "View Details",
+    "ViewDetails": "View Details",
     "Indicator Details": "Indicator Details",
     "No questions are linked to this indicator.": "No questions are linked to this indicator.",
     "Response Statistics": "Response Statistics",
