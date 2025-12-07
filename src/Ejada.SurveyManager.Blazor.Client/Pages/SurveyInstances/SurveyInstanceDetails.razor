@@ -16,52 +16,57 @@
 @inherits AbpComponentBase
 @attribute [Authorize(SurveyManagerPermissions.SurveyInstances.ViewAll)]
 
-<Card Class="shadow-sm">
-    <CardHeader Class="bg-white border-bottom">
-        <Row Class="align-items-center justify-content-between g-3">
-            <Column ColumnSize="ColumnSize.IsAuto">
-                <div class="d-flex align-items-center">
-                    <Icon Name="IconName.Eye" Class="text-primary me-2" Size="IconSize.Large" />
-                    <div>
-                        <h4 class="mb-0 fw-bold">@L["Survey Instance Details"]</h4>
-                        <small class="text-muted">@L["View survey responses and answers"]</small>
-                    </div>
-                </div>
-            </Column>
-            <Column ColumnSize="ColumnSize.IsAuto">
-                <Button Color="Color.Secondary" Outline Clicked="Back">
-                    <Icon Name="IconName.ArrowLeft" />
-                    @L["Back"]
-                </Button>
-            </Column>
-        </Row>
-    </CardHeader>
+<div class="modern-page-wrapper">
+    <div class="glass-card">
+        <div class="gradient-header">
+            <div class="gradient-header-content">
+                <Row Class="align-items-center justify-content-between g-3">
+                    <Column ColumnSize="ColumnSize.IsAuto">
+                        <div class="d-flex align-items-center">
+                            <div class="header-icon-box me-3">
+                                <Icon Name="IconName.Eye" Size="IconSize.ExtraLarge" />
+                            </div>
+                            <div>
+                                <h2 class="mb-1 fw-bold text-white">@LH.Localize("SurveyInstanceDetails")</h2>
+                                <p class="text-white-50 mb-0">@LH.Localize("ViewSurveyResponsesAndAnswers")</p>
+                            </div>
+                        </div>
+                    </Column>
+                    <Column ColumnSize="ColumnSize.IsAuto">
+                        <Button Color="Color.Secondary" Outline Clicked="Back" Class="btn-light">
+                            <Icon Name="IconName.ArrowLeft" />
+                            @LH.Localize("Back")
+                        </Button>
+                    </Column>
+                </Row>
+            </div>
+        </div>
 
-    <CardBody Class="p-4">
+        <div class="px-4 pb-4">
         @if (SurveyInstanceData == null)
         {
             <div class="text-center py-5">
                 <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">@L["Loading"]</span>
+                    <span class="visually-hidden">@LH.Localize("Loading")</span>
                 </div>
-                <p class="mt-3 text-muted">@L["Loading"]</p>
+                <p class="mt-3 text-muted">@LH.Localize("Loading")</p>
             </div>
         }
         else
         {
             <!-- Instance Information -->
-            <Card Class="mb-4 border-0 shadow-sm">
-                <CardHeader Class="bg-light">
-                    <h5 class="mb-0 fw-semibold d-flex align-items-center">
+            <div class="dashboard-card mb-4">
+                <div class="dashboard-card-header">
+                    <h5 class="dashboard-card-title">
                         <Icon Name="IconName.InfoCircle" Class="text-primary me-2" />
-                        @L["Assignment Information"]
+                        @LH.Localize("AssignmentInformation")
                     </h5>
-                </CardHeader>
-                <CardBody>
+                </div>
+                <div class="dashboard-card-body">
                     <Row Class="g-3">
                         <Column ColumnSize="ColumnSize.Is6">
                             <div class="mb-3">
-                                <label class="form-label text-muted small text-uppercase fw-semibold">@L["Survey"]</label>
+                                <label class="form-label text-muted small text-uppercase fw-semibold">@LH.Localize("Survey")</label>
                                 <div class="d-flex align-items-center">
                                     <Icon Name="IconName.Poll" Class="text-primary me-2" />
                                     <strong>@SurveyInstanceData.SurveyName</strong>
@@ -70,32 +75,32 @@
                         </Column>
                         <Column ColumnSize="ColumnSize.Is6">
                             <div class="mb-3">
-                                <label class="form-label text-muted small text-uppercase fw-semibold">@L["Status"]</label>
+                                <label class="form-label text-muted small text-uppercase fw-semibold">@LH.Localize("Status")</label>
                                 <div>
                                     @switch (SurveyInstanceData.Status)
                                     {
                                         case SurveyInstanceStatus.Assigned:
                                             <Badge Color="Color.Info">
                                                 <Icon Name="IconName.Clock" />
-                                                @L["Assigned"]
+                                                @LH.Localize("Assigned")
                                             </Badge>
                                             break;
                                         case SurveyInstanceStatus.InProgress:
                                             <Badge Color="Color.Warning">
                                                 <Icon Name="IconName.Sync" />
-                                                @L["In Progress"]
+                                                @LH.Localize("InProgress")
                                             </Badge>
                                             break;
                                         case SurveyInstanceStatus.Submitted:
                                             <Badge Color="Color.Success">
                                                 <Icon Name="IconName.Check" />
-                                                @L["Submitted"]
+                                                @LH.Localize("Submitted")
                                             </Badge>
                                             break;
                                         case SurveyInstanceStatus.Expired:
                                             <Badge Color="Color.Danger">
                                                 <Icon Name="IconName.ExclamationTriangle" />
-                                                @L["Expired"]
+                                                @LH.Localize("Expired")
                                             </Badge>
                                             break;
                                     }
@@ -104,7 +109,7 @@
                         </Column>
                         <Column ColumnSize="ColumnSize.Is6">
                             <div class="mb-3">
-                                <label class="form-label text-muted small text-uppercase fw-semibold">@L["Assigned To"]</label>
+                                <label class="form-label text-muted small text-uppercase fw-semibold">@LH.Localize("AssignedTo")</label>
                                 <div class="d-flex align-items-center">
                                     <Icon Name="IconName.User" Class="text-info me-2" />
                                     <span>@AssigneeUserEmail</span>
@@ -113,7 +118,7 @@
                         </Column>
                         <Column ColumnSize="ColumnSize.Is6">
                             <div class="mb-3">
-                                <label class="form-label text-muted small text-uppercase fw-semibold">@L["Due Date"]</label>
+                                <label class="form-label text-muted small text-uppercase fw-semibold">@LH.Localize("DueDate")</label>
                                 <div class="d-flex align-items-center">
                                     <Icon Name="IconName.Calendar" Class="text-warning me-2" />
                                     @if (SurveyInstanceData.DueDate.HasValue)
@@ -122,37 +127,37 @@
                                     }
                                     else
                                     {
-                                        <Badge Color="Color.Secondary">@L["No Due Date"]</Badge>
+                                        <Badge Color="Color.Secondary">@LH.Localize("NoDueDate")</Badge>
                                     }
                                 </div>
                             </div>
                         </Column>
                     </Row>
-                </CardBody>
-            </Card>
+                </div>
+            </div>
 
             <!-- Responses Section -->
-            <Card Class="mb-4 border-0 shadow-sm">
-                <CardHeader Class="bg-light">
-                    <h5 class="mb-0 fw-semibold d-flex align-items-center">
+            <div class="dashboard-card mb-4">
+                <div class="dashboard-card-header">
+                    <h5 class="dashboard-card-title">
                         <Icon Name="IconName.Clipboard" Class="text-primary me-2" />
-                        @L["Responses"]
+                        @LH.Localize("Responses")
                     </h5>
-                </CardHeader>
-                <CardBody>
+                </div>
+                <div class="dashboard-card-body">
 
                     @if (!SurveyInstanceData.Questions.Any())
                     {
                         <Alert Color="Color.Info" Visible="true">
                             <Icon Name="IconName.InfoCircle" Class="me-2" />
-                            @L["No questions in this survey"]
+                            @LH.Localize("NoQuestionsInThisSurvey")
                         </Alert>
                     }
                     else if (SurveyInstanceData.Status == SurveyInstanceStatus.Assigned)
                     {
                         <Alert Color="Color.Warning" Visible="true">
                             <Icon Name="IconName.ExclamationTriangle" Class="me-2" />
-                            @L["Employee has not started this survey yet"]
+                            @LH.Localize("EmployeeHasNotStartedThisSurveyYet")
                         </Alert>
                     }
                     else
@@ -179,14 +184,14 @@
                                                 {
                                                     <Alert Color="Color.Success" Visible>
                                                         <Icon Name="IconName.Check" Class="me-2" />
-                                                        <strong>@L["Answer"]:</strong> @question.AnswerValue.Value / @(question.Type == QuestionType.Likert1To5 ? 5 : 7)
+                                                        <strong>@LH.Localize("Answer"):</strong> @question.AnswerValue.Value / @(question.Type == QuestionType.Likert1To5 ? 5 : 7)
                                                     </Alert>
                                                 }
                                                 else
                                                 {
                                                     <Alert Color="Color.Secondary" Visible>
                                                         <Icon Name="IconName.Times" Class="me-2" />
-                                                        @L["Not Answered"]
+                                                        @LH.Localize("NotAnswered")
                                                     </Alert>
                                                 }
                                             }
@@ -196,7 +201,7 @@
                                                 {
                                                     <Alert Color="Color.Success" Visible>
                                                         <Icon Name="IconName.Check" Class="me-2" />
-                                                        <strong>@L["Selected Options"]:</strong>
+                                                        <strong>@LH.Localize("SelectedOptions"):</strong>
                                                         <ul class="mb-0 mt-2">
                                                             @foreach (var optionId in question.SelectedOptionIds)
                                                             {
@@ -213,14 +218,14 @@
                                                 {
                                                     <Alert Color="Color.Secondary" Visible>
                                                         <Icon Name="IconName.Times" Class="me-2" />
-                                                        @L["Not Answered"]
+                                                        @LH.Localize("NotAnswered")
                                                     </Alert>
                                                 }
 
                                                 @if (question.Options.Any())
                                                 {
                                                     <div class="mt-3">
-                                                        <small class="text-muted d-block mb-2">@L["Available Options"]:</small>
+                                                        <small class="text-muted d-block mb-2">@LH.Localize("AvailableOptions"):</small>
                                                         <ul class="small">
                                                             @foreach (var option in question.Options)
                                                             {
@@ -236,11 +241,12 @@
                             }
                         </div>
                     }
-                </CardBody>
-            </Card>
+                </div>
+            </div>
         }
-    </CardBody>
-</Card>
+        </div>
+    </div>
+</div>
 
 @code {
     [Parameter]

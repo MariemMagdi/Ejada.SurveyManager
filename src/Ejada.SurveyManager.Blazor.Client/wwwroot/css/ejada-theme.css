@@ -1,0 +1,218 @@
+/* ============================================
+   EJADA BRAND THEME - PRIORITY 1 COLORS
+   ============================================ */
+
+:root {
+    /* PRIORITY 1 - MAIN BRAND COLORS (Highest Priority) */
+    --brand-primary-deep: #001081;        /* Deep navy - headers, nav bars, strong brand areas */
+    --brand-primary: #0000FF;            /* Pure blue - primary/strong accent */
+    --brand-accent: #1FED93;             /* Green accent - success/highlight/CTA */
+    --brand-bg: #F2F2F2;                 /* Light gray - backgrounds, surfaces */
+    
+    /* Derived brand colors (staying close to brand palette) */
+    --brand-primary-light: #4d4dff;      /* Lighter blue for hover states */
+    --brand-primary-dark: #0000cc;       /* Darker blue for active states */
+    --brand-accent-dark: #1dd17a;        /* Darker green for hover states */
+    --brand-accent-light: #4ff5a8;       /* Lighter green for light backgrounds */
+    --brand-bg-light: #ffffff;            /* White for cards/surfaces */
+    --brand-bg-dark: #e5e5e5;            /* Slightly darker gray for borders */
+    
+    /* PRIORITY 2 - BASE DESIGN TOKENS (Non-color tokens preserved, colors overridden by Priority 1) */
+    
+    /* Layout & Container */
+    --container-max-sm: 540px;
+    --container-max-md: 720px;
+    --container-max-lg: 960px;
+    --container-max-xl: 1248px;
+    
+    /* Typography - Font Sizes */
+    --h1-font-size: 1.625rem;
+    --h2-font-size: 1.375rem;
+    --h3-font-size: 1.1875rem;
+    --h4-font-size: 1rem;
+    --h5-font-size: 0.875rem;
+    --h6-font-size: 0.8125rem;
+    --font-size-base: 0.875rem;
+    --font-size-sm: 0.875rem;
+    --font-size-lg: 1.125rem;
+    --lead-font-size: 1.25rem;
+    --lead-font-weight: 300;
+    --blockquote-font-size: 1.25rem;
+    --blockquote-small-font-size: 80%;
+    
+    /* Typography - Font Weights */
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-semi-bold: 600;
+    --font-weight-bold: 700;
+    --font-weight-lighter: lighter;
+    --font-weight-bolder: 900;
+    
+    /* Typography - Font Families */
+    --font-family-base: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+    --font-family-sans-serif: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+    --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+    
+    /* Display Sizes */
+    --display1-size: 6rem;
+    --display1-weight: 300;
+    --display2-size: 5.5rem;
+    --display2-weight: 300;
+    --display3-size: 4.5rem;
+    --display3-weight: 300;
+    --display4-size: 3.5rem;
+    --display4-weight: 300;
+    --display-line-height: 1.2;
+    
+    /* Spacing */
+    --spacer-0: 0;
+    --spacer-1: 0.25rem;
+    --spacer-2: 0.5rem;
+    --spacer-3: 1rem;
+    --spacer-4: 1.5rem;
+    --spacer-5: 3rem;
+    --spacer-6: 4.5rem;
+    --spacer-7: 6rem;
+    --spacer-8: 7.5rem;
+    --spacer-9: 9rem;
+    --spacer-10: 10rem;
+    
+    /* Border Radius */
+    --border-radius: 0.25rem;
+    --border-radius-sm: 0.1875rem;
+    --border-radius-lg: 0.375rem;
+    --border-radius-circle: 50%;
+    --rounded-pill: 50rem;
+    
+    /* Aspect Ratios */
+    --aspect-ratio: 100%;
+    --aspect-ratio-4-to-3: 75%;
+    --aspect-ratio-8-to-3: 37.5%;
+    --aspect-ratio-16-to-9: 56.25%;
+    
+    /* Shadows */
+    --box-shadow-sm: 0 .125rem .25rem rgba(0, 0, 0, .075);
+    --box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
+    --box-shadow-lg: 0 1rem 3rem rgba(0, 0, 0, .175);
+    
+    /* Transitions */
+    --transition-fade: opacity .15s linear;
+    --transition-collapse: height .35s ease;
+    
+    /* HR */
+    --hr-border-width: 1px;
+    --hr-border-color: rgba(0, 0, 0, .1);
+    --hr-border-margin-y: 1rem;
+    
+    /* PRIORITY 2 - COLOR TOKENS (Overridden by Priority 1 where applicable) */
+    
+    /* Primary Colors - Using Priority 1 brand colors */
+    --primary: var(--brand-primary-deep);              /* Use deep navy as primary */
+    --brand-color-1: var(--brand-primary);            /* Pure blue */
+    --brand-color-2: #6b6c7e;                         /* Keep neutral gray */
+    --brand-color-3: var(--brand-primary-deep);        /* Deep navy */
+    --brand-color-4: #30313f;                         /* Keep dark neutral */
+    
+    /* Semantic Colors - Aligned with brand */
+    --success: var(--brand-accent);                    /* Use green accent for success */
+    --info: var(--brand-primary);                      /* Use pure blue for info */
+    --warning: #b95000;                                /* Keep warning orange */
+    --danger: #da1414;                                 /* Keep danger red */
+    
+    /* Background Colors */
+    --body-bg: var(--brand-bg-light);                 /* White for body */
+    --body-color: #1c1c24;                            /* Dark text */
+    
+    /* Gray Scale - Compatible with brand-bg */
+    --white: #fff;
+    --black: #000;
+    --gray-100: #f7f8f9;
+    --gray-200: #f1f2f5;
+    --gray-300: #e7e7ed;
+    --gray-400: #cdced9;
+    --gray-500: #a7a9bc;
+    --gray-600: #6b6c7e;
+    --gray-700: #495057;
+    --gray-800: #393a4a;
+    --gray-900: #272833;
+    --gray-dark: #393a4a;
+    --text-muted: #a7a9bc;
+    
+    /* Light/Dark */
+    --light: #f1f2f5;
+    --lighter: #f7f8f9;
+    --dark: #272833;
+    
+    /* Secondary */
+    --secondary: #6b6c7e;
+    
+    /* Button Colors - Primary (using brand colors) */
+    --btn-primary-background-color: var(--brand-primary-deep);
+    --btn-primary-border-color: var(--brand-primary-deep);
+    --btn-primary-color: #fff;
+    --btn-primary-hover-background-color: var(--brand-primary-dark);
+    --btn-primary-hover-border-color: transparent;
+    --btn-primary-hover-color: #fff;
+    
+    /* Button Colors - Outline Primary */
+    --btn-outline-primary-color: var(--brand-primary-deep);
+    --btn-outline-primary-border-color: var(--brand-primary-deep);
+    --btn-outline-primary-hover-background-color: var(--brand-primary-deep);
+    --btn-outline-primary-hover-border-color: var(--brand-primary-deep);
+    --btn-outline-primary-hover-color: #ffffff;
+    
+    /* Button Colors - Secondary */
+    --btn-secondary-background-color: #fff;
+    --btn-secondary-border-color: #cdced9;
+    --btn-secondary-color: #6b6c7e;
+    --btn-secondary-hover-background-color: #f7f8f9;
+    --btn-secondary-hover-border-color: #cdced9;
+    --btn-secondary-hover-color: #272833;
+    
+    /* Button Colors - Outline Secondary */
+    --btn-outline-secondary-color: #6b6c7e;
+    --btn-outline-secondary-border-color: #cdced9;
+    --btn-outline-secondary-hover-background-color: rgba(39, 40, 51, 0.03);
+    --btn-outline-secondary-hover-border-color: transparent;
+    --btn-outline-secondary-hover-color: #272833;
+    
+    /* Button Colors - Link */
+    --btn-link-color: var(--brand-primary);
+    --btn-link-hover-color: #004ad7;
+    
+    /* Blockquote */
+    --blockquote-small-color: #6b6c7e;
+    
+    /* Legacy Ejada Primary (for backward compatibility with existing CSS) */
+    --ejada-primary: var(--brand-primary-deep);
+    --ejada-primary-dark: var(--brand-primary-dark);
+    --ejada-primary-light: #dbeafe;
+    --ejada-success: var(--brand-accent);
+    --ejada-warning: #f97316;
+    
+    /* LeptonX Brand Override */
+    --lpx-brand: var(--brand-primary-deep) !important;
+    
+    /* Bootstrap Badge CSS Variables - Brand theme alignment */
+    --bs-success: var(--brand-accent) !important;
+    --bs-success-rgb: 31, 237, 147 !important;
+    --bs-primary: var(--brand-primary-deep) !important;
+    --bs-primary-rgb: 0, 16, 129 !important;
+    --bs-info: var(--brand-primary) !important;
+    --bs-info-rgb: 0, 0, 255 !important;
+    --bs-warning: #f59e0b !important;
+    --bs-warning-rgb: 245, 158, 11 !important;
+    --bs-danger: #da1414 !important;
+    --bs-danger-rgb: 218, 20, 20 !important;
+    --bs-secondary: #6b6c7e !important;
+    --bs-secondary-rgb: 107, 108, 126 !important;
+    
+    /* Bootstrap Pagination CSS Variables - Brand theme alignment */
+    --bs-pagination-active-bg: var(--brand-primary-deep) !important;
+    --bs-pagination-active-border-color: var(--brand-primary-deep) !important;
+    --bs-pagination-active-color: #ffffff !important;
+    --bs-pagination-hover-bg: var(--brand-primary-light) !important;
+    --bs-pagination-hover-color: var(--brand-primary-deep) !important;
+    --bs-pagination-focus-box-shadow: 0 0 0 0.25rem rgba(0, 16, 129, 0.25) !important;
+}
+

@@ -14,224 +14,199 @@
 @inject IIndicatorAppService IndicatorService
 @inject IIdentityUserAppService UserService
 @inject NavigationManager NavigationManager
+@inject Volo.Abp.AspNetCore.Components.Web.AbpBlazorMessageLocalizerHelper<SurveyManagerResource> LH
 @inherits SurveyManagerComponentBase
 
-<PageTitle>@L["Dashboard"]</PageTitle>
+<PageTitle>@LH.Localize("Dashboard")</PageTitle>
 
-<div class="container-fluid px-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="mb-1 fw-bold">
-                <Icon Name="IconName.Dashboard" Class="text-primary me-2" />
-                @L["Dashboard"]
-            </h2>
-            <p class="text-muted mb-0">@L["Welcome to Survey Manager"]</p>
+<div class="modern-page-wrapper">
+    <div class="glass-card">
+        <div class="gradient-header">
+            <div class="gradient-header-content">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="header-icon-box me-3">
+                        <Icon Name="IconName.Dashboard" Size="IconSize.ExtraLarge" />
+                    </div>
+                    <div>
+                        <h2 class="mb-1 fw-bold text-white">@LH.Localize("Dashboard")</h2>
+                        <p class="text-white-50 mb-0">@LH.Localize("WelcomeToSurveyManager")</p>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
 
     @if (IsLoading)
     {
         <div class="text-center py-5">
             <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">@L["Loading"]</span>
+                <span class="visually-hidden">@LH.Localize("Loading")</span>
             </div>
-            <p class="mt-3 text-muted">@L["Loading"]</p>
+            <p class="mt-3 text-muted">@LH.Localize("Loading")</p>
         </div>
     }
     else
     {
         <!-- Statistics Cards -->
-        <Row Class="g-4 mb-4">
-            <Column ColumnSize="ColumnSize.Is3">
-                <Card Class="shadow-sm border-0 h-100">
-                    <CardBody Class="p-4">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div>
-                                <p class="text-muted mb-2 small text-uppercase fw-semibold">@L["Total Surveys"]</p>
-                                <h3 class="mb-0 fw-bold text-primary">@TotalSurveys</h3>
-                            </div>
-                            <div class="bg-primary bg-opacity-10 rounded-circle p-3">
-                                <Icon Name="IconName.Poll" Size="IconSize.ExtraLarge" Class="text-primary" />
-                            </div>
-                        </div>
-                    </CardBody>
-                </Card>
-            </Column>
-            <Column ColumnSize="ColumnSize.Is3">
-                <Card Class="shadow-sm border-0 h-100">
-                    <CardBody Class="p-4">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div>
-                                <p class="text-muted mb-2 small text-uppercase fw-semibold">@L["Active Surveys"]</p>
-                                <h3 class="mb-0 fw-bold text-success">@ActiveSurveys</h3>
-                            </div>
-                            <div class="bg-success bg-opacity-10 rounded-circle p-3">
-                                <Icon Name="IconName.CheckCircle" Size="IconSize.ExtraLarge" Class="text-success" />
-                            </div>
-                        </div>
-                    </CardBody>
-                </Card>
-            </Column>
-            <Column ColumnSize="ColumnSize.Is3">
-                <Card Class="shadow-sm border-0 h-100">
-                    <CardBody Class="p-4">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div>
-                                <p class="text-muted mb-2 small text-uppercase fw-semibold">@L["Total Assignments"]</p>
-                                <h3 class="mb-0 fw-bold text-info">@TotalAssignments</h3>
-                            </div>
-                            <div class="bg-info bg-opacity-10 rounded-circle p-3">
-                                <Icon Name="IconName.Clipboard" Size="IconSize.ExtraLarge" Class="text-info" />
-                            </div>
-                        </div>
-                    </CardBody>
-                </Card>
-            </Column>
-            <Column ColumnSize="ColumnSize.Is3">
-                <Card Class="shadow-sm border-0 h-100">
-                    <CardBody Class="p-4">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <div>
-                                <p class="text-muted mb-2 small text-uppercase fw-semibold">@L["Total Indicators"]</p>
-                                <h3 class="mb-0 fw-bold text-warning">@TotalIndicators</h3>
-                            </div>
-                            <div class="bg-warning bg-opacity-10 rounded-circle p-3">
-                                <Icon Name="IconName.ChartLine" Size="IconSize.ExtraLarge" Class="text-warning" />
-                            </div>
-                        </div>
-                    </CardBody>
-                </Card>
-            </Column>
-        </Row>
+        <div class="info-cards-grid">
+            <div class="modern-info-card accent-primary">
+                <div class="card-icon-wrapper">
+                    <Icon Name="IconName.Poll" Size="IconSize.ExtraLarge" />
+                </div>
+                <div class="card-label">@LH.Localize("TotalSurveys")</div>
+                <div class="card-value">@TotalSurveys</div>
+            </div>
+            <div class="modern-info-card accent-success">
+                <div class="card-icon-wrapper">
+                    <Icon Name="IconName.CheckCircle" Size="IconSize.ExtraLarge" />
+                </div>
+                <div class="card-label">@LH.Localize("ActiveSurveys")</div>
+                <div class="card-value">@ActiveSurveys</div>
+            </div>
+            <div class="modern-info-card accent-info">
+                <div class="card-icon-wrapper">
+                    <Icon Name="IconName.Clipboard" Size="IconSize.ExtraLarge" />
+                </div>
+                <div class="card-label">@LH.Localize("TotalAssignments")</div>
+                <div class="card-value">@TotalAssignments</div>
+            </div>
+            <div class="modern-info-card accent-warning">
+                <div class="card-icon-wrapper">
+                    <Icon Name="IconName.ChartLine" Size="IconSize.ExtraLarge" />
+                </div>
+                <div class="card-label">@LH.Localize("TotalIndicators")</div>
+                <div class="card-value">@TotalIndicators</div>
+            </div>
+        </div>
 
         <!-- Status Breakdown -->
-        <Row Class="g-4 mb-4">
-            <Column ColumnSize="ColumnSize.Is6">
-                <Card Class="shadow-sm border-0">
-                    <CardHeader Class="bg-white border-bottom">
-                        <h5 class="mb-0 fw-bold">
-                            <Icon Name="IconName.ChartPie" Class="text-primary me-2" />
-                            @L["Assignment Status Breakdown"]
-                        </h5>
-                    </CardHeader>
-                    <CardBody>
-                        <div class="d-flex flex-column gap-3">
-                            <div class="d-flex align-items-center justify-content-between p-3 bg-info bg-opacity-10 rounded">
-                                <div class="d-flex align-items-center">
-                                    <Badge Color="Color.Info" Class="me-3">
-                                        <Icon Name="IconName.Clock" />
-                                    </Badge>
-                                    <span class="fw-semibold">@L["Assigned"]</span>
-                                </div>
-                                <h5 class="mb-0 fw-bold text-info">@AssignedCount</h5>
-                            </div>
-                            <div class="d-flex align-items-center justify-content-between p-3 bg-warning bg-opacity-10 rounded">
-                                <div class="d-flex align-items-center">
-                                    <Badge Color="Color.Warning" Class="me-3">
-                                        <Icon Name="IconName.Sync" />
-                                    </Badge>
-                                    <span class="fw-semibold">@L["In Progress"]</span>
-                                </div>
-                                <h5 class="mb-0 fw-bold text-warning">@InProgressCount</h5>
-                            </div>
-                            <div class="d-flex align-items-center justify-content-between p-3 bg-success bg-opacity-10 rounded">
-                                <div class="d-flex align-items-center">
-                                    <Badge Color="Color.Success" Class="me-3">
-                                        <Icon Name="IconName.Check" />
-                                    </Badge>
-                                    <span class="fw-semibold">@L["Submitted"]</span>
-                                </div>
-                                <h5 class="mb-0 fw-bold text-success">@SubmittedCount</h5>
-                            </div>
-                            <div class="d-flex align-items-center justify-content-between p-3 bg-danger bg-opacity-10 rounded">
-                                <div class="d-flex align-items-center">
-                                    <Badge Color="Color.Danger" Class="me-3">
-                                        <Icon Name="IconName.ExclamationTriangle" />
-                                    </Badge>
-                                    <span class="fw-semibold">@L["Expired"]</span>
-                                </div>
-                                <h5 class="mb-0 fw-bold text-danger">@ExpiredCount</h5>
-                            </div>
-                        </div>
-                    </CardBody>
-                </Card>
-            </Column>
-            <Column ColumnSize="ColumnSize.Is6">
-                <Card Class="shadow-sm border-0">
-                    <CardHeader Class="bg-white border-bottom">
-                        <h5 class="mb-0 fw-bold">
-                            <Icon Name="IconName.Clock" Class="text-primary me-2" />
-                            @L["Recently Created Surveys"]
-                        </h5>
-                    </CardHeader>
-                    <CardBody>
-                        @if (RecentSurveys != null && RecentSurveys.Any())
-                        {
-                            <div class="list-group list-group-flush">
-                                @foreach (var survey in RecentSurveys.Take(5))
-                                {
-                                    <div class="list-group-item border-0 px-0 py-3">
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <div class="d-flex align-items-center">
-                                                <Icon Name="IconName.Poll" Class="text-primary me-3" />
-                                                <div>
-                                                    <h6 class="mb-1 fw-semibold">@survey.Name</h6>
-                                                    <small class="text-muted">@survey.CreationTime.ToString("MMM dd, yyyy")</small>
-                                                </div>
-                                            </div>
-                                            @if (survey.IsActive)
-                                            {
-                                                <Badge Color="Color.Success">@L["Active"]</Badge>
-                                            }
-                                            else
-                                            {
-                                                <Badge Color="Color.Secondary">@L["Inactive"]</Badge>
-                                            }
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="text-center py-4 text-muted">
-                                <Icon Name="IconName.Inbox" Size="IconSize.ExtraLarge" Class="mb-2 opacity-50" />
-                                <p class="mb-0">@L["No recent surveys"]</p>
-                            </div>
-                        }
-                    </CardBody>
-                </Card>
-            </Column>
-        </Row>
-
-        <!-- Latest Assignments -->
-        <Row Class="g-4">
-            <Column ColumnSize="ColumnSize.Is12">
-                <Card Class="shadow-sm border-0">
-                    <CardHeader Class="bg-white border-bottom">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <h5 class="mb-0 fw-bold">
-                                <Icon Name="IconName.List" Class="text-primary me-2" />
-                                @L["Latest Survey Assignments"]
+        <div class="px-4 pb-4">
+            <Row Class="g-4 mb-4">
+                <Column ColumnSize="ColumnSize.Is6">
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <h5 class="dashboard-card-title">
+                                <Icon Name="IconName.ChartPie" Class="text-primary me-2" />
+                                @LH.Localize("AssignmentStatusBreakdown")
                             </h5>
-                            <Button Color="Color.Primary" Outline Clicked="NavigateToSurveyInstances">
-                                @L["ViewAll"]
-                                <Icon Name="IconName.ArrowRight" />
-                            </Button>
                         </div>
-                    </CardHeader>
-                    <CardBody Class="p-0">
-                        @if (LatestAssignments != null && LatestAssignments.Any())
-                        {
-                            <div class="table-responsive">
-                                <table class="table table-hover mb-0">
-                                    <thead class="table-light">
+                        <div class="dashboard-card-body">
+                            <div class="d-flex flex-column gap-3">
+                                <div class="d-flex align-items-center justify-content-between p-3 bg-info bg-opacity-10 rounded">
+                                    <div class="d-flex align-items-center">
+                                        <Badge Color="Color.Info" Class="me-3">
+                                            <Icon Name="IconName.Clock" />
+                                        </Badge>
+                                        <span class="fw-semibold">@LH.Localize("Assigned")</span>
+                                    </div>
+                                    <h5 class="mb-0 fw-bold text-info">@AssignedCount</h5>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between p-3 bg-warning bg-opacity-10 rounded">
+                                    <div class="d-flex align-items-center">
+                                        <Badge Color="Color.Warning" Class="me-3">
+                                            <Icon Name="IconName.Sync" />
+                                        </Badge>
+                                        <span class="fw-semibold">@LH.Localize("InProgress")</span>
+                                    </div>
+                                    <h5 class="mb-0 fw-bold text-warning">@InProgressCount</h5>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between p-3 bg-success bg-opacity-10 rounded">
+                                    <div class="d-flex align-items-center">
+                                        <Badge Color="Color.Success" Class="me-3">
+                                            <Icon Name="IconName.Check" />
+                                        </Badge>
+                                        <span class="fw-semibold">@LH.Localize("Submitted")</span>
+                                    </div>
+                                    <h5 class="mb-0 fw-bold text-success">@SubmittedCount</h5>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between p-3 bg-danger bg-opacity-10 rounded">
+                                    <div class="d-flex align-items-center">
+                                        <Badge Color="Color.Danger" Class="me-3">
+                                            <Icon Name="IconName.ExclamationTriangle" />
+                                        </Badge>
+                                        <span class="fw-semibold">@LH.Localize("Expired")</span>
+                                    </div>
+                                    <h5 class="mb-0 fw-bold text-danger">@ExpiredCount</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </Column>
+                <Column ColumnSize="ColumnSize.Is6">
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <h5 class="dashboard-card-title">
+                                <Icon Name="IconName.Clock" Class="text-primary me-2" />
+                                @LH.Localize("RecentlyCreatedSurveys")
+                            </h5>
+                        </div>
+                        <div class="dashboard-card-body">
+                            @if (RecentSurveys != null && RecentSurveys.Any())
+                            {
+                                <div class="list-group list-group-flush">
+                                    @foreach (var survey in RecentSurveys.Take(5))
+                                    {
+                                        <div class="list-group-item border-0 px-0 py-3">
+                                            <div class="d-flex align-items-center justify-content-between">
+                                                <div class="d-flex align-items-center">
+                                                    <Icon Name="IconName.Poll" Class="text-primary me-3" />
+                                                    <div>
+                                                        <h6 class="mb-1 fw-semibold">@survey.Name</h6>
+                                                        <small class="text-muted">@survey.CreationTime.ToString("MMM dd, yyyy")</small>
+                                                    </div>
+                                                </div>
+                                                @if (survey.IsActive)
+                                                {
+                                                    <Badge Color="Color.Success">@LH.Localize("Active")</Badge>
+                                                }
+                                                else
+                                                {
+                                                    <Badge Color="Color.Secondary">@LH.Localize("Inactive")</Badge>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center py-4 text-muted">
+                                    <Icon Name="IconName.Inbox" Size="IconSize.ExtraLarge" Class="mb-2 opacity-50" />
+                                    <p class="mb-0">@LH.Localize("NoRecentSurveys")</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </Column>
+            </Row>
+
+            <!-- Latest Assignments -->
+            <Row Class="g-4">
+                <Column ColumnSize="ColumnSize.Is12">
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-header">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <h5 class="dashboard-card-title">
+                                    <Icon Name="IconName.List" Class="text-primary me-2" />
+                                    @LH.Localize("LatestSurveyAssignments")
+                                </h5>
+                                <Button Color="Color.Primary" Outline Clicked="NavigateToSurveyInstances">
+                                    @LH.Localize("ViewAll")
+                                    <Icon Name="IconName.ArrowRight" />
+                                </Button>
+                            </div>
+                        </div>
+                        <div class="dashboard-card-body p-0">
+                            @if (LatestAssignments != null && LatestAssignments.Any())
+                            {
+                                <div class="modern-table-wrapper">
+                                    <table class="table modern-table mb-0">
+                                        <thead>
                                         <tr>
-                                            <th>@L["Survey"]</th>
-                                            <th>@L["Assignee"]</th>
-                                            <th>@L["Status"]</th>
-                                            <th>@L["Due Date"]</th>
-                                            <th>@L["Created"]</th>
+                                            <th>@LH.Localize("Survey")</th>
+                                            <th>@LH.Localize("Assignee")</th>
+                                            <th>@LH.Localize("Status")</th>
+                                            <th>@LH.Localize("DueDate")</th>
+                                            <th>@LH.Localize("Created")</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -256,25 +231,25 @@
                                                         case SurveyInstanceStatus.Assigned:
                                                             <Badge Color="Color.Info">
                                                                 <Icon Name="IconName.Clock" />
-                                                                @L["Assigned"]
+                                                                @LH.Localize("Assigned")
                                                             </Badge>
                                                             break;
                                                         case SurveyInstanceStatus.InProgress:
                                                             <Badge Color="Color.Warning">
                                                                 <Icon Name="IconName.Sync" />
-                                                                @L["In Progress"]
+                                                                @LH.Localize("InProgress")
                                                             </Badge>
                                                             break;
                                                         case SurveyInstanceStatus.Submitted:
                                                             <Badge Color="Color.Success">
                                                                 <Icon Name="IconName.Check" />
-                                                                @L["Submitted"]
+                                                                @LH.Localize("Submitted")
                                                             </Badge>
                                                             break;
                                                         case SurveyInstanceStatus.Expired:
                                                             <Badge Color="Color.Danger">
                                                                 <Icon Name="IconName.ExclamationTriangle" />
-                                                                @L["Expired"]
+                                                                @LH.Localize("Expired")
                                                             </Badge>
                                                             break;
                                                     }
@@ -286,7 +261,7 @@
                                                     }
                                                     else
                                                     {
-                                                        <Badge Color="Color.Secondary">@L["No Due Date"]</Badge>
+                                                        <Badge Color="Color.Secondary">@LH.Localize("NoDueDate")</Badge>
                                                     }
                                                 </td>
                                                 <td>
@@ -294,22 +269,24 @@
                                                 </td>
                                             </tr>
                                         }
-                                    </tbody>
-                                </table>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="text-center py-5 text-muted">
-                                <Icon Name="IconName.Inbox" Size="IconSize.ExtraLarge" Class="mb-2 opacity-50" />
-                                <p class="mb-0">@L["No assignments found"]</p>
-                            </div>
-                        }
-                    </CardBody>
-                </Card>
-            </Column>
-        </Row>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center py-5 text-muted">
+                                    <Icon Name="IconName.Inbox" Size="IconSize.ExtraLarge" Class="mb-2 opacity-50" />
+                                    <p class="mb-0">@LH.Localize("NoAssignmentsFound")</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </Column>
+            </Row>
+        </div>
     }
+</div>
 </div>
 
 @code {

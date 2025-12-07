@@ -25,38 +25,52 @@
 @inherits AbpComponentBase
 @attribute [Authorize(SurveyManagerPermissions.Indicators.ViewAll)]
 
-<div class="container-fluid px-4 py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">@L["IndicatorDetails"]</h2>
-        <div class="d-flex gap-2">
-            <Button Color="Color.Primary" Clicked="ExportPdf" Disabled="@isExporting">
-                @if (isExporting)
-                {
-                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                    <text>Exporting...</text>
-                }
-                else
-                {
-                    <text>Export PDF</text>
-                }
-            </Button>
-            <Button Color="Color.Secondary" Clicked="Back">
-                @L["Back"]
-            </Button>
+<div class="modern-page-wrapper">
+    <div class="glass-card">
+        <div class="gradient-header">
+            <div class="gradient-header-content">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <div class="header-icon-box me-3">
+                            <Icon Name="IconName.ChartLine" Size="IconSize.ExtraLarge" />
+                        </div>
+                        <div>
+                            <h2 class="mb-1 fw-bold text-white">@LH.Localize("IndicatorDetails")</h2>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <Button Color="Color.Primary" Clicked="ExportPdf" Disabled="@isExporting" Class="btn-modern">
+                            @if (isExporting)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                <text>Exporting...</text>
+                            }
+                            else
+                            {
+                                <text>Export PDF</text>
+                            }
+                        </Button>
+                        <Button Color="Color.Secondary" Outline Clicked="Back" Class="btn-light">
+                            @LH.Localize("Back")
+                        </Button>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+
+        <div class="px-4 pb-4">
 
     @if (Indicator == null)
     {
         <div class="text-center py-5">
-            <p class="text-muted">@L["Loading"]...</p>
+            <p class="text-muted">@LH.Localize("Loading")...</p>
         </div>
     }
     else
     {
         <!-- Indicator Information Card -->
-        <Card Class="mb-4 shadow-sm">
-            <CardBody Class="p-4">
+        <div class="dashboard-card mb-4">
+            <div class="dashboard-card-body">
                 <div class="d-flex align-items-start justify-content-between mb-3">
                     <div class="flex-grow-1">
                         <h3 class="mb-2 fw-bold">@Indicator.Name</h3>
@@ -68,25 +82,25 @@
                     <div>
                         @if (Indicator.IsActive)
                         {
-                            <Badge Color="Color.Success" Class="px-3 py-2">@L["Active"]</Badge>
+                            <Badge Color="Color.Success" Class="px-3 py-2">@LH.Localize("Active")</Badge>
                         }
                         else
                         {
-                            <Badge Color="Color.Secondary" Class="px-3 py-2">@L["Inactive"]</Badge>
+                            <Badge Color="Color.Secondary" Class="px-3 py-2">@LH.Localize("Inactive")</Badge>
                         }
                     </div>
                 </div>
-            </CardBody>
-        </Card>
+            </div>
+        </div>
 
         <!-- Linked Questions Section -->
         <div class="mb-4">
-            <h4 class="mb-3 fw-semibold">@L["LinkedQuestions"]</h4>
+            <h4 class="mb-3 fw-semibold">@LH.Localize("LinkedQuestions")</h4>
             
             @if (LinkedQuestions == null || !LinkedQuestions.Any())
             {
                 <Alert Color="Color.Info" Visible Class="mb-0">
-                    @L["NoQuestionsLinkedToIndicator"]
+                    @LH.Localize("NoQuestionsLinkedToThisIndicator")
                 </Alert>
             }
             else
@@ -106,7 +120,7 @@
                             @if (question.Options != null && question.Options.Any())
                             {
                                 <div class="mb-4">
-                                    <h6 class="fw-semibold mb-2">@L["Options"]:</h6>
+                                    <h6 class="fw-semibold mb-2">@LH.Localize("Options"):</h6>
                                     <ul class="list-unstyled mb-0">
                                         @foreach (var option in question.Options)
                                         {
@@ -124,11 +138,11 @@
                                 var responses = QuestionResponses[question.Id];
                                 
                                 <div class="mb-4">
-                                    <h6 class="fw-semibold mb-3">@L["ResponseStatistics"]</h6>
+                                    <h6 class="fw-semibold mb-3">@LH.Localize("ResponseStatistics")</h6>
                                     
                                     @if (!responses.Any())
                                     {
-                                        <p class="text-muted mb-0">@L["NoResponsesYet"]</p>
+                                        <p class="text-muted mb-0">@LH.Localize("NoResponsesRecordedYet")</p>
                                     }
                                     else
                                     {
@@ -138,7 +152,7 @@
                                                     <div class="card-body p-3">
                                                         <div class="d-flex align-items-center">
                                                             <div class="flex-grow-1">
-                                                                <small class="text-muted d-block">@L["TotalResponses"]</small>
+                                                                <small class="text-muted d-block">@LH.Localize("TotalResponses")</small>
                                                                 <strong class="fs-4">@responses.Count</strong>
                                                             </div>
                                                         </div>
@@ -150,7 +164,7 @@
                                                     <div class="card-body p-3">
                                                         <div class="d-flex align-items-center">
                                                             <div class="flex-grow-1">
-                                                                <small class="text-muted d-block">@L["SubmittedResponses"]</small>
+                                                                <small class="text-muted d-block">@LH.Localize("SubmittedResponses")</small>
                                                                 <strong class="fs-4">@responses.Count(r => r.IsSubmitted)</strong>
                                                             </div>
                                                         </div>
@@ -168,7 +182,7 @@
                                                 var maxValue = question.Type == QuestionType.Likert1To5 ? 5 : 7;
                                                 
                                                 <div class="alert alert-info mb-3">
-                                                    <strong>@L["AverageRating"]:</strong> 
+                                                    <strong>@LH.Localize("AverageRating"):</strong> 
                                                     <span class="fs-5 fw-bold">@average.ToString("F2")</span> / @maxValue
                                                 </div>
                                             }
@@ -179,14 +193,14 @@
                                             if (submittedResponses.Any())
                                             {
                                                 <div class="mb-3">
-                                                    <strong class="d-block mb-2">@L["OptionDistribution"]:</strong>
+                                                    <strong class="d-block mb-2">@LH.Localize("OptionDistribution"):</strong>
                                                     <div class="table-responsive">
                                                         <table class="table table-sm table-bordered">
                                                             <thead class="table-light">
                                                                 <tr>
-                                                                    <th>@L["Option"]</th>
-                                                                    <th>@L["Count"]</th>
-                                                                    <th>@L["Percentage"]</th>
+                                                                    <th>@LH.Localize("Option")</th>
+                                                                    <th>@LH.Localize("Count")</th>
+                                                                    <th>@LH.Localize("Percentage")</th>
                                                                 </tr>
                                                             </thead>
                                                             <tbody>
@@ -257,6 +271,8 @@
             }
         </div>
     }
+        </div>
+    </div>
 </div>
 
 @code {

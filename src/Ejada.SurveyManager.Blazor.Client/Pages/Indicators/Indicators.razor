@@ -14,31 +14,36 @@
 @inject Volo.Abp.AspNetCore.Components.Web.AbpBlazorMessageLocalizerHelper<SurveyManagerResource> LH
 @inherits AbpCrudPageBase<IIndicatorAppService, IndicatorDto, Guid, PagedAndSortedResultRequestDto, CreateIndicatorDto, UpdateIndicatorDto>
 
-<Card Class="shadow-sm">
-    <CardHeader Class="bg-white border-bottom">
-        <Row Class="align-items-center justify-content-between g-3">
-            <Column ColumnSize="ColumnSize.IsAuto">
-                <div class="d-flex align-items-center">
-                    <Icon Name="IconName.ChartLine" Class="text-primary me-2" Size="IconSize.Large" />
-                    <div>
-                        <h4 class="mb-0 fw-bold">@L["Indicators"]</h4>
-                        <small class="text-muted">@L["Manage your indicators"]</small>
-                    </div>
-                </div>
-            </Column>
-            <Column ColumnSize="ColumnSize.IsAuto">
-                @if (HasCreatePermission)
-                {
-                    <Button Color="Color.Primary" Clicked="OpenCreateModalAsync" Class="px-4">
-                        <Icon Name="IconName.Add" />
-                        @L["Create Indicator"]
-                    </Button>
-                }
-            </Column>
-        </Row>
-    </CardHeader>
-    <CardBody Class="p-0">
-        <DataGrid TItem="IndicatorDto"
+<div class="modern-page-wrapper">
+    <div class="glass-card">
+        <div class="gradient-header">
+            <div class="gradient-header-content">
+                <Row Class="align-items-center justify-content-between g-3">
+                    <Column ColumnSize="ColumnSize.IsAuto">
+                        <div class="d-flex align-items-center">
+                            <div class="header-icon-box me-3">
+                                <Icon Name="IconName.ChartLine" Size="IconSize.ExtraLarge" />
+                            </div>
+                            <div>
+                                <h2 class="mb-1 fw-bold text-white">@LH.Localize("Indicators")</h2>
+                                <p class="text-white-50 mb-0">@LH.Localize("ManageYourIndicators")</p>
+                            </div>
+                        </div>
+                    </Column>
+                    <Column ColumnSize="ColumnSize.IsAuto">
+                        @if (HasCreatePermission)
+                        {
+                            <Button Color="Color.Primary" Clicked="OpenCreateModalAsync" Class="px-4 btn-modern">
+                                <Icon Name="IconName.Add" />
+                                @LH.Localize("CreateIndicator")
+                            </Button>
+                        }
+                    </Column>
+                </Row>
+            </div>
+        </div>
+        <div class="px-4 pb-4">
+            <DataGrid TItem="IndicatorDto"
                   Data="Entities"
                   ReadData="OnDataGridReadAsync"
                   TotalItems="TotalCount"
@@ -48,9 +53,9 @@
                   Striped="true"
                   Hoverable="true"
                   Responsive="true"
-                  Class="border-0">
+                  Class="border-0 modern-table">
             <DataGridColumns>
-                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.Name)" Caption="@L["Indicator Name"]" Sortable="true">
+                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.Name)" Caption="@LH.Localize("IndicatorName")" Sortable="true">
                     <DisplayTemplate Context="context">
                         <div class="d-flex align-items-center">
                             <Icon Name="IconName.ChartBar" Class="text-primary me-2" />
@@ -58,51 +63,51 @@
                         </div>
                     </DisplayTemplate>
                 </DataGridColumn>
-                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.Description)" Caption="@L["Description"]" Sortable="true">
+                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.Description)" Caption="@LH.Localize("Description")" Sortable="true">
                     <DisplayTemplate Context="context">
                         <span class="text-muted">@(context.Description?.Length > 60 ? context.Description.Substring(0, 60) + "..." : context.Description)</span>
                     </DisplayTemplate>
                 </DataGridColumn>
-                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.IsActive)" Caption="@L["IsActive"]" Sortable="true">
+                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.IsActive)" Caption="@LH.Localize("IsActive")" Sortable="true">
                     <DisplayTemplate Context="context">
                         @if (context.IsActive)
                         {
                             <Badge Color="Color.Success">
                                 <Icon Name="IconName.Check" />
-                                @L["Active"]
+                                @LH.Localize("Active")
                             </Badge>
                         }
                         else
                         {
                             <Badge Color="Color.Secondary">
                                 <Icon Name="IconName.Times" />
-                                @L["Inactive"]
+                                @LH.Localize("Inactive")
                             </Badge>
                         }
                     </DisplayTemplate>
                 </DataGridColumn>
-                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.QuestionIds)" Caption="@L["Linked Questions"]" Sortable="true">
+                <DataGridColumn TItem="IndicatorDto" Field="@nameof(IndicatorDto.QuestionIds)" Caption="@LH.Localize("LinkedQuestions")" Sortable="true">
                     <DisplayTemplate Context="context">
                         <Badge Color="Color.Info">
                             <Icon Name="IconName.Link" />
-                            @context.QuestionIds.Count @L["Questions"]
+                            @context.QuestionIds.Count @LH.Localize("Questions")
                         </Badge>
                     </DisplayTemplate>
                 </DataGridColumn>
-                <DataGridEntityActionsColumn TItem="IndicatorDto" @ref="@EntityActionsColumn" Caption="@L["Actions"]" Width="180px">
+                <DataGridEntityActionsColumn TItem="IndicatorDto" @ref="@EntityActionsColumn" Caption="@LH.Localize("Actions")" Width="180px">
                     <DisplayTemplate Context="context">
                         <EntityActions TItem="IndicatorDto" EntityActionsColumn="@EntityActionsColumn">
                             <EntityAction TItem="IndicatorDto" 
-                                          Text="@L["ViewDetails"]"
+                                          Text="@LH.Localize("ViewDetails")"
                                           Icon="IconName.Eye"
                                           Clicked="() => NavigateToDetails(context.Id)" />
                             <EntityAction TItem="IndicatorDto" 
-                                          Text="@L["Edit"]"
+                                          Text="@LH.Localize("Edit")"
                                           Icon="IconName.Edit"
                                           Visible="@HasUpdatePermission" 
                                           Clicked="() => OpenEditModalAsync(context)" />
                             <EntityAction TItem="IndicatorDto" 
-                                          Text="@L["Delete"]"
+                                          Text="@LH.Localize("Delete")"
                                           Icon="IconName.Trash"
                                           Color="Color.Danger"
                                           Visible="@HasDeletePermission" 
@@ -114,22 +119,23 @@
                 
             </DataGridColumns>
         </DataGrid>
-    </CardBody>
-</Card>
+        </div>
+    </div>
+</div>
 
 <!-- Create Modal -->
 <Modal @ref="@CreateModal">
     <ModalContent Centered Size="ModalSize.Large">
         <Form>
             <ModalHeader>
-                <ModalTitle>@L["Create Indicator"]</ModalTitle>
+                <ModalTitle>@LH.Localize("CreateIndicator")</ModalTitle>
                 <CloseButton Clicked="CloseCreateModalAsync" />
             </ModalHeader>
             <ModalBody>
                 <Validations @ref="@CreateValidationsRef" Model="@NewEntity" ValidateOnLoad="false">
                     <Validation MessageLocalizer="@LH.Localize">
                         <Field>
-                            <FieldLabel>@L["Indicator Name"] *</FieldLabel>
+                            <FieldLabel>@LH.Localize("IndicatorName") *</FieldLabel>
                             <TextEdit @bind-Text="@NewEntity.Name">
                                 <Feedback>
                                     <ValidationError />
@@ -139,16 +145,16 @@
                     </Validation>
                     
                     <Field>
-                        <FieldLabel>@L["Description"]</FieldLabel>
+                        <FieldLabel>@LH.Localize("Description")</FieldLabel>
                         <MemoEdit @bind-Text="@NewEntity.Description" Rows="3" />
                     </Field>
 
                     <Field>
-                        <Check TValue="bool" @bind-Checked="@NewEntity.IsActive">@L["IsActive"]</Check>
+                        <Check TValue="bool" @bind-Checked="@NewEntity.IsActive">@LH.Localize("IsActive")</Check>
                     </Field>
 
                     <Field>
-                        <FieldLabel>@L["Linked Questions"]</FieldLabel>
+                        <FieldLabel>@LH.Localize("LinkedQuestions")</FieldLabel>
                         @if (AllQuestions != null && AllQuestions.Any())
                         {
                             <div style="max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; padding: 10px; border-radius: 4px;">
@@ -165,16 +171,16 @@
                         else
                         {
                             <Alert Color="Color.Info" Visible>
-                                @L["No questions available. Please create questions first."]
+                                @LH.Localize("Error.NoQuestionsAvailable")
                             </Alert>
                         }
                     </Field>
                 </Validations>
             </ModalBody>
             <ModalFooter>
-                <Button Color="Color.Secondary" Clicked="CloseCreateModalAsync">@L["Cancel"]</Button>
+                <Button Color="Color.Secondary" Clicked="CloseCreateModalAsync">@LH.Localize("Cancel")</Button>
                 <Button Color="Color.Primary" Type="@ButtonType.Submit" PreventDefaultOnSubmit Clicked="CreateEntityAsync">
-                    @L["Save"]
+                    @LH.Localize("Save")
                 </Button>
             </ModalFooter>
         </Form>
@@ -186,14 +192,14 @@
     <ModalContent Centered Size="ModalSize.Large">
         <Form>
             <ModalHeader>
-                <ModalTitle>@L["Edit Indicator"]</ModalTitle>
+                <ModalTitle>@LH.Localize("EditIndicator")</ModalTitle>
                 <CloseButton Clicked="CloseEditModalAsync" />
             </ModalHeader>
             <ModalBody>
                 <Validations @ref="@EditValidationsRef" Model="@EditingEntity" ValidateOnLoad="false">
                     <Validation MessageLocalizer="@LH.Localize">
                         <Field>
-                            <FieldLabel>@L["Indicator Name"] *</FieldLabel>
+                            <FieldLabel>@LH.Localize("IndicatorName") *</FieldLabel>
                             <TextEdit @bind-Text="@EditingEntity.Name">
                                 <Feedback>
                                     <ValidationError />
@@ -203,16 +209,16 @@
                     </Validation>
                     
                     <Field>
-                        <FieldLabel>@L["Description"]</FieldLabel>
+                        <FieldLabel>@LH.Localize("Description")</FieldLabel>
                         <MemoEdit @bind-Text="@EditingEntity.Description" Rows="3" />
                     </Field>
 
                     <Field>
-                        <Check TValue="bool" @bind-Checked="@EditingEntity.IsActive">@L["IsActive"]</Check>
+                        <Check TValue="bool" @bind-Checked="@EditingEntity.IsActive">@LH.Localize("IsActive")</Check>
                     </Field>
 
                     <Field>
-                        <FieldLabel>@L["Linked Questions"]</FieldLabel>
+                        <FieldLabel>@LH.Localize("LinkedQuestions")</FieldLabel>
                         @if (AllQuestions != null && AllQuestions.Any())
                         {
                             <div style="max-height: 300px; overflow-y: auto; border: 1px solid #dee2e6; padding: 10px; border-radius: 4px;">
@@ -229,16 +235,16 @@
                         else
                         {
                             <Alert Color="Color.Info" Visible>
-                                @L["No questions available. Please create questions first."]
+                                @LH.Localize("Error.NoQuestionsAvailable")
                             </Alert>
                         }
                     </Field>
                 </Validations>
             </ModalBody>
             <ModalFooter>
-                <Button Color="Color.Secondary" Clicked="CloseEditModalAsync">@L["Cancel"]</Button>
+                <Button Color="Color.Secondary" Clicked="CloseEditModalAsync">@LH.Localize("Cancel")</Button>
                 <Button Color="Color.Primary" Type="@ButtonType.Submit" PreventDefaultOnSubmit Clicked="UpdateEntityAsync">
-                    @L["Save"]
+                    @LH.Localize("Save")
                 </Button>
             </ModalFooter>
         </Form>
@@ -374,7 +380,7 @@
 
     protected override string GetDeleteConfirmationMessage(IndicatorDto entity)
     {
-        return string.Format(L["Are you sure you want to delete the indicator '{0}'?"], entity.Name);
+        return string.Format(LH.Localize("Error.ConfirmDeleteIndicator"), entity.Name);
     }
 
     private void NavigateToDetails(Guid indicatorId)

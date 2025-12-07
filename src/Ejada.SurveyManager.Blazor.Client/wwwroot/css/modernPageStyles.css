@@ -1,0 +1,514 @@
+/* ============================================
+   MODERN SCHEDULE PAGE STYLES
+   ============================================ */
+
+/* Subtle page background - Using brand background color */
+.modern-page-wrapper {
+    background: linear-gradient(135deg, var(--brand-bg, #f8fafc) 0%, #e2e8f0 100%);
+    min-height: 100vh;
+    padding: 2rem;
+}
+
+/* Clean card design */
+.glass-card {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: box-shadow 0.3s ease;
+}
+
+    .glass-card:hover {
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+
+/* Clean gradient header - Using brand primary colors */
+.gradient-header {
+    background: linear-gradient(135deg, var(--brand-primary-deep) 0%, var(--brand-primary-dark) 100%);
+    padding: 2rem;
+}
+
+.gradient-header-content {
+    position: relative;
+    z-index: 1;
+}
+
+.header-icon-box {
+    width: 56px;
+    height: 56px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+}
+
+.header-icon-box * {
+    color: white !important;
+}
+
+/* Info cards grid */
+.info-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+    padding: 2rem;
+    margin-top: 1.5rem;
+}
+
+.modern-info-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.75rem;
+    transition: all 0.2s ease;
+    border: 2px solid #f1f5f9;
+    border-top: 3px solid var(--card-accent);
+}
+
+    .modern-info-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        border-color: var(--card-accent);
+    }
+
+    .modern-info-card.accent-primary {
+        --card-accent: var(--brand-primary-deep);
+    }
+
+    .modern-info-card.accent-info {
+        --card-accent: var(--brand-primary);
+    }
+
+    .modern-info-card.accent-warning {
+        --card-accent: #f59e0b;
+    }
+
+    .modern-info-card.accent-success {
+        --card-accent: var(--brand-accent);
+    }
+
+.card-icon-wrapper {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    font-size: 28px;
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+}
+
+.card-label {
+    font-size: 0.813rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.card-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+/* Content section spacing after gradient header */
+.glass-card > .px-4.pb-4 {
+    margin-top: 1.5rem;
+}
+
+/* Modern table styling - Using brand primary colors */
+.modern-table-wrapper {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e2e8f0;
+}
+
+.modern-table {
+    margin-bottom: 0;
+}
+
+    .modern-table thead {
+        background: linear-gradient(135deg, var(--brand-primary-deep) 0%, var(--brand-primary-dark) 100%);
+    }
+
+        .modern-table thead th {
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.813rem;
+            letter-spacing: 0.5px;
+            padding: 1rem 1.5rem;
+            border: none;
+        }
+
+    .modern-table tbody tr {
+        transition: background 0.15s ease;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+        .modern-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .modern-table tbody tr.today-highlight {
+            background: #fef3c7;
+        }
+
+    .modern-table tbody td {
+        padding: 1rem 1.5rem;
+        vertical-align: middle;
+        color: #475569;
+        font-size: 0.938rem;
+    }
+
+/* Modern badges - Using brand colors */
+.badge-modern {
+    padding: 0.4rem 0.85rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.813rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+    .badge-modern.badge-onsite {
+        background: var(--brand-primary-deep);
+        color: white;
+    }
+
+    .badge-modern.badge-remote {
+        background: var(--brand-primary);
+        color: white;
+    }
+
+    .badge-modern.badge-today {
+        background: #f59e0b;
+        color: white;
+    }
+
+/* Global badge color overrides - Brand theme alignment (complementing custom.css) */
+/* Additional specificity for modern pages */
+.modern-page-wrapper .badge.bg-success,
+.modern-page-wrapper .badge-success,
+.glass-card .badge.bg-success,
+.glass-card .badge-success {
+    background-color: var(--brand-accent) !important;
+    color: #1e293b !important;
+}
+
+.modern-page-wrapper .badge.bg-primary,
+.modern-page-wrapper .badge-primary,
+.glass-card .badge.bg-primary,
+.glass-card .badge-primary {
+    background-color: var(--brand-primary-deep) !important;
+    color: #ffffff !important;
+}
+
+.modern-page-wrapper .badge.bg-info,
+.modern-page-wrapper .badge-info,
+.glass-card .badge.bg-info,
+.glass-card .badge-info {
+    background-color: var(--brand-primary) !important;
+    color: #ffffff !important;
+}
+
+/* Pagination active page number - Additional specificity for modern pages */
+.modern-page-wrapper .pagination .page-item.active .page-link,
+.modern-page-wrapper .pagination .page-link.active,
+.glass-card .pagination .page-item.active .page-link,
+.glass-card .pagination .page-link.active,
+.modern-page-wrapper .b-pagination .page-item.active .page-link,
+.modern-page-wrapper .b-pagination .page-link.active,
+.glass-card .b-pagination .page-item.active .page-link,
+.glass-card .b-pagination .page-link.active,
+.modern-page-wrapper .b-datagrid-pager .pagination .page-item.active .page-link,
+.modern-page-wrapper .b-datagrid-pager .pagination .page-link.active,
+.glass-card .b-datagrid-pager .pagination .page-item.active .page-link,
+.glass-card .b-datagrid-pager .pagination .page-link.active {
+    background-color: var(--brand-primary-deep) !important;
+    border-color: var(--brand-primary-deep) !important;
+    color: #ffffff !important;
+}
+
+/* Modern button styles - Using brand accent for success/CTA */
+.btn-modern {
+    background: linear-gradient(135deg, var(--brand-accent) 0%, var(--brand-accent-dark) 100%);
+    border: none;
+    border-radius: 10px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.938rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(31, 237, 147, 0.25);
+    color: white !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+    .btn-modern:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(31, 237, 147, 0.3);
+        color: white;
+    }
+
+/* Light button for gradient headers */
+.btn-light {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    color: white !important;
+}
+
+    .btn-light:hover {
+        background-color: rgba(255, 255, 255, 0.3) !important;
+        border-color: rgba(255, 255, 255, 0.4) !important;
+        color: white !important;
+    }
+
+/* Section headers - Using brand primary */
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.section-icon {
+    width: 42px;
+    height: 42px;
+    background: var(--brand-primary-deep);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+/* Loading spinner - Using brand primary */
+.modern-spinner {
+    width: 3rem;
+    height: 3rem;
+    border: 3px solid #e2e8f0;
+    border-top-color: var(--brand-primary-deep);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Alert styling */
+.alert-modern {
+    border: none;
+    border-radius: 12px;
+    padding: 1.25rem;
+    background: #fef3c7;
+    border-left: 4px solid #f59e0b;
+}
+
+.alert-modern-heading {
+    font-weight: 700;
+    font-size: 1.125rem;
+    color: #92400e;
+    margin-bottom: 0.5rem;
+}
+
+.alert-modern-text {
+    color: #78350f;
+    font-size: 0.938rem;
+}
+
+/* ============================================
+   DASHBOARD PAGE STYLES
+   ============================================ */
+
+/* Dashboard card base */
+.dashboard-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease;
+    border: 1px solid #f1f5f9;
+    overflow: hidden;
+    height: 100%;
+}
+
+    .dashboard-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+.dashboard-card-header {
+    background: #f8fafc;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.dashboard-card-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.dashboard-card-body {
+    padding: 1.5rem;
+}
+
+/* Stats grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 1rem;
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--brand-primary-deep);
+}
+
+/* Employee info card */
+.employee-info-item {
+    display: flex;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+    .employee-info-item:last-child {
+        border-bottom: none;
+    }
+
+.employee-info-label {
+    font-weight: 600;
+    color: #64748b;
+    min-width: 150px;
+    font-size: 0.875rem;
+}
+
+.employee-info-value {
+    color: #1e293b;
+    font-weight: 500;
+}
+
+/* Pending approvals card - Using brand primary */
+.approvals-highlight {
+    text-align: center;
+    padding: 2rem;
+    background: #eff6ff;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    border: 2px solid #bfdbfe;
+}
+
+.approvals-count {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--brand-primary-deep);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+}
+
+.approvals-label {
+    font-size: 0.938rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .modern-page-wrapper {
+        padding: 1rem;
+    }
+
+    .info-cards-grid {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .gradient-header {
+        padding: 1.5rem;
+    }
+}
+
+
+.table thead th {
+    color: white !important
+}
+
+/* DataGrid modern styling */
+.modern-table .b-table thead th,
+.modern-table table thead th {
+    background: linear-gradient(135deg, var(--brand-primary-deep) 0%, var(--brand-primary-dark) 100%) !important;
+    color: white !important;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.813rem;
+    letter-spacing: 0.5px;
+    padding: 1rem 1.5rem;
+    border: none;
+}
+
+.modern-table .b-table tbody tr,
+.modern-table table tbody tr {
+    transition: background 0.15s ease;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.modern-table .b-table tbody tr:hover,
+.modern-table table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.modern-table .b-table tbody td,
+.modern-table table tbody td {
+    padding: 1rem 1.5rem;
+    vertical-align: middle;
+    color: #475569;
+    font-size: 0.938rem;
+}
+

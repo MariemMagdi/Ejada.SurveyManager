@@ -15,34 +15,39 @@
 
 @inherits AbpCrudPageBase<IQuestionAppService, QuestionDto, Guid, PagedAndSortedResultRequestDto, CreateQuestionDto, UpdateQuestionDto>
 
-<Card Class="shadow-sm">
-    <CardHeader Class="bg-white border-bottom">
-        <Row Class="align-items-center justify-content-between g-3">
-            <Column ColumnSize="ColumnSize.IsAuto">
-                <div class="d-flex align-items-center">
-                    <Icon Name="IconName.Edit" Class="text-primary me-2" Size="IconSize.Large" />
-                    <div>
-                        <h4 class="mb-0 fw-bold">@L["Edit Question"]</h4>
-                        <small class="text-muted">@L["Update question information"]</small>
-                    </div>
-                </div>
-            </Column>
-            <Column ColumnSize="ColumnSize.IsAuto">
-                <Button Color="Color.Secondary" Outline Clicked="Back">
-                    <Icon Name="IconName.ArrowLeft" />
-                    @L["Back"]
-                </Button>
-            </Column>
-        </Row>
-    </CardHeader>
+<div class="modern-page-wrapper">
+    <div class="glass-card">
+        <div class="gradient-header">
+            <div class="gradient-header-content">
+                <Row Class="align-items-center justify-content-between g-3">
+                    <Column ColumnSize="ColumnSize.IsAuto">
+                        <div class="d-flex align-items-center">
+                            <div class="header-icon-box me-3">
+                                <Icon Name="IconName.Edit" Size="IconSize.ExtraLarge" />
+                            </div>
+                            <div>
+                                <h2 class="mb-1 fw-bold text-white">@LH.Localize("EditQuestion")</h2>
+                                <p class="text-white-50 mb-0">@LH.Localize("UpdateQuestionInformation")</p>
+                            </div>
+                        </div>
+                    </Column>
+                    <Column ColumnSize="ColumnSize.IsAuto">
+                        <Button Color="Color.Secondary" Outline Clicked="Back" Class="btn-light">
+                            <Icon Name="IconName.ArrowLeft" />
+                            @LH.Localize("Back")
+                        </Button>
+                    </Column>
+                </Row>
+            </div>
+        </div>
 
-    <CardBody Class="p-4">
+        <div class="px-4 pb-4">
         @if (LinkedSurveyNames.Any())
         {
             <Alert Color="Color.Warning" Visible="true" Class="mb-4">
                 <AlertMessage>
                     <Icon Name="IconName.ExclamationTriangle" Class="me-2" />
-                    <strong>@L["Warning"]:</strong> @L["This question is linked to the following survey(s) and cannot be edited:"]
+                    <strong>@LH.Localize("Warning"):</strong> @LH.Localize("Error.QuestionLinkedToSurveysCannotEdit")
                 </AlertMessage>
                 <AlertDescription>
                     <ul class="mb-0 mt-2">
@@ -61,18 +66,18 @@
                          ValidateOnLoad="false"
                          @key="EditingEntity">
                 <!-- Question Information -->
-                <Card Class="mb-4 border-0 shadow-sm">
-                    <CardHeader Class="bg-light">
-                        <h5 class="mb-0 fw-semibold d-flex align-items-center">
+                <div class="dashboard-card mb-4">
+                    <div class="dashboard-card-header">
+                        <h5 class="dashboard-card-title">
                             <Icon Name="IconName.InfoCircle" Class="text-primary me-2" />
-                            @L["QuestionInformation"]
+                            @LH.Localize("QuestionInformation")
                         </h5>
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <div class="dashboard-card-body">
                         <Validation MessageLocalizer="@LH.Localize">
                             <Field>
-                                <FieldLabel>@L["Question Text"] *</FieldLabel>
-                                <TextEdit @bind-Text="EditingEntity.Text" Disabled="@IsLinkedToSurvey" Placeholder="@L["Enter question text"]">
+                                <FieldLabel>@LH.Localize("QuestionText") *</FieldLabel>
+                                <TextEdit @bind-Text="EditingEntity.Text" Disabled="@IsLinkedToSurvey" Placeholder="@LH.Localize("EnterQuestionText")">
                                     <Feedback>
                                         <ValidationError />
                                     </Feedback>
@@ -81,7 +86,7 @@
                         </Validation>
 
                         <Field>
-                            <FieldLabel>@L["Question Type"]</FieldLabel>
+                            <FieldLabel>@LH.Localize("QuestionType")</FieldLabel>
                             <Select TValue="QuestionType"
                                     SelectedValue="EditingEntity.Type"
                                     SelectedValueChanged="@(EventCallback.Factory.Create<QuestionType>(this, OnEditTypeChanged))"
@@ -97,7 +102,7 @@
                         @if (EditRequiresOptions)
                         {
                             <Field>
-                                <FieldLabel>@L["Options"]</FieldLabel>
+                                <FieldLabel>@LH.Localize("Options")</FieldLabel>
                                 <div class="border rounded p-3 bg-light">
                                     @for (var i = 0; i < EditOptionInputs.Count; i++)
                                     {
@@ -109,7 +114,7 @@
                                                 {
                                                     <TextEdit Text="@option.Label"
                                                               TextChanged="@((string value) => OnOptionLabelChanged(option, value))"
-                                                              Placeholder="@L["Option Label"]"
+                                                              Placeholder="@LH.Localize("OptionLabel")"
                                                               Disabled="@IsLinkedToSurvey"
                                                               Color="@(IsOptionLabelValid(option) ? null : Color.Danger)" />
                                                     @if (!IsOptionLabelValid(option) && !string.IsNullOrWhiteSpace(option.Label))
@@ -122,7 +127,7 @@
                                                     <TextEdit Text="@option.Label"
                                                               TextChanged="@((string value) => OnOptionLabelChanged(option, value))"
                                                               Type="TextInputType.Number"
-                                                              Placeholder="@L["Enter whole number"]"
+                                                              Placeholder="@LH.Localize("EnterWholeNumber")"
                                                               Disabled="@IsLinkedToSurvey"
                                                               Color="@(IsOptionLabelValid(option) ? null : Color.Danger)" />
                                                     @if (!IsOptionLabelValid(option) && !string.IsNullOrWhiteSpace(option.Label))
@@ -136,7 +141,7 @@
                                                               TextChanged="@((string value) => OnOptionLabelChanged(option, value))"
                                                               Type="TextInputType.Number"
                                                               Step="0.01"
-                                                              Placeholder="@L["Enter decimal number"]"
+                                                              Placeholder="@LH.Localize("EnterDecimalNumber")"
                                                               Disabled="@IsLinkedToSurvey"
                                                               Color="@(IsOptionLabelValid(option) ? null : Color.Danger)" />
                                                     @if (!IsOptionLabelValid(option) && !string.IsNullOrWhiteSpace(option.Label))
@@ -207,23 +212,23 @@
                                     }
                                     <Button Color="Color.Secondary" Outline Clicked="AddEditOption" Disabled="@IsLinkedToSurvey">
                                         <Icon Name="IconName.Add" />
-                                        @L["AddOption"]
+                                        @LH.Localize("AddOption")
                                     </Button>
                                 </div>
                             </Field>
                         }
-                    </CardBody>
-                </Card>
+                    </div>
+                </div>
 
                 <!-- Linked Indicators -->
-                <Card Class="mb-4 border-0 shadow-sm">
-                    <CardHeader Class="bg-light">
-                        <h5 class="mb-0 fw-semibold d-flex align-items-center">
+                <div class="dashboard-card mb-4">
+                    <div class="dashboard-card-header">
+                        <h5 class="dashboard-card-title">
                             <Icon Name="IconName.ChartLine" Class="text-primary me-2" />
-                            @L["Linked Indicators"]
+                            @LH.Localize("LinkedIndicators")
                         </h5>
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <div class="dashboard-card-body">
                         @if (AllIndicators != null && AllIndicators.Any())
                         {
                             <div class="border rounded p-3" style="max-height: 250px; overflow-y: auto;">
@@ -248,18 +253,18 @@
                         {
                             <Alert Color="Color.Info" Visible>
                                 <Icon Name="IconName.InfoCircle" Class="me-2" />
-                                @L["No indicators available. Please create indicators first."]
+                                @LH.Localize("Error.NoIndicatorsAvailable")
                             </Alert>
                         }
-                    </CardBody>
-                </Card>
+                    </div>
+                </div>
             </Validations>
 
             <!-- Action Buttons -->
             <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
-                <Button Color="Color.Secondary" Outline Clicked="Back">
+                <Button Color="Color.Primary" Outline Clicked="Back">
                     <Icon Name="IconName.Times" />
-                    @L["Cancel"]
+                    @LH.Localize("Cancel")
                 </Button>
 
                 <Button Color="Color.Primary"
@@ -267,14 +272,15 @@
                         PreventDefaultOnSubmit="true"
                         Clicked="UpdateQuestionAsync"
                         Disabled="@IsLinkedToSurvey"
-                        Class="px-5">
+                        Class="px-5 btn-modern">
                     <Icon Name="IconName.Save" />
-                    @L["Save"]
+                    @LH.Localize("Save")
                 </Button>
             </div>
         </Form>
-    </CardBody>
-</Card>
+        </div>
+    </div>
+</div>
 
 @code {
     [Parameter]
@@ -479,12 +485,12 @@
 
         return option.Type switch
         {
-            OptionDataType.String => L["Please enter text (not numbers only)"],
-            OptionDataType.Int => L["Please enter a valid whole number"],
-            OptionDataType.Decimal => L["Please enter a valid decimal number"],
-            OptionDataType.Bool => L["Please select True or False"],
-            OptionDataType.Date => L["Please enter a valid date"],
-            OptionDataType.DateTime => L["Please enter a valid date and time"],
+            OptionDataType.String => LH.Localize("Error.EnterTextNotNumbersOnly"),
+            OptionDataType.Int => LH.Localize("Error.EnterValidWholeNumber"),
+            OptionDataType.Decimal => LH.Localize("Error.EnterValidDecimalNumber"),
+            OptionDataType.Bool => LH.Localize("Error.SelectTrueOrFalse"),
+            OptionDataType.Date => LH.Localize("Error.EnterValidDate"),
+            OptionDataType.DateTime => LH.Localize("Error.EnterValidDateAndTime"),
             _ => string.Empty
         };
     }

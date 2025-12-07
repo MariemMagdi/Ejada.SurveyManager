@@ -1,5 +1,5 @@
 /* 
-    loader
+    loader - Using brand background color
 */
 .loader {
     position: fixed;
@@ -10,7 +10,7 @@
     width: 100vw;
     height: 100vh;
     z-index: 999;
-    background-color: #f1f1f2;
+    background-color: var(--brand-bg, #F2F2F2);
   }
 
 #ApplicationContainer > div:first-child:not(:only-child) {

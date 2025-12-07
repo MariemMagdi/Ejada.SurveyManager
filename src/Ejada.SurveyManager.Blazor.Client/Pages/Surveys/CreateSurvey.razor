@@ -13,43 +13,48 @@
 
 @inherits AbpCrudPageBase<ISurveyAppService, SurveyDto, Guid, PagedAndSortedResultRequestDto, CreateSurveyDto, UpdateSurveyDto>
 
-<Card Class="shadow-sm">
-    <CardHeader Class="bg-white border-bottom">
-        <Row Class="align-items-center justify-content-between g-3">
-            <Column ColumnSize="ColumnSize.IsAuto">
-                <div class="d-flex align-items-center">
-                    <Icon Name="IconName.Add" Class="text-primary me-2" Size="IconSize.Large" />
-                    <div>
-                        <h4 class="mb-0 fw-bold">@L["New Survey"]</h4>
-                        <small class="text-muted">@L["Create a new survey with questions"]</small>
-                    </div>
-                </div>
-            </Column>
-            <Column ColumnSize="ColumnSize.IsAuto">
-                <Button Color="Color.Secondary" Outline Clicked="Back">
-                    <Icon Name="IconName.ArrowLeft" />
-                    @L["Back"]
-                </Button>
-            </Column>
-        </Row>
-    </CardHeader>
+<div class="modern-page-wrapper">
+    <div class="glass-card">
+        <div class="gradient-header">
+            <div class="gradient-header-content">
+                <Row Class="align-items-center justify-content-between g-3">
+                    <Column ColumnSize="ColumnSize.IsAuto">
+                        <div class="d-flex align-items-center">
+                            <div class="header-icon-box me-3">
+                                <Icon Name="IconName.Add" Size="IconSize.ExtraLarge" />
+                            </div>
+                            <div>
+                                <h2 class="mb-1 fw-bold text-white">@LH.Localize("NewSurvey")</h2>
+                                <p class="text-white-50 mb-0">@LH.Localize("CreateNewSurveyWithQuestions")</p>
+                            </div>
+                        </div>
+                    </Column>
+                    <Column ColumnSize="ColumnSize.IsAuto">
+                        <Button Color="Color.Secondary" Outline Clicked="Back" Class="btn-light">
+                            <Icon Name="IconName.ArrowLeft" />
+                            @LH.Localize("Back")
+                        </Button>
+                    </Column>
+                </Row>
+            </div>
+        </div>
 
-    <CardBody Class="p-4">
+        <div class="px-4 pb-4">
         <Form>
             <Validations @ref="@CreateValidationsRef" Model="@NewEntity" ValidateOnLoad="false" @key="NewEntity">
                 <!-- General Information Section -->
-                <Card Class="mb-4 border-0 shadow-sm">
-                    <CardHeader Class="bg-light d-flex align-items-center">
-                        <h5 class="mb-0 fw-semibold d-flex align-items-center">
-                            <Icon Name="IconName.InfoCircle" Class="text-primary me-2" Style="flex-shrink: 0; line-height: 1;" />
-                            <span style="line-height: 1.2;">@L["General Information"]</span>
+                <div class="dashboard-card mb-4">
+                    <div class="dashboard-card-header">
+                        <h5 class="dashboard-card-title">
+                            <Icon Name="IconName.InfoCircle" Class="text-primary me-2" />
+                            @LH.Localize("GeneralInformation")
                         </h5>
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <div class="dashboard-card-body">
                         <Validation MessageLocalizer="@LH.Localize">
                             <Field>
-                                <FieldLabel>@L["Name"] *</FieldLabel>
-                                <TextEdit @bind-Text="@NewEntity.Name" Placeholder="@L["Enter survey name"]">
+                                <FieldLabel>@LH.Localize("Name") *</FieldLabel>
+                                <TextEdit @bind-Text="@NewEntity.Name" Placeholder="@LH.Localize("EnterSurveyName")">
                                     <Feedback>
                                         <ValidationError />
                                     </Feedback>
@@ -58,38 +63,38 @@
                         </Validation>
 
                         <Field>
-                            <FieldLabel>@L["Purpose"]</FieldLabel>
-                            <MemoEdit @bind-Text="NewEntity.Purpose" Rows="3" Placeholder="@L["Enter survey purpose"]" />
+                            <FieldLabel>@LH.Localize("Purpose")</FieldLabel>
+                            <MemoEdit @bind-Text="NewEntity.Purpose" Rows="3" Placeholder="@LH.Localize("EnterSurveyPurpose")" />
                         </Field>
 
                         <Field>
-                            <FieldLabel>@L["Target Audience"]</FieldLabel>
-                            <TextEdit @bind-Text="NewEntity.TargetAudience" Placeholder="@L["Enter target audience"]" />
+                            <FieldLabel>@LH.Localize("TargetAudience")</FieldLabel>
+                            <TextEdit @bind-Text="NewEntity.TargetAudience" Placeholder="@LH.Localize("EnterTargetAudience")" />
                         </Field>
 
                         <Field>
                             <Check TValue="bool" @bind-Checked="NewEntity.IsActive">
-                                @L["Active"]
+                                @LH.Localize("Active")
                             </Check>
-                            <FieldHelp>@L["Make this survey available for assignment"]</FieldHelp>
+                            <FieldHelp>@LH.Localize("MakeSurveyAvailableForAssignment")</FieldHelp>
                         </Field>
-                    </CardBody>
-                </Card>
+                    </div>
+                </div>
 
                 <!-- Questions Section -->
-                <Card Class="mb-4 border-0 shadow-sm">
-                    <CardHeader Class="bg-light d-flex align-items-center">
-                        <h5 class="mb-0 fw-semibold d-flex align-items-center">
-                            <Icon Name="IconName.QuestionCircle" Class="text-primary me-2" Style="flex-shrink: 0; line-height: 1;" />
-                            <span style="line-height: 1.2;">@L["Attached Questions"]</span>
+                <div class="dashboard-card mb-4">
+                    <div class="dashboard-card-header">
+                        <h5 class="dashboard-card-title">
+                            <Icon Name="IconName.QuestionCircle" Class="text-primary me-2" />
+                            @LH.Localize("AttachedQuestions")
                         </h5>
-                    </CardHeader>
-                    <CardBody>
+                    </div>
+                    <div class="dashboard-card-body">
                         @if (!AttachedQuestions.Any())
                         {
                             <Alert Color="Color.Info" Visible>
                                 <Icon Name="IconName.InfoCircle" Class="me-2" />
-                                @L["No questions attached"]
+                                @LH.Localize("NoQuestionsAttached")
                             </Alert>
                         }
                         else
@@ -107,7 +112,7 @@
                                         </div>
                                         <Button Color="Color.Danger" Size="Size.Small" Outline Clicked="@(() => RemoveAttachedQuestion(q))">
                                             <Icon Name="IconName.Delete" />
-                                            @L["Remove"]
+                                            @LH.Localize("Remove")
                                         </Button>
                                     </div>
                                 }
@@ -122,15 +127,15 @@
                                 <CollapseHeader>
                                     <Heading Size="HeadingSize.Is5">
                                         <AccordionToggle Clicked="@(() => ShowExistingQuestionsSection = !ShowExistingQuestionsSection)">
-                                            <Icon Name="IconName.List" /> @L["Select Existing Questions"]
+                                            <Icon Name="IconName.List" /> @LH.Localize("SelectExistingQuestions")
                                         </AccordionToggle>
                                     </Heading>
                                 </CollapseHeader>
                                 <CollapseBody>
                                     <Field>
-                                        <FieldLabel>@L["Available Questions"]</FieldLabel>
+                                        <FieldLabel>@LH.Localize("AvailableQuestions")</FieldLabel>
                                         <Select TValue="Guid?" @bind-SelectedValue="SelectedQuestionId">
-                                            <SelectItem Value="@((Guid?)null)">-- @L["Select Question"] --</SelectItem>
+                                            <SelectItem Value="@((Guid?)null)">-- @LH.Localize("SelectQuestion") --</SelectItem>
                                             @foreach (var q in FilteredAvailableQuestions)
                                             {
                                                 <SelectItem Value="@((Guid?)q.Id)">@q.Text</SelectItem>
@@ -138,7 +143,7 @@
                                         </Select>
                                         <Button Color="Color.Success" Clicked="AddExistingQuestion" Class="mt-2">
                                             <Icon Name="IconName.Add" />
-                                            @L["Add Question"]
+                                            @LH.Localize("AddQuestion")
                                         </Button>
                                     </Field>
                                 </CollapseBody>
@@ -151,17 +156,17 @@
                                 <CollapseHeader>
                                     <Heading Size="HeadingSize.Is5">
                                         <AccordionToggle Clicked="@(() => ShowNewQuestionSection = !ShowNewQuestionSection)">
-                                            <Icon Name="IconName.Add" /> @L["Create New Question"]
+                                            <Icon Name="IconName.Add" /> @LH.Localize("CreateNewQuestion")
                                         </AccordionToggle>
                                     </Heading>
                                 </CollapseHeader>
                                 <CollapseBody>
                                     <Field>
-                                        <FieldLabel>@L["Question Text"]</FieldLabel>
-                                        <TextEdit @bind-Text="NewQuestionText" Placeholder="@L["Enter question text"]" />
+                                        <FieldLabel>@LH.Localize("QuestionText")</FieldLabel>
+                                        <TextEdit @bind-Text="NewQuestionText" Placeholder="@LH.Localize("EnterQuestionText")" />
                                     </Field>
                                     <Field>
-                                        <FieldLabel>@L["Question Type"]</FieldLabel>
+                                        <FieldLabel>@LH.Localize("QuestionType")</FieldLabel>
                                         <Select TValue="QuestionType" @bind-SelectedValue="NewQuestionType">
                                             @foreach (var type in QuestionTypes)
                                             {
@@ -173,7 +178,7 @@
                                     @if (NewQuestionRequiresOptions)
                                     {
                                         <Field>
-                                            <FieldLabel>@L["Options"]</FieldLabel>
+                                            <FieldLabel>@LH.Localize("Options")</FieldLabel>
                                             <div class="border rounded p-3 bg-light">
                                                 @for (var i = 0; i < NewQuestionOptions.Count; i++)
                                                 {
@@ -185,7 +190,7 @@
                                                             {
                                                                 <TextEdit Text="@opt.Label" 
                                                                          TextChanged="@((string value) => OnNewQuestionOptionLabelChanged(opt, value))"
-                                                                         Placeholder="@L["Option Label"]"
+                                                                         Placeholder="@LH.Localize("OptionLabel")"
                                                                          Color="@(IsNewQuestionOptionLabelValid(opt) ? null : Color.Danger)" />
                                                                 @if (!IsNewQuestionOptionLabelValid(opt) && !string.IsNullOrWhiteSpace(opt.Label))
                                                                 {
@@ -197,7 +202,7 @@
                                                                 <TextEdit Text="@opt.Label"
                                                                           TextChanged="@((string value) => OnNewQuestionOptionLabelChanged(opt, value))"
                                                                           Type="TextInputType.Number"
-                                                                          Placeholder="@L["Enter whole number"]"
+                                                                          Placeholder="@LH.Localize("EnterWholeNumber")"
                                                                           Color="@(IsNewQuestionOptionLabelValid(opt) ? null : Color.Danger)" />
                                                                 @if (!IsNewQuestionOptionLabelValid(opt) && !string.IsNullOrWhiteSpace(opt.Label))
                                                                 {
@@ -210,7 +215,7 @@
                                                                           TextChanged="@((string value) => OnNewQuestionOptionLabelChanged(opt, value))"
                                                                           Type="TextInputType.Number"
                                                                           Step="0.01"
-                                                                          Placeholder="@L["Enter decimal number"]"
+                                                                          Placeholder="@LH.Localize("EnterDecimalNumber")"
                                                                           Color="@(IsNewQuestionOptionLabelValid(opt) ? null : Color.Danger)" />
                                                                 @if (!IsNewQuestionOptionLabelValid(opt) && !string.IsNullOrWhiteSpace(opt.Label))
                                                                 {
@@ -272,7 +277,7 @@
                                                 }
                                                 <Button Color="Color.Secondary" Outline Clicked="AddNewQuestionOption">
                                                     <Icon Name="IconName.Add" />
-                                                    @L["AddOption"]
+                                                    @LH.Localize("AddOption")
                                                 </Button>
                                             </div>
                                         </Field>
@@ -280,34 +285,35 @@
 
                                     <Button Color="Color.Primary" Clicked="AddNewQuestion" Class="mt-2">
                                         <Icon Name="IconName.Add" />
-                                        @L["Add New Question to Survey"]
+                                        @LH.Localize("AddNewQuestionToSurvey")
                                     </Button>
                                 </CollapseBody>
                             </Collapse>
                         </Accordion>
-                    </CardBody>
-                </Card>
+                    </div>
+                </div>
             </Validations>
 
             <!-- Action Buttons -->
             <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
-                <Button Color="Color.Secondary" Outline Clicked="Back">
+                <Button Color="Color.Primary" Outline Clicked="Back">
                     <Icon Name="IconName.Times" />
-                    @L["Cancel"]
+                    @LH.Localize("Cancel")
                 </Button>
 
                 <Button Color="Color.Primary"
                         Type="@ButtonType.Submit"
                         PreventDefaultOnSubmit="true"
                         Clicked="SaveSurveyAsync"
-                        Class="px-5">
+                        Class="px-5 btn-modern">
                     <Icon Name="IconName.Save" />
-                    @L["Save"]
+                    @LH.Localize("Save")
                 </Button>
             </div>
         </Form>
-    </CardBody>
-</Card>
+        </div>
+    </div>
+</div>
 
 @code {
     private List<QuestionDto> AvailableQuestions { get; set; } = new();
@@ -550,12 +556,12 @@
 
         return option.Type switch
         {
-            OptionDataType.String => L["Please enter text (not numbers only)"],
-            OptionDataType.Int => L["Please enter a valid whole number"],
-            OptionDataType.Decimal => L["Please enter a valid decimal number"],
-            OptionDataType.Bool => L["Please select True or False"],
-            OptionDataType.Date => L["Please enter a valid date"],
-            OptionDataType.DateTime => L["Please enter a valid date and time"],
+            OptionDataType.String => LH.Localize("Error.EnterTextNotNumbersOnly"),
+            OptionDataType.Int => LH.Localize("Error.EnterValidWholeNumber"),
+            OptionDataType.Decimal => LH.Localize("Error.EnterValidDecimalNumber"),
+            OptionDataType.Bool => LH.Localize("Error.SelectTrueOrFalse"),
+            OptionDataType.Date => LH.Localize("Error.EnterValidDate"),
+            OptionDataType.DateTime => LH.Localize("Error.EnterValidDateAndTime"),
             _ => string.Empty
         };
     }

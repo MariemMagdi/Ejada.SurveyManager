@@ -1,0 +1,780 @@
+/* Fix 1: Icon circle size in wizard - More specific selector */
+.text-center > .d-inline-flex.align-items-center.justify-content-center {
+    width: 85px !important;
+    height: 80px !important;
+    min-width: 80px !important;
+    min-height: 80px !important;
+    display: inline-flex !important;
+}
+
+.text-center > .d-inline-flex i.fa-chart-bar,
+.text-center > .d-inline-flex i.fas.fa-chart-bar {
+    font-size: 2.5rem !important;
+    line-height: 1 !important;
+}
+
+/* Fix 2: Ensure sidebar is properly positioned */
+.app-sidebar {
+    position: fixed !important;
+    height: 100vh !important;
+    width: 260px !important;
+    overflow-y: auto !important;
+    z-index: 1000 !important;
+    left: 0 !important;
+    top: 0 !important;
+}
+
+/* Fix 3: Main content accounting for fixed sidebar */
+.app-main {
+    margin-left: 260px !important;
+    width: calc(100% - 260px) !important;
+}
+
+/* Fix 4: Login page specific fixes */
+body.abp-application-layout {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Fix 5: Ensure login forms are properly centered */
+.abp-login-page,
+.account-layout {
+    min-height: 100vh !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 20px !important;
+}
+
+    /* Fix 6: Login card styling */
+    .account-layout .card,
+    .abp-login-page .card {
+        max-width: 450px !important;
+        width: 100% !important;
+        margin: auto !important;
+    }
+
+/* Login page background - Using brand primary colors */
+.login-page-background {
+    background: linear-gradient(135deg, var(--brand-primary-deep) 0%, var(--brand-primary) 100%) !important;
+}
+
+/* Fix 7: Prevent layout shift */
+.app-layout {
+    position: relative;
+    min-height: 100vh;
+}
+
+/* Fix 8: Wizard progress steps */
+.d-flex.align-items-center.justify-content-center > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Fix 9: Ensure responsive behavior */
+@media (max-width: 768px) {
+    .app-sidebar {
+        width: 0 !important;
+        overflow: hidden;
+    }
+
+    .app-main {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+}
+
+/* Fix 10: Custom Ejada brand theme colors - Using Priority 1 brand colors */
+:root {
+    /* Use theme variables from ejada-theme.css */
+    --ejada-primary: var(--brand-primary-deep, #001081);
+    --ejada-primary-dark: var(--brand-primary-dark, #0000cc);
+    --ejada-primary-light: #dbeafe;
+    --ejada-success: var(--brand-accent, #1FED93);
+    --ejada-warning: #f97316;
+    --lpx-brand: var(--brand-primary-deep, #001081) !important;
+}
+
+.btn-primary {
+    background-color: var(--brand-primary-deep) !important;
+    border-color: var(--brand-primary-deep) !important;
+}
+
+    .btn-primary:hover {
+        background-color: var(--brand-primary-dark) !important;
+        border-color: var(--brand-primary-dark) !important;
+    }
+
+.text-primary {
+    color: var(--brand-primary-deep) !important;
+}
+
+.bg-primary {
+    background-color: var(--brand-primary-deep) !important;
+}
+
+/* Fix 11: Card hover effects */
+.hover-shadow {
+    transition: all 0.3s ease;
+}
+
+    .hover-shadow:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+    }
+
+/* Fix 12: Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+.app-main main {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Fix 13: Loading spinner */
+.spinner-border {
+    color: var(--brand-primary-deep) !important;
+}
+
+/* Fix 14: lpx sidebar color - Using brand background color */
+/* Sidebar background */
+.lpx-sidebar,
+.lpx-nav-menu,
+.lpx-menu-container {
+    background-color: var(--brand-bg, #F8F8FF) !important; /* Ghost White background */
+    border-right: 1px solid #e5e7eb !important;
+}
+
+/* Logo container */
+.lpx-logo-container {
+    background-color: var(--brand-bg, #F8F8FF) !important; /* Ghost White */
+    border-bottom: 1px solid #e5e7eb !important;
+    padding: 1rem !important;
+}
+
+/* Menu items default state */
+.lpx-menu-item,
+.lpx-menu-item-link {
+    background-color: transparent !important;
+    color: #64748b !important; /* Gray text */
+    transition: all 0.2s ease !important;
+}
+
+    /* Menu item icons */
+    .lpx-menu-item-icon,
+    .lpx-menu-item i {
+        color: #64748b !important;
+        transition: color 0.2s ease !important;
+    }
+
+    /* Menu item hover state */
+    .lpx-menu-item:hover,
+    .lpx-menu-item-link:hover {
+        background-color: #f1f5f9 !important; /* Light gray hover */
+        color: var(--brand-primary-deep) !important; /* Brand blue text on hover */
+    }
+
+        .lpx-menu-item:hover .lpx-menu-item-icon,
+        .lpx-menu-item:hover i,
+        .lpx-menu-item-link:hover .lpx-menu-item-icon,
+        .lpx-menu-item-link:hover i {
+            color: var(--brand-primary-deep) !important;
+        }
+
+    /* Menu item active/selected state */
+    .lpx-menu-item.active,
+    .lpx-menu-item.selected,
+    .lpx-menu-item-link.active,
+    .lpx-menu-item-link.selected {
+        background-color: var(--brand-primary-deep) !important; /* Brand blue background */
+        color: #ffffff !important; /* White text */
+    }
+
+        .lpx-menu-item.active .lpx-menu-item-icon,
+        .lpx-menu-item.active i,
+        .lpx-menu-item.selected .lpx-menu-item-icon,
+        .lpx-menu-item.selected i,
+        .lpx-menu-item-link.active .lpx-menu-item-icon,
+        .lpx-menu-item-link.active i {
+            color: #ffffff !important;
+        }
+
+/* Menu group headers */
+.lpx-menu-group-title,
+.lpx-menu-section-title {
+    color: #9ca3af !important; /* Lighter gray for headers */
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    padding: 0.5rem 1rem !important;
+}
+
+/* Submenu items */
+.lpx-submenu-item,
+.lpx-submenu-item-link {
+    background-color: transparent !important;
+    color: #64748b !important;
+    padding-left: 2.5rem !important;
+}
+
+    .lpx-submenu-item:hover,
+    .lpx-submenu-item-link:hover {
+        background-color: #f1f5f9 !important;
+        color: var(--brand-primary) !important; /* Use pure blue for submenu hover */
+    }
+
+    .lpx-submenu-item.active,
+    .lpx-submenu-item-link.active {
+        background-color: #dbeafe !important; /* Light blue for submenu */
+        color: var(--brand-primary-deep) !important; /* Deep navy text */
+    }
+
+/* Menu dividers */
+.lpx-menu-divider {
+    border-color: #e5e7eb !important;
+    margin: 0.5rem 1rem !important;
+}
+
+/* Scrollbar styling for sidebar */
+.lpx-sidebar::-webkit-scrollbar,
+.lpx-nav-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.lpx-sidebar::-webkit-scrollbar-track,
+.lpx-nav-menu::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.lpx-sidebar::-webkit-scrollbar-thumb,
+.lpx-nav-menu::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+    .lpx-sidebar::-webkit-scrollbar-thumb:hover,
+    .lpx-nav-menu::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
+/* Fix for menu item text alignment */
+.lpx-menu-item-text,
+.lpx-menu-item-link-text {
+    color: inherit !important;
+}
+
+/* Remove any default shadows */
+.lpx-sidebar,
+.lpx-menu-container {
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Ensure proper spacing */
+.lpx-menu-item,
+.lpx-menu-item-link {
+    margin-bottom: 2px !important;
+}
+
+    /* Badge colors (if any) */
+    .lpx-menu-item .badge {
+        background-color: var(--brand-primary) !important; /* Use pure blue */
+        color: white !important;
+    }
+
+
+/*Changing default bg color*/
+.lpx-content-container,
+.lpx-breadcrumb-container,
+.lpx-topbar-container,
+.lpx-topbar{
+    background-color: var(--brand-bg, #F8F8FF) !important
+}
+
+
+/*topbar item*/
+.lpx-breadcrumb-item:hover,
+.lpx-breadcrumb-item-link:hover {
+    background-color: #f1f5f9 !important; /* Light gray hover */
+    color: var(--brand-primary-deep) !important; /* Brand blue text on hover */
+}
+
+    .lpx-breadcrumb-item:hover .lpx-menu-item-icon,
+    .lpx-breadcrumb-item:hover i,
+    .lpx-breadcrumb-item-link:hover .lpx-menu-item-icon,
+    .lpx-breadcrumb-item-link:hover i {
+        color: var(--brand-primary-deep) !important;
+    }
+
+/* topbar item active/selected state */
+.lpx-breadcrumb-item.active,
+.lpx-breadcrumb-item.selected,
+.lpx-breadcrumb-item-link.active,
+.lpx-breadcrumb-item-link.selected {
+    background-color: var(--brand-primary-deep) !important; /* Brand blue background */
+    color: #ffffff !important; /* White text */
+}
+
+    .lpx-breadcrumb-item.active .lpx-menu-item-icon,
+    .lpx-breadcrumb-item.active i,
+    .lpx-breadcrumb-item.selected .lpx-menu-item-icon,
+    .lpx-breadcrumb-item.selected i,
+    .lpx-breadcrumb-item-link.active .lpx-menu-item-icon,
+    .lpx-breadcrumb-item-link.active i {
+        color: #ffffff !important;
+    }
+
+.lpx-language-selection .dropdown-toggle .lpx-icon {
+    color: var(--brand-primary-deep) !important; 
+}
+
+/*form-switch color - Using more specific selector to override framework rules */
+.form-switch .form-check-input:checked,
+.form-switch input[type="checkbox"].form-check-input:checked,
+.form-check.form-switch .form-check-input:checked,
+body .form-switch .form-check-input:checked,
+html body .form-switch .form-check-input:checked {
+    border-color: var(--brand-primary-deep) !important;
+    background-color: var(--brand-primary-deep) !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e") !important;
+}
+
+/*dropdown menus*/
+.dropdown-menu {
+    --bs-dropdown-link-active-bg: var(--brand-primary-deep) !important;
+    --bs-dropdown-header-color: var(--brand-primary-deep) !important;
+    --bs-dropdown-link-hover-bg: var(--ejada-primary-light) !important;
+    --bs-dropdown-link-hover-color: var(--brand-primary-deep) !important;
+    --bs-dropdown-link-active-color: #ffffff !important;
+}
+
+/* Set Bootstrap CSS variables for dropdowns globally */
+:root {
+    --bs-dropdown-link-active-bg: var(--brand-primary-deep) !important;
+    --bs-dropdown-link-hover-bg: var(--ejada-primary-light) !important;
+    --bs-dropdown-link-hover-color: var(--brand-primary-deep) !important;
+    --bs-dropdown-link-active-color: #ffffff !important;
+}
+
+/* Select component styling - Selected option with maximum specificity */
+html body select.form-select:focus,
+html body select.form-control:focus,
+html body .b-select select:focus,
+html body select:focus,
+body select.form-select:focus,
+body select.form-control:focus,
+body .b-select select:focus,
+body select:focus {
+    border-color: var(--brand-primary-deep) !important;
+    box-shadow: 0 0 0 0.25rem rgba(0, 16, 129, 0.25) !important;
+}
+
+/* Select option hover and selected states - Maximum specificity */
+html body select.form-select option:hover,
+html body select.form-control option:hover,
+html body select option:hover,
+body select.form-select option:hover,
+body select.form-control option:hover,
+body select option:hover {
+    background-color: var(--ejada-primary-light) !important;
+}
+
+html body select.form-select option:checked,
+html body select.form-control option:checked,
+html body select option:checked,
+body select.form-select option:checked,
+body select.form-control option:checked,
+body select option:checked {
+    background-color: var(--brand-primary-deep) !important;
+    color: #ffffff !important;
+}
+
+/* For Blazorise Select component wrapper */
+html body .b-select .form-select,
+html body .b-select select,
+body .b-select .form-select,
+body .b-select select {
+    border-color: #dee2e6 !important;
+}
+
+html body .b-select .form-select:focus,
+html body .b-select select:focus,
+body .b-select .form-select:focus,
+body .b-select select:focus {
+    border-color: var(--brand-primary-deep) !important;
+    box-shadow: 0 0 0 0.25rem rgba(0, 16, 129, 0.25) !important;
+}
+
+/* Select dropdown arrow color */
+html body select.form-select,
+html body select.form-control,
+body select.form-select,
+body select.form-control {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23001081' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e") !important;
+}
+
+/* Blazorise Select dropdown menu items - Target the actual dropdown */
+html body .dropdown-menu .dropdown-item.active,
+html body .dropdown-menu .dropdown-item:active,
+html body .dropdown-menu .dropdown-item.selected,
+html body .dropdown-menu .dropdown-item[aria-selected="true"],
+body .dropdown-menu .dropdown-item.active,
+body .dropdown-menu .dropdown-item:active,
+body .dropdown-menu .dropdown-item.selected,
+body .dropdown-menu .dropdown-item[aria-selected="true"] {
+    background-color: var(--brand-primary-deep) !important;
+    color: #ffffff !important;
+}
+
+html body .dropdown-menu .dropdown-item:hover,
+body .dropdown-menu .dropdown-item:hover {
+    background-color: var(--ejada-primary-light) !important;
+    color: var(--brand-primary-deep) !important;
+}
+
+/* Blazorise SelectItem styling */
+html body .b-select-item.active,
+html body .b-select-item.selected,
+html body .b-select-item[aria-selected="true"],
+body .b-select-item.active,
+body .b-select-item.selected,
+body .b-select-item[aria-selected="true"] {
+    background-color: var(--brand-primary-deep) !important;
+    color: #ffffff !important;
+}
+
+html body .b-select-item:hover,
+body .b-select-item:hover {
+    background-color: var(--ejada-primary-light) !important;
+    color: var(--brand-primary-deep) !important;
+}
+
+/* Override Bootstrap dropdown active state */
+html body .dropdown-item.active,
+html body .dropdown-item:active,
+body .dropdown-item.active,
+body .dropdown-item:active {
+    background-color: var(--brand-primary-deep) !important;
+    color: #ffffff !important;
+}
+
+/* Target any element with aria-selected (common in custom dropdowns) */
+html body [aria-selected="true"],
+body [aria-selected="true"] {
+    background-color: var(--brand-primary-deep) !important;
+    color: #ffffff !important;
+}
+
+/* Target any element with selected class or attribute */
+html body .selected,
+html body [selected],
+body .selected,
+body [selected] {
+    background-color: var(--brand-primary-deep) !important;
+    color: #ffffff !important;
+}
+
+/* Pagination - Active page number background color */
+.pagination .page-item.active .page-link,
+.pagination .page-link.active,
+.page-item.active .page-link,
+.b-pagination .page-item.active .page-link,
+.b-pagination .page-link.active,
+.b-datagrid-pager .pagination .page-item.active .page-link,
+.b-datagrid-pager .pagination .page-link.active,
+.b-table-pager .pagination .page-item.active .page-link,
+.b-table-pager .pagination .page-link.active,
+.pagination .page-link[aria-current="page"],
+.b-pagination .page-link[aria-current="page"],
+.b-datagrid-pager .pagination .page-link[aria-current="page"],
+.b-table-pager .pagination .page-link[aria-current="page"],
+.pagination .page-item[aria-current="page"] .page-link,
+.b-pagination .page-item[aria-current="page"] .page-link {
+    background-color: var(--brand-primary-deep) !important;
+    border-color: var(--brand-primary-deep) !important;
+    color: #ffffff !important;
+    z-index: 3;
+}
+
+/* Pagination - Hover state */
+.pagination .page-link:hover,
+.b-pagination .page-link:hover,
+.b-datagrid-pager .pagination .page-link:hover,
+.b-table-pager .pagination .page-link:hover {
+    color: var(--brand-primary-deep) !important;
+    background-color: var(--brand-primary-light) !important;
+    border-color: var(--brand-primary-deep) !important;
+}
+
+/* Pagination - Focus state */
+.pagination .page-link:focus,
+.b-pagination .page-link:focus,
+.b-datagrid-pager .pagination .page-link:focus,
+.b-table-pager .pagination .page-link:focus {
+    color: var(--brand-primary-deep) !important;
+    background-color: var(--brand-bg) !important;
+    border-color: var(--brand-primary-deep) !important;
+    box-shadow: 0 0 0 0.25rem rgba(0, 16, 129, 0.25) !important;
+}
+
+/* Primary Outline Buttons - Use brand primary colors */
+.btn-outline-primary,
+button.btn-outline-primary,
+.b-button.btn-outline-primary,
+.b-button[class*="outline-primary"],
+button[class*="outline-primary"] {
+    color: var(--brand-primary-deep) !important;
+    border-color: var(--brand-primary-deep) !important;
+    background-color: transparent !important;
+}
+
+.btn-outline-primary:hover,
+button.btn-outline-primary:hover,
+.b-button.btn-outline-primary:hover,
+.b-button[class*="outline-primary"]:hover,
+button[class*="outline-primary"]:hover {
+    color: #ffffff !important;
+    background-color: var(--brand-primary-deep) !important;
+    border-color: var(--brand-primary-deep) !important;
+}
+
+.btn-outline-primary:active,
+button.btn-outline-primary:active,
+.b-button.btn-outline-primary:active,
+.b-button[class*="outline-primary"]:active,
+button[class*="outline-primary"]:active,
+.btn-outline-primary:focus,
+button.btn-outline-primary:focus,
+.b-button.btn-outline-primary:focus,
+.b-button[class*="outline-primary"]:focus,
+button[class*="outline-primary"]:focus {
+    color: #ffffff !important;
+    background-color: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 16, 129, 0.25) !important;
+}
+
+/* Secondary Outline Buttons - Use brand primary colors (for backward compatibility) */
+.btn-outline-secondary,
+button.btn-outline-secondary,
+.b-button.btn-outline-secondary,
+.b-button[class*="outline-secondary"] {
+    color: var(--brand-primary-deep) !important;
+    border-color: var(--brand-primary-deep) !important;
+    background-color: transparent !important;
+}
+
+.btn-outline-secondary:hover,
+button.btn-outline-secondary:hover,
+.b-button.btn-outline-secondary:hover,
+.b-button[class*="outline-secondary"]:hover {
+    color: #ffffff !important;
+    background-color: var(--brand-primary-deep) !important;
+    border-color: var(--brand-primary-deep) !important;
+}
+
+.btn-outline-secondary:active,
+button.btn-outline-secondary:active,
+.b-button.btn-outline-secondary:active,
+.b-button[class*="outline-secondary"]:active,
+.btn-outline-secondary:focus,
+button.btn-outline-secondary:focus,
+.b-button.btn-outline-secondary:focus,
+.b-button[class*="outline-secondary"]:focus {
+    color: #ffffff !important;
+    background-color: var(--brand-primary) !important;
+    border-color: var(--brand-primary) !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 16, 129, 0.25) !important;
+}
+
+/* Global modern badge styling - Apply modern design to all badges */
+.badge,
+.b-badge,
+span.badge {
+    padding: 0.4rem 0.85rem !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 0.813rem !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 0.4rem !important;
+    border: none !important;
+    transition: all 0.2s ease !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+}
+
+.badge:hover,
+.b-badge:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Badge colors - Aligned with brand theme */
+/* Success badges - Use brand green accent */
+.badge.bg-success,
+.badge-success,
+.badge[class*="success"],
+.badge[class*="Success"] {
+    background-color: var(--brand-accent) !important;
+    color: #1e293b !important; /* Dark text for better contrast on light green */
+    border-color: var(--brand-accent) !important;
+}
+
+/* Primary badges - Use brand primary deep */
+.badge.bg-primary,
+.badge-primary,
+.badge[class*="primary"],
+.badge[class*="Primary"] {
+    background-color: var(--brand-primary-deep) !important;
+    color: #ffffff !important;
+    border-color: var(--brand-primary-deep) !important;
+}
+
+/* Info badges - Use brand primary (pure blue) */
+.badge.bg-info,
+.badge-info,
+.badge[class*="info"],
+.badge[class*="Info"] {
+    background-color: var(--brand-primary) !important;
+    color: #ffffff !important;
+    border-color: var(--brand-primary) !important;
+}
+
+/* Warning badges - Keep warning orange */
+.badge.bg-warning,
+.badge-warning,
+.badge[class*="warning"],
+.badge[class*="Warning"] {
+    background-color: #f59e0b !important;
+    color: #ffffff !important;
+    border-color: #f59e0b !important;
+}
+
+/* Danger badges - Keep danger red */
+.badge.bg-danger,
+.badge-danger,
+.badge[class*="danger"],
+.badge[class*="Danger"] {
+    background-color: #da1414 !important;
+    color: #ffffff !important;
+    border-color: #da1414 !important;
+}
+
+/* Secondary badges - Neutral gray */
+.badge.bg-secondary,
+.badge-secondary,
+.badge[class*="secondary"],
+.badge[class*="Secondary"] {
+    background-color: #6b6c7e !important;
+    color: #ffffff !important;
+    border-color: #6b6c7e !important;
+}
+
+/* Blazorise Badge component overrides */
+.b-badge.bg-success,
+.b-badge-success,
+.badge[data-badge-color="Success"],
+.badge[data-color="Success"] {
+    background-color: var(--brand-accent) !important;
+    color: #1e293b !important;
+}
+
+.b-badge.bg-primary,
+.b-badge-primary,
+.badge[data-badge-color="Primary"],
+.badge[data-color="Primary"] {
+    background-color: var(--brand-primary-deep) !important;
+    color: #ffffff !important;
+}
+
+.b-badge.bg-info,
+.b-badge-info,
+.badge[data-badge-color="Info"],
+.badge[data-color="Info"] {
+    background-color: var(--brand-primary) !important;
+    color: #ffffff !important;
+}
+
+.b-badge.bg-warning,
+.b-badge-warning,
+.badge[data-badge-color="Warning"],
+.badge[data-color="Warning"] {
+    background-color: #f59e0b !important;
+    color: #ffffff !important;
+}
+
+.b-badge.bg-danger,
+.b-badge-danger,
+.badge[data-badge-color="Danger"],
+.badge[data-color="Danger"] {
+    background-color: #da1414 !important;
+    color: #ffffff !important;
+}
+
+.b-badge.bg-secondary,
+.b-badge-secondary,
+.badge[data-badge-color="Secondary"],
+.badge[data-color="Secondary"] {
+    background-color: #6b6c7e !important;
+    color: #ffffff !important;
+}
+
+/* Bootstrap 5 badge utility classes */
+.bg-success.badge,
+.bg-primary.badge,
+.bg-info.badge,
+.bg-warning.badge,
+.bg-danger.badge,
+.bg-secondary.badge {
+    color: #ffffff !important;
+}
+
+.bg-success.badge {
+    background-color: var(--brand-accent) !important;
+    color: #1e293b !important;
+}
+
+.bg-primary.badge {
+    background-color: var(--brand-primary-deep) !important;
+}
+
+.bg-info.badge {
+    background-color: var(--brand-primary) !important;
+}
+
+/* Override Bootstrap CSS variables for badges */
+:root {
+    --bs-success: var(--brand-accent) !important;
+    --bs-primary: var(--brand-primary-deep) !important;
+    --bs-info: var(--brand-primary) !important;
+}
+
+/* Additional badge selectors for maximum coverage */
+span.badge.bg-success,
+span.badge-success,
+span.badge[class*="success"],
+span.badge[class*="Success"] {
+    background-color: var(--brand-accent) !important;
+    color: #1e293b !important;
+}
+
+span.badge.bg-primary,
+span.badge-primary,
+span.badge[class*="primary"],
+span.badge[class*="Primary"] {
+    background-color: var(--brand-primary-deep) !important;
+    color: #ffffff !important;
+}
+
+span.badge.bg-info,
+span.badge-info,
+span.badge[class*="info"],
+span.badge[class*="Info"] {
+    background-color: var(--brand-primary) !important;
+    color: #ffffff !important;
+}
+

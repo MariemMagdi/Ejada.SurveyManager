@@ -13,19 +13,24 @@
 
 @inherits AbpCrudPageBase<ISurveyInstanceAppService, SurveyInstanceDto, Guid, PagedAndSortedResultRequestDto, CreateSurveyInstanceDto, UpdateSurveyInstanceDto>
 
-<Card Class="shadow-sm">
-    <CardHeader Class="bg-white border-bottom">
-        <div class="d-flex align-items-center">
-                    <Icon Name="IconName.List" Class="text-primary me-2" Size="IconSize.Large" />
-            <div>
-                <h4 class="mb-0 fw-bold">@L["My Assigned Surveys"]</h4>
-                <small class="text-muted">@L["View and manage your assigned surveys"]</small>
+<div class="modern-page-wrapper">
+    <div class="glass-card">
+        <div class="gradient-header">
+            <div class="gradient-header-content">
+                <div class="d-flex align-items-center">
+                    <div class="header-icon-box me-3">
+                        <Icon Name="IconName.List" Size="IconSize.ExtraLarge" />
+                    </div>
+                    <div>
+                        <h2 class="mb-1 fw-bold text-white">@LH.Localize("MyAssignedSurveys")</h2>
+                        <p class="text-white-50 mb-0">@LH.Localize("ViewAndManageYourAssignedSurveys")</p>
+                    </div>
+                </div>
             </div>
         </div>
-    </CardHeader>
 
-    <CardBody Class="p-0">
-        <DataGrid TItem="SurveyInstanceDto"
+        <div class="px-4 pb-4">
+            <DataGrid TItem="SurveyInstanceDto"
                   Data="Entities"
                   ReadData="OnDataGridReadAsync"
                   TotalItems="TotalCount"
@@ -35,9 +40,9 @@
                   Striped="true"
                   Hoverable="true"
                   Responsive="true"
-                  Class="border-0">
+                  Class="border-0 modern-table">
             <DataGridColumns>
-                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.SurveyName)" Caption="@L["Survey"]" Sortable="true">
+                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.SurveyName)" Caption="@LH.Localize("Survey")" Sortable="true">
                     <DisplayTemplate Context="context">
                         <div class="d-flex align-items-center">
                             <Icon Name="IconName.Poll" Class="text-primary me-2" />
@@ -45,7 +50,7 @@
                         </div>
                     </DisplayTemplate>
                 </DataGridColumn>
-                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.DueDate)" Caption="@L["Due Date"]" Sortable="true">
+                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.DueDate)" Caption="@LH.Localize("DueDate")" Sortable="true">
                     <DisplayTemplate Context="context">
                         @if (context.DueDate.HasValue)
                         {
@@ -57,58 +62,58 @@
                                     @context.DueDate.Value.ToString("yyyy-MM-dd HH:mm")
                                     @if (daysLeft < 0)
                                     {
-                                        <Badge Color="Color.Danger" Class="ms-2">@L["Overdue"]</Badge>
+                                        <Badge Color="Color.Danger" Class="ms-2">@LH.Localize("Overdue")</Badge>
                                     }
                                     else if (daysLeft < 1)
                                     {
-                                        <Badge Color="Color.Warning" Class="ms-2">@L["DueSoon"]</Badge>
+                                        <Badge Color="Color.Warning" Class="ms-2">@LH.Localize("DueSoon")</Badge>
                                     }
                                 </span>
                             </div>
                         }
                         else
                         {
-                            <Badge Color="Color.Secondary">@L["No Due Date"]</Badge>
+                            <Badge Color="Color.Secondary">@LH.Localize("NoDueDate")</Badge>
                         }
                     </DisplayTemplate>
                 </DataGridColumn>
-                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.Status)" Caption="@L["Status"]" Sortable="true">
+                <DataGridColumn TItem="SurveyInstanceDto" Field="@nameof(SurveyInstanceDto.Status)" Caption="@LH.Localize("Status")" Sortable="true">
                     <DisplayTemplate Context="context">
                         @switch (context.Status)
                         {
                             case SurveyInstanceStatus.Assigned:
                                 <Badge Color="Color.Info">
                                     <Icon Name="IconName.Clock" />
-                                    @L["Not Started"]
+                                    @LH.Localize("NotStarted")
                                 </Badge>
                                 break;
                             case SurveyInstanceStatus.InProgress:
                                 <Badge Color="Color.Warning">
                                     <Icon Name="IconName.Sync" />
-                                    @L["Draft"]
+                                    @LH.Localize("Draft")
                                 </Badge>
                                 break;
                             case SurveyInstanceStatus.Submitted:
                                 <Badge Color="Color.Success">
                                     <Icon Name="IconName.Check" />
-                                    @L["Submitted"]
+                                    @LH.Localize("Submitted")
                                 </Badge>
                                 break;
                             case SurveyInstanceStatus.Expired:
                                 <Badge Color="Color.Danger">
                                     <Icon Name="IconName.ExclamationTriangle" />
-                                    @L["Expired"]
+                                    @LH.Localize("Expired")
                                 </Badge>
                                 break;
                         }
                     </DisplayTemplate>
                 </DataGridColumn>
 
-                <DataGridEntityActionsColumn TItem="SurveyInstanceDto" @ref="@EntityActionsColumn" Caption="@L["Actions"]" Width="150px">
+                <DataGridEntityActionsColumn TItem="SurveyInstanceDto" @ref="@EntityActionsColumn" Caption="@LH.Localize("Actions")" Width="150px">
                     <DisplayTemplate Context="context">
                         <EntityActions TItem="SurveyInstanceDto" EntityActionsColumn="@EntityActionsColumn">
                             <EntityAction TItem="SurveyInstanceDto"
-                                          Text="@(context.Status == SurveyInstanceStatus.Submitted ? L["ViewResponses"] : L["AnswerSurvey"])"
+                                          Text="@(context.Status == SurveyInstanceStatus.Submitted ? LH.Localize("ViewResponses") : LH.Localize("AnswerSurvey"))"
                                           Icon="@(context.Status == SurveyInstanceStatus.Submitted ? "IconName.Eye" : "IconName.Edit")"
                                           Clicked="() => GoToAnswerPage(context.Id)" />
                         </EntityActions>
@@ -116,8 +121,9 @@
                 </DataGridEntityActionsColumn>
             </DataGridColumns>
         </DataGrid>
-    </CardBody>
-</Card>
+        </div>
+    </div>
+</div>
 
 @code {
     protected override async Task OnInitializedAsync()

@@ -4,11 +4,12 @@
 @using Microsoft.Extensions.Configuration
 @inject NavigationManager NavigationManager
 @inject IConfiguration Configuration
+@inject Volo.Abp.AspNetCore.Components.Web.AbpBlazorMessageLocalizerHelper<SurveyManagerResource> LH
 @inherits SurveyManagerComponentBase
 
-<PageTitle>@L["Login"] - SurveyManager</PageTitle>
+<PageTitle>@LH.Localize("Login") - SurveyManager</PageTitle>
 
-<div class="min-vh-100 d-flex align-items-center justify-content-center bg-light" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+<div class="min-vh-100 d-flex align-items-center justify-content-center bg-light login-page-background">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-5 col-lg-4">
@@ -19,7 +20,7 @@
                                 <Icon Name="IconName.Poll" Size="IconSize.ExtraLarge" Class="text-primary" />
                             </div>
                             <h2 class="fw-bold mb-2">SurveyManager</h2>
-                            <p class="text-muted mb-0">@L["LongWelcomeMessage"]</p>
+                            <p class="text-muted mb-0">@LH.Localize("LongWelcomeMessage")</p>
                         </div>
 
                         <div class="mb-4">
@@ -29,13 +30,13 @@
                                     Clicked="HandleLogin"
                                     Class="py-3 fw-semibold">
                                 <Icon Name="IconName.User" Class="me-2" />
-                                @L["Login"]
+                                @LH.Localize("Login")
                             </Button>
                         </div>
 
                         <div class="text-center">
                             <small class="text-muted">
-                                @L["LoginDescription"]
+                                @LH.Localize("LoginDescription")
                             </small>
                         </div>
                     </CardBody>
@@ -43,8 +44,8 @@
 
                 <div class="text-center mt-4">
                     <p class="text-white small mb-0">
-                        @L["NeedHelp"]? 
-                        <a href="#" class="text-white text-decoration-underline">@L["ContactSupport"]</a>
+                        @LH.Localize("NeedHelp")? 
+                        <a href="#" class="text-white text-decoration-underline">@LH.Localize("ContactSupport")</a>
                     </p>
                 </div>
             </div>

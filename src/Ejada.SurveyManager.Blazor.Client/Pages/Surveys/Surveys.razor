@@ -9,31 +9,36 @@
 
 @inherits AbpCrudPageBase<ISurveyAppService, SurveyDto, Guid, PagedAndSortedResultRequestDto, CreateSurveyDto, UpdateSurveyDto>
 
-<Card Class="shadow-sm">
-    <CardHeader Class="bg-white border-bottom">
-        <Row Class="align-items-center justify-content-between g-3">
-            <Column ColumnSize="ColumnSize.IsAuto">
-                <div class="d-flex align-items-center">
-                    <Icon Name="IconName.Poll" Class="text-primary me-2" Size="IconSize.Large" />
-                    <div>
-                        <h4 class="mb-0 fw-bold">@L["Surveys"]</h4>
-                        <small class="text-muted">@L["Manage your surveys"]</small>
-                    </div>
-                </div>
-            </Column>
-            <Column ColumnSize="ColumnSize.IsAuto">
-                <Button Color="Color.Primary"
-                        Clicked="GoToCreatePage"
-                        Class="px-4">
-                    <Icon Name="IconName.Add" />
-                     @LH.Localize("Actions")
-                </Button>
-            </Column>
-        </Row>
-    </CardHeader>
+<div class="modern-page-wrapper">
+    <div class="glass-card">
+        <div class="gradient-header">
+            <div class="gradient-header-content">
+                <Row Class="align-items-center justify-content-between g-3">
+                    <Column ColumnSize="ColumnSize.IsAuto">
+                        <div class="d-flex align-items-center">
+                            <div class="header-icon-box me-3">
+                                <Icon Name="IconName.Poll" Size="IconSize.ExtraLarge" />
+                            </div>
+                            <div>
+                                <h2 class="mb-1 fw-bold text-white">@LH.Localize("NewSurvey")</h2>
+                                <p class="text-white-50 mb-0">@LH.Localize("ManageYourSurveys")</p>
+                            </div>
+                        </div>
+                    </Column>
+                    <Column ColumnSize="ColumnSize.IsAuto">
+                        <Button Color="Color.Primary"
+                                Clicked="GoToCreatePage"
+                                Class="px-4 btn-modern">
+                            <Icon Name="IconName.Add" />
+                            @LH.Localize("NewSurvey")
+                        </Button>
+                    </Column>
+                </Row>
+            </div>
+        </div>
 
-    <CardBody Class="p-0">
-        <DataGrid TItem="SurveyDto"
+        <div class="px-4 pb-4">
+            <DataGrid TItem="SurveyDto"
                   Data="Entities"
                   ReadData="OnDataGridReadAsync"
                   TotalItems="TotalCount"
@@ -43,9 +48,9 @@
                   Striped="true"
                   Hoverable="true"
                   Responsive="true"
-                  Class="border-0">
+                  Class="border-0 modern-table">
             <DataGridColumns>
-                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.Name)" Caption="@L["Survey Name"]" Sortable="true">
+                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.Name)" Caption="@LH.Localize("SurveyName")" Sortable="true">
                     <DisplayTemplate Context="context">
                         <div class="d-flex align-items-center">
                             <Icon Name="IconName.File" Class="text-primary me-2" />
@@ -53,36 +58,36 @@
                         </div>
                     </DisplayTemplate>
                 </DataGridColumn>
-                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.Purpose)" Caption="@L["Purpose"]" Sortable="true">
+                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.Purpose)" Caption="@LH.Localize("Purpose")" Sortable="true">
                     <DisplayTemplate Context="context">
                         <span class="text-muted">@(context.Purpose?.Length > 50 ? context.Purpose.Substring(0, 50) + "..." : context.Purpose)</span>
                     </DisplayTemplate>
                 </DataGridColumn>
-                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.TargetAudience)" Caption="@L["Target Audience"]" Sortable="true">
+                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.TargetAudience)" Caption="@LH.Localize("TargetAudience")" Sortable="true">
                     <DisplayTemplate Context="context">
                         <Badge Color="Color.Info">@context.TargetAudience</Badge>
                     </DisplayTemplate>
                 </DataGridColumn>
-                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.IsActive)" Caption="@L["Is Active"]" Sortable="true">
+                <DataGridColumn TItem="SurveyDto" Field="@nameof(SurveyDto.IsActive)" Caption="@LH.Localize("IsActive")" Sortable="true">
                     <DisplayTemplate Context="context">
                         @if (context.IsActive)
                         {
                             <Badge Color="Color.Success">
                                 <Icon Name="IconName.Check" />
-                                @L["Active"]
+                                @LH.Localize("Active")
                             </Badge>
                         }
                         else
                         {
                             <Badge Color="Color.Secondary">
                                 <Icon Name="IconName.Times" />
-                                @L["Inactive"]
+                                @LH.Localize("Inactive")
                             </Badge>
                         }
                     </DisplayTemplate>
                 </DataGridColumn>
 
-                <DataGridEntityActionsColumn TItem="SurveyDto" @ref="@EntityActionsColumn" Caption="@L["Actions"]" Width="180px">
+                <DataGridEntityActionsColumn TItem="SurveyDto" @ref="@EntityActionsColumn" Caption="@LH.Localize("Actions")" Width="180px">
                     <DisplayTemplate Context="context">
                         <EntityActions TItem="SurveyDto" EntityActionsColumn="@EntityActionsColumn">
                             <EntityAction TItem="SurveyDto"
@@ -90,11 +95,11 @@
                                           Icon="IconName.Eye"
                                           Clicked="() => GoToDetailsPage(context.Id)" />
                             <EntityAction TItem="SurveyDto"
-                                          Text="@L["Edit"]"
+                                          Text="@LH.Localize("Edit")"
                                           Icon="IconName.Edit"
                                           Clicked="() => GoToEditPage(context.Id)" />
                             <EntityAction TItem="SurveyDto"
-                                          Text="@L["Delete"]"
+                                          Text="@LH.Localize("Delete")"
                                           Icon="IconName.Trash"
                                           Color="Color.Danger"
                                           Clicked="() => DeleteEntityAsync(context)"
@@ -104,8 +109,9 @@
                 </DataGridEntityActionsColumn>
             </DataGridColumns>
         </DataGrid>
-    </CardBody>
-</Card>
+        </div>
+    </div>
+</div>
 
 @code {
     private void GoToCreatePage()
@@ -125,6 +131,6 @@
 
     protected override string GetDeleteConfirmationMessage(SurveyDto entity)
     {
-        return string.Format(L["Are you sure you want to delete the survey '{0}'?"], entity.Name);
+        return string.Format(LH.Localize("Error.ConfirmDeleteSurvey"), entity.Name);
     }
 }
