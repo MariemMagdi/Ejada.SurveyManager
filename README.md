@@ -130,33 +130,33 @@ The following screenshots are recommended to be placed under
 
 ### Dashboard
 
-![Dashboard](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/dashboard.png)
+![Dashboard](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/Dashboard.png)
 
 ### Survey Management
 
-![Survey Management](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/surveyManagement.png)
+![Survey Management](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/SurveyManagement.png)
 
 ### Question Creation
 
-![Question Creation](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/questioncreation.png)
+![Question Creation](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/QuestionCreation.png)
 
 ### Survey Assignment
 
-![Survey Assignment](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/surveyassignment.png)
+![Survey Assignment](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/SurveyAssignment.png)
 
 ### Survey Response
 
-![Survey Response](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/surveyresponse.png)
+![Survey Response](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/SurveyResponse.png)
 
 ### Indicator Details
 
-![Indicator Details](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/indicatordetails.png)
+![Indicator Details](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/IndicatorDetails.png)
 
 ### User Management
 
-![User Management](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/usermanagement.png)
+![User Management](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/UserManagement.png)
 
 ### Indicator PDF Report
 
-![Indicator PDF Report](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/indicatorreport.png)
+![Indicator PDF Report](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/IndicatorReport.png)
 
