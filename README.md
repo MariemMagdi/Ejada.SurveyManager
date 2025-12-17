@@ -1,644 +1,127 @@
-# Survey Management System
+## Survey Management System
 
-A comprehensive survey management platform built with ASP.NET Core and ABP Framework, enabling organizations to create, distribute, and analyze surveys with a modern Blazor-based user interface.
-
-## Table of Contents
-
-- [Project Overview](#project-overview)
-- [Tech Stack](#tech-stack)
-- [Features](#features)
-- [System Architecture](#system-architecture)
-- [Database Design](#database-design)
-- [Setup & Installation](#setup--installation)
-- [Configuration](#configuration)
-- [User Roles & Permissions](#user-roles--permissions)
-- [Localization](#localization)
-- [Development Notes](#development-notes)
-- [Future Improvements](#future-improvements)
-- [Screenshots](#screenshots)
+A survey lifecycle platform built with ASP.NET Core and ABP Framework, enabling organizations to create, distribute, and analyze surveys through a modern Blazor WebAssembly UI.
 
 ## Project Overview
 
-The Survey Management System is an enterprise-grade application designed to streamline the entire survey lifecycle from creation to analysis. It serves three main user roles within an organization:
-
-- **Admin**: Full control over configuration, surveys, questions, indicators, assignments, and users
-- **Auditor**: Read-only / analytical access to indicators, responses, and generated reports
-- **Employee**: Access to assigned surveys, ability to answer questions, and view their own responses
-
-### High-Level Features
-
-- **Survey Creation & Management**: Create surveys with custom questions, set target audiences, and manage survey lifecycle
-- **Question Management**: Build reusable question libraries with multiple question types (Single Choice, Multi Choice, Likert Scale, Text)
-- **Survey Assignment**: Assign surveys to specific employees with optional due dates
-- **Survey Responses**: Employees can answer assigned surveys with draft saving and submission capabilities
-- **Indicator Management**: Link questions to performance indicators for analytics
-- **Dashboard**: Real-time overview of surveys, assignments, and statistics
-- **Localization**: Full support for English and Arabic languages
-- **Role-Based Access Control**: Granular permissions system integrated with ABP Framework
+- **Purpose**: Manage end-to-end surveys (design, assignment, response collection, analytics, and reporting).
+- **Main roles**:
+  - **Admin** – full control over configuration, surveys, questions, indicators, assignments, and users.
+  - **Auditor** – read-only / analytical access to indicators, responses, and reports.
+  - **Employee** – completes assigned surveys and can review own responses.
 
 ## Tech Stack
 
-- **.NET 9.0**: Latest .NET framework version
-- **ASP.NET Core**: Web application framework
-- **ABP Framework 9.3.5**: Modular application framework providing:
-  - Dependency injection
-  - Authorization & authentication
-  - Multi-tenancy support
-  - Localization infrastructure
-  - Audit logging
-- **Blazor WebAssembly**: Client-side UI framework
-- **Blazorise 1.8.1**: Component library with Bootstrap 5 styling
-- **Entity Framework Core**: ORM for database operations
-- **SQL Server**: Relational database management system
-- **OpenIddict**: Authentication server for OAuth 2.0 / OpenID Connect
-- **QuestPDF**: PDF generation library for per-user performance reports based on survey indicators
+- **Backend**: .NET 9, ASP.NET Core, ABP Framework 9.3.5, Entity Framework Core, SQL Server, OpenIddict.
+- **Frontend**: Blazor WebAssembly, Blazorise (Bootstrap 5), custom modern styling.
+- **Infrastructure & Cross-cutting**: ABP modules (DI, auth, multi-tenancy-ready, localization, audit logging).
+- **Reporting**: **QuestPDF** for indicator-level and per-employee PDF performance reports.
 
-## Features
+## Core Capabilities
 
-### Survey Management
+- **Survey & Question Management**
+  - Create and manage surveys with metadata, lifecycle (activate/deactivate), and question composition.
+  - Reusable question library with Single Choice, Multi Choice, Likert scales, and text questions.
+  - Typed options, validation, and protection for questions used in active surveys.
 
-- Create and edit surveys with metadata (name, purpose, target audience)
-- Activate/deactivate surveys for assignment
-- Attach existing questions or create new questions inline
-- View survey details with all associated questions and options
-- Delete surveys (with validation for linked assignments)
+- **Assignments, Responses & Analytics**
+  - Assign surveys to employees with due dates and status tracking (Assigned, In Progress, Submitted, Expired).
+  - Employees can save drafts and submit responses; per-question statistics and option distributions are available.
+  - Indicator management links questions to performance indicators and surfaces per-indicator response statistics.
 
-### Question Management
+- **Dashboards & Reporting**
+  - Dashboard with key counts (surveys, assignments, indicators) and recent activity.
+  - **Indicator PDF report**: all linked questions, per-question stats, and detailed employee responses.
+  - **Employee PDF report**: per-employee performance across indicators and questions.
 
-- Create questions with multiple types:
-  - **Single Choice**: One option selection
-  - **Multi Choice**: Multiple option selection
-  - **Likert Scale**: Predefined 5-point or 7-point scale
-- Define options with typed values (String, Int, Decimal, Bool, Date, DateTime)
-- Link questions to indicators for analytics
-- Reusable question library
-- Protection against editing questions linked to active surveys
-- Client-side validation for option data types
-
-### Indicator Management
-
-- Create performance indicators with descriptions
-- Link multiple questions to indicators
-- View response statistics per indicator
-- Active/inactive indicator status management
-- Export **indicator-level PDF reports** that include:
-  - All questions linked to the indicator
-  - Per-question statistics (total and submitted responses, averages for Likert questions)
-  - Detailed employee responses (email, answer, response date), optionally filtered to submitted responses only
-
-### Survey Assignment
-
-- Assign surveys to specific employees
-- Set optional due dates with visual warnings
-- Track assignment status:
-  - **Assigned**: Not yet started
-  - **In Progress**: Draft saved
-  - **Submitted**: Completed
-  - **Expired**: Past due date
-- View all assignments or filter by assignee
-- Mark assignments as expired manually
-
-### Survey Responses & Statistics
-
-- Employees can answer assigned surveys
-- Save drafts for later completion
-- Submit completed surveys
-- View response details including:
-  - Selected options for choice questions
-  - Text responses
-  - Likert scale ratings
-- Response statistics per question:
-  - Total responses
-  - Option distribution
-  - Average ratings (for Likert scales)
-  - Percentage breakdowns
-
-### User Management & Performance Reports
-
-- Modern users page with a responsive data grid showing:
-  - Username, email, name, surname
-  - Assigned roles visualized as badges
-- Sorting and basic filtering support on user columns
-- Integration with identity user and role APIs via ABP
-- Ability to generate **per-employee performance reports**:
-  - PDF report summarizing the employee's answers grouped by indicators
-  - Includes indicator-wise breakdown of questions and the employee's answers
-  - Only available for users in the **Employee** role
-  - Generated using **QuestPDF** and downloaded directly from the Blazor client
-
-### Dashboard
-
-- Overview statistics:
-  - Total surveys count
-  - Active surveys count
-  - Total assignments count
-  - Total indicators count
-- Assignment status breakdown with visual indicators
-- Recently created surveys list
-- Latest survey assignments with assignee information
-- Quick navigation to detailed views
-
-### Authentication & Authorization
-
-- OpenIddict-based authentication
-- Role-based access control (RBAC)
-- Permission-based authorization:
-  - Survey management permissions (Create, Edit, Delete)
-  - Question management permissions (Create, Edit, Delete)
-  - Survey instance permissions (ViewOwn, ViewAll, Create, Edit, Delete, MarkExpired)
-  - Response permissions (ViewOwn, ViewAll, Answer, Submit)
-  - Indicator permissions (ViewAll, Create, Edit, Delete)
-- Custom login page with modern UI
-
-### Localization
-
-- Full support for English (en) and Arabic (ar)
-- JSON-based localization resources
-- Localized UI text, validation messages, and error messages
-- Culture-specific date/time formatting
-- Right-to-left (RTL) support for Arabic
+- **Authentication, Authorization & Localization**
+  - OpenIddict-based authentication with ABP role & permission system.
+  - Typical permissions: manage surveys/questions/indicators, assign surveys, view own/all responses, export reports.
+  - Built-in localization with **English / Arabic**, including RTL support for Arabic.
 
 ## System Architecture
 
-The solution follows ABP Framework's layered architecture pattern, ensuring separation of concerns and maintainability:
+- **Domain (`Ejada.SurveyManager.Domain`)**: Core entities and business rules (surveys, questions, indicators, responses, survey instances).
+- **Application (`Ejada.SurveyManager.Application`)**: Application services orchestrating domain logic and reporting (CRUD, assignments, PDF exports).
+- **Application Contracts (`Ejada.SurveyManager.Application.Contracts`)**: DTOs, service interfaces, permissions, shared enums.
+- **Domain Shared (`Ejada.SurveyManager.Domain.Shared`)**: Shared localization resources and domain constants.
+- **HTTP API (`Ejada.SurveyManager.HttpApi` + `HttpApi.Host`)**: REST endpoints, hosting, authentication, middleware, configuration.
+- **Blazor Client (`Ejada.SurveyManager.Blazor.Client`)**: WebAssembly UI for surveys, questions, indicators, assignments, users, and dashboards.
+- **Entity Framework Core (`Ejada.SurveyManager.EntityFrameworkCore`)**: DbContext, mappings, repositories, migrations.
+- **DbMigrator (`Ejada.SurveyManager.DbMigrator`)**: Console app to apply migrations and seed initial data.
 
-### Domain Layer (`Ejada.SurveyManager.Domain`)
+## Data Model Overview
 
-Contains the core business logic and entities:
-- **Entities**: `Survey`, `Question`, `Option`, `SurveyInstance`, `Response`, `ResponseOption`, `Indicator`, `QuestionIndicator`
-- **Domain Services**: Business logic encapsulated within entities
-- **Value Objects**: Domain constants and enums
-- **Repository Interfaces**: Defined here, implemented in EF Core layer
-
-### Application Layer (`Ejada.SurveyManager.Application`)
-
-Implements application services and business workflows:
-- **Application Services**: `SurveyAppService`, `QuestionAppService`, `SurveyInstanceAppService`, `ResponseAppService`, `IndicatorAppService`
-- **DTOs**: Data transfer objects for input/output
-- **AutoMapper Profiles**: Entity to DTO mappings
-- **Business Logic**: Orchestrates domain operations
-
-### Application Contracts Layer (`Ejada.SurveyManager.Application.Contracts`)
-
-Defines public contracts:
-- **DTOs**: Shared data transfer objects
-- **Interfaces**: Application service interfaces
-- **Permissions**: Permission definitions
-- **Enums**: Shared enumerations
-
-### Domain Shared Layer (`Ejada.SurveyManager.Domain.Shared`)
-
-Shared resources across layers:
-- **Localization**: JSON files for en/ar languages
-- **Constants**: Domain constants
-- **Enums**: Shared enumerations
-
-### HTTP API Layer (`Ejada.SurveyManager.HttpApi`)
-
-RESTful API controllers:
-- Exposes application services as HTTP endpoints
-- Handles request/response serialization
-- API versioning support
-
-### HTTP API Host (`Ejada.SurveyManager.HttpApi.Host`)
-
-API hosting and configuration:
-- Startup configuration
-- Middleware pipeline
-- Authentication server (OpenIddict)
-- Database context configuration
-- Virtual file system for localization
-
-### Blazor Client (`Ejada.SurveyManager.Blazor.Client`)
-
-WebAssembly-based UI:
-- **Pages**: Razor components for all features
-- **Navigation**: Menu configuration
-- **Components**: Reusable UI components
-- **Services**: Client-side service implementations
-- **Localization**: Client-side localization setup
-
-### Entity Framework Core Layer (`Ejada.SurveyManager.EntityFrameworkCore`)
-
-Data access implementation:
-- **DbContext**: `SurveyManagerDbContext`
-- **Entity Configurations**: Fluent API configurations for all entities
-- **Migrations**: Database schema migrations
-- **Repositories**: EF Core repository implementations
-
-### Database Migrator (`Ejada.SurveyManager.DbMigrator`)
-
-Standalone application for:
-- Running database migrations
-- Seeding initial data
-- Development and production database setup
-
-## Database Design
-
-The system uses a relational database model with the following main entities:
-
-### Core Entities
-
-**Survey**
-- Represents a survey with metadata (name, purpose, target audience, active status)
-- Links to multiple questions through `SurveyQuestion` junction table
-- Supports soft delete and audit fields
-
-**Question**
-- Contains question text and type (SingleChoice, MultiChoice, Likert, Text)
-- Has multiple options (for choice types)
-- Can be linked to multiple indicators
-- Protected from editing when linked to active surveys
-
-**Option**
-- Belongs to a question
-- Has a label and data type (String, Int, Decimal, Bool, Date, DateTime)
-- Validated against its data type
-
-**SurveyInstance**
-- Represents a survey assignment to an employee
-- Links a survey to an assignee user
-- Tracks status and optional due date
-- Supports status transitions
-
-**Response**
-- Stores an employee's answer to a question
-- Links to a survey instance and question
-- Contains answer value (text or reference to options)
-
-**ResponseOption**
-- Junction table for multi-choice responses
-- Links responses to selected options
-
-**Indicator**
-- Performance indicator with name and description
-- Links to multiple questions for analytics
-- Active/inactive status
-
-**QuestionIndicator**
-- Junction table linking questions to indicators
-- Enables many-to-many relationship
-
-### Relationships
-
-- Survey → SurveyQuestion → Question (Many-to-Many)
-- Question → Option (One-to-Many)
-- SurveyInstance → Survey (Many-to-One)
-- SurveyInstance → User (Many-to-One)
-- Response → SurveyInstance (Many-to-One)
-- Response → Question (Many-to-One)
-- Response → ResponseOption → Option (Many-to-Many)
-- Indicator → QuestionIndicator → Question (Many-to-Many)
-
-All entities include ABP audit fields (CreationTime, CreatorId, LastModificationTime, LastModifierId, IsDeleted, DeleterId, DeletionTime).
+- Relational SQL Server schema with ABP audited entities.
+- Core concepts: **surveys**, **questions**, **options**, **indicators**, **survey instances (assignments)**, **responses**, and link tables for many‑to‑many relationships.
+- Responses support both direct numeric/text values (e.g., Likert) and option selections, enabling rich statistics and PDF reporting.
 
 ## Setup & Installation
 
-### Prerequisites
+- **Prerequisites**
+  - .NET 9 SDK, SQL Server (2019+ or Express), Git, and optionally Visual Studio 2022 / VS Code.
 
-- **.NET 9.0 SDK** or later
-- **SQL Server 2019** or later (or SQL Server Express)
-- **Visual Studio 2022** or **Visual Studio Code** (optional, for development)
-- **Git** (for cloning the repository)
+- **Quick setup**
+  - **Clone & restore**
+    - `git clone <repository-url>`
+    - `cd Ejada.SurveyManager`
+    - `dotnet restore`
+  - **Configure DB connection**
+    - Edit `src/Ejada.SurveyManager.HttpApi.Host/appsettings.json` → `ConnectionStrings:Default` (Windows or SQL auth).
+  - **Run migrations & seed**
+    - `cd src/Ejada.SurveyManager.DbMigrator`
+    - `dotnet run`
+  - **Run the apps**
+    - API Host: `cd src/Ejada.SurveyManager.HttpApi.Host && dotnet run`
+    - Blazor Client: `cd src/Ejada.SurveyManager.Blazor.Client && dotnet run`
+  - **Access**
+    - Blazor Client (SPA): `https://localhost:44300` (or console port).
+    - HTTP API / Swagger: `https://localhost:44301/swagger`.
+  - **Default admin (seeded)**
+    - Username: `admin`
+    - Password: `1q2w3E*` (or as configured in `appsettings.json` / seed).
 
-### Step 1: Clone the Repository
+## Configuration & Localization
 
-```bash
-git clone <repository-url>
-cd Ejada.SurveyManager
-```
+- **Configuration files**
+  - App settings: `src/Ejada.SurveyManager.HttpApi.Host/appsettings*.json`.
+  - DbMigrator: `src/Ejada.SurveyManager.DbMigrator/appsettings*.json`.
+  - Common production env vars:
+    - `ConnectionStrings__Default` – database connection string.
+    - `App__SelfUrl` – backend base URL for OpenIddict.
+    - `AuthServer__Authority` – authentication server authority.
 
-### Step 2: Restore NuGet Packages
-
-```bash
-dotnet restore
-```
-
-### Step 3: Configure Database Connection
-
-Update the connection string in `src/Ejada.SurveyManager.HttpApi.Host/appsettings.json`:
-
-```json
-{
-  "ConnectionStrings": {
-    "Default": "Server=localhost;Database=SurveyManagerDb;Trusted_Connection=True;TrustServerCertificate=True"
-  }
-}
-```
-
-For SQL Server authentication, use:
-```
-Server=localhost;Database=SurveyManagerDb;User Id=sa;Password=YourPassword;TrustServerCertificate=True
-```
-
-### Step 4: Apply Database Migrations
-
-Run the database migrator:
-
-```bash
-cd src/Ejada.SurveyManager.DbMigrator
-dotnet run
-```
-
-This will:
-- Create the database if it doesn't exist
-- Apply all EF Core migrations
-- Seed initial data (admin user, permissions, etc.)
-
-### Step 5: Run the Application
-
-#### Option A: Run API Host and Blazor Client Separately
-
-**Terminal 1 - API Host:**
-```bash
-cd src/Ejada.SurveyManager.HttpApi.Host
-dotnet run
-```
-
-**Terminal 2 - Blazor Client:**
-```bash
-cd src/Ejada.SurveyManager.Blazor.Client
-dotnet run
-```
-
-#### Option B: Run from Visual Studio
-
-1. Set `Ejada.SurveyManager.HttpApi.Host` as startup project
-2. Set `Ejada.SurveyManager.Blazor.Client` as startup project (for Blazor)
-3. Run both projects
-
-### Step 6: Access the Application
-
-- **Blazor Client**: `https://localhost:44300` (or the port shown in console)
-- **API Host**: `https://localhost:44301` (or the port shown in console)
-- **Swagger UI**: `https://localhost:44301/swagger`
-
-### Default Credentials
-
-After running the database migrator, default admin credentials are created:
-- **Username**: `admin`
-- **Password**: `1q2w3E*` (check `appsettings.json` or seed data for actual password)
-
-## Configuration
-
-### Localization Configuration
-
-Localization files are located in:
-- `src/Ejada.SurveyManager.Domain.Shared/Localization/SurveyManager/en.json`
-- `src/Ejada.SurveyManager.Domain.Shared/Localization/SurveyManager/ar.json`
-
-The localization is configured in:
-- `src/Ejada.SurveyManager.Domain.Shared/SurveyManagerDomainSharedModule.cs`
-- `src/Ejada.SurveyManager.HttpApi.Host/SurveyManagerHttpApiHostModule.cs`
-- `src/Ejada.SurveyManager.Blazor.Client/SurveyManagerBlazorClientModule.cs`
-
-### Database Connection
-
-Connection strings are configured in:
-- `src/Ejada.SurveyManager.HttpApi.Host/appsettings.json`
-- `src/Ejada.SurveyManager.DbMigrator/appsettings.json`
-
-### Environment Variables
-
-For production deployments, use environment variables or `appsettings.Production.json`:
-- `ConnectionStrings__Default`: Database connection string
-- `App__SelfUrl`: Application self URL for OpenIddict
-- `AuthServer__Authority`: Authentication server authority
+- **Localization**
+  - Resources: `src/Ejada.SurveyManager.Domain.Shared/Localization/SurveyManager/en.json` and `ar.json`.
+  - Localization configured via Domain Shared, HttpApi.Host, and Blazor Client modules.
+  - All user-facing strings should use localization keys to support **en/ar** and RTL for Arabic.
 
 ## User Roles & Permissions
 
-### Admin Capabilities
+- **Roles**
+  - **Admin**: full management of surveys, questions, indicators, survey instances, users, and permissions.
+  - **Auditor**: read-only access to indicators, survey instances, responses, and PDF reports (indicator and employee).
+  - **Employee**: view and complete own survey assignments; view own responses and drafts.
 
-Administrators have full access to all features:
-- Create, edit, and delete surveys
-- Manage question library
-- Create and manage indicators
-- Assign surveys to any employee
-- View all survey assignments and responses
-- Mark assignments as expired
-- Manage user permissions
+- **Example capabilities**
+  - Admin: create/edit/delete surveys and questions, manage indicators, assign surveys, expire assignments, manage users/roles.
+  - Auditor: view all indicators and linked questions, inspect survey instances and responses, export indicator and employee reports.
+  - Employee: view own assignments, answer and submit surveys, save drafts, view own response history.
 
-### Auditor Capabilities
+## Developer Notes
 
-Auditors focus on **reviewing data and insights** rather than managing configuration:
-- View all indicators and their linked questions
-- View survey instances and responses for analytical/review purposes
-- Access indicator-level PDF reports and employee performance reports (subject to assigned permissions)
-
-### Employee Capabilities
-
-Employees have limited access:
-- View their own assigned surveys (`SurveyInstances.ViewOwn`)
-- Answer assigned surveys (`Responses.Answer`)
-- Submit survey responses (`Responses.Submit`)
-- View their own responses (`Responses.ViewOwn`)
-- Save drafts of incomplete surveys
-
-### Permission System
-
-The system uses ABP Framework's permission system with the following permission groups:
-
-**SurveyManager.Surveys**
-- `Create`: Create new surveys
-- `Edit`: Edit existing surveys
-- `Delete`: Delete surveys
-
-**SurveyManager.Questions**
-- `Create`: Create new questions
-- `Edit`: Edit existing questions
-- `Delete`: Delete questions
-
-**SurveyManager.SurveyInstances**
-- `ViewOwn`: View own assigned surveys
-- `ViewAll`: View all survey assignments
-- `Create`: Assign surveys to employees
-- `Edit`: Edit survey assignments
-- `Delete`: Delete survey assignments
-- `MarkExpired`: Mark assignments as expired
-
-**SurveyManager.Responses**
-- `ViewOwn`: View own responses
-- `ViewAll`: View all responses
-- `Answer`: Answer assigned surveys
-- `Submit`: Submit survey responses
-
-**SurveyManager.Indicators**
-- `ViewAll`: View all indicators
-- `Create`: Create indicators
-- `Edit`: Edit indicators
-- `Delete`: Delete indicators
-
-Permissions are defined in `src/Ejada.SurveyManager.Application.Contracts/Permissions/SurveyManagerPermissions.cs` and registered in `SurveyManagerPermissionDefinitionProvider.cs`.
-
-## Localization
-
-### How It Works
-
-The system uses ABP Framework's localization infrastructure with JSON-based resources. Localization keys are stored in JSON files and loaded at runtime.
-
-### File Structure
-
-Localization files are located at:
-```
-src/Ejada.SurveyManager.Domain.Shared/Localization/SurveyManager/
-├── en.json (English)
-└── ar.json (Arabic)
-```
-
-### Adding New Keys
-
-1. Open the appropriate JSON file (`en.json` or `ar.json`)
-2. Add a new key-value pair in the `Texts` object:
-   ```json
-   {
-     "Culture": "en",
-     "Texts": {
-       "YourNewKey": "Your New Value"
-     }
-   }
-   ```
-3. Use the key in Razor pages: `@L["YourNewKey"]`
-4. Add the same key to both `en.json` and `ar.json` with appropriate translations
-
-### Using Localization in Code
-
-**In Razor Pages:**
-```razor
-@L["Survey Name"]
-```
-
-**In C# Code:**
-```csharp
-@inject IStringLocalizer<SurveyManagerResource> L
-var text = L["Survey Name"];
-```
-
-**For Validation Messages:**
-```csharp
-@inject AbpBlazorMessageLocalizerHelper<SurveyManagerResource> LH
-<Validation MessageLocalizer="@LH.Localize">
-```
-
-### Localization Resource
-
-The localization resource is defined in:
-- `src/Ejada.SurveyManager.Domain.Shared/Localization/SurveyManagerResource.cs`
-- Registered in `SurveyManagerDomainSharedModule.cs`
-
-## Development Notes
-
-### Adding a New Entity/Module
-
-1. **Create Domain Entity** (`Domain` layer):
-   - Add entity class inheriting from `FullAuditedEntity<Guid>`
-   - Add domain methods and business logic
-   - Define repository interface
-
-2. **Create EF Core Configuration** (`EntityFrameworkCore` layer):
-   - Add `IEntityTypeConfiguration<T>` implementation
-   - Configure table name, columns, relationships
-   - Register in `SurveyManagerDbContext.OnModelCreating`
-
-3. **Create DTOs** (`Application.Contracts` layer):
-   - Create DTOs for input/output
-   - Add AutoMapper mappings
-
-4. **Create Application Service** (`Application` layer):
-   - Implement `CrudAppService` or custom service
-   - Add business logic
-   - Register in module
-
-5. **Create API Controller** (`HttpApi` layer):
-   - Add controller inheriting from ABP base controllers
-   - Expose application service methods
-
-6. **Create Blazor Pages** (`Blazor.Client` layer):
-   - Add Razor pages for list, create, edit, details
-   - Use `AbpCrudPageBase` for CRUD operations
-   - Add navigation menu items
-
-7. **Add Permissions** (`Application.Contracts` layer):
-   - Add permission constants
-   - Register in `PermissionDefinitionProvider`
-
-8. **Add Localization Keys** (`Domain.Shared` layer):
-   - Add keys to `en.json` and `ar.json`
-
-9. **Create Migration**:
-   ```bash
-   cd src/Ejada.SurveyManager.EntityFrameworkCore
-   dotnet ef migrations add AddNewEntity --startup-project ../Ejada.SurveyManager.HttpApi.Host
-   ```
-
-### Wiring Pages with Localization
-
-1. Add `@using Ejada.SurveyManager.Localization` to Razor page
-2. Use `@L["Key"]` for all user-facing text
-3. Add keys to both `en.json` and `ar.json`
-4. For validation messages, use `AbpBlazorMessageLocalizerHelper<SurveyManagerResource>`
-
-### Extending Dashboard
-
-The dashboard is located at `src/Ejada.SurveyManager.Blazor.Client/Pages/Dashboard.razor`.
-
-To add new statistics:
-1. Inject required application services
-2. Add data fetching logic in `OnInitializedAsync`
-3. Add UI cards with statistics
-4. Update localization keys if needed
-
-### Extending Indicators
-
-Indicators are managed in:
-- Domain: `src/Ejada.SurveyManager.Domain/Indicators/`
-- Application: `src/Ejada.SurveyManager.Application/Indicators/`
-- UI: `src/Ejada.SurveyManager.Blazor.Client/Pages/Indicators/`
-
-To add new indicator features:
-1. Extend `Indicator` entity if needed
-2. Update DTOs and application service
-3. Modify UI pages
-4. Add localization keys
+- Follow **ABP layered architecture** when adding features: Domain → EF Core mapping → Application (service + DTOs) → HttpApi → Blazor Client.
+- Reuse existing patterns: `CrudAppService`, ABP permissions, localization keys, and the existing QuestPDF report services for new reports.
+- When adding UI pages, register routes/navigation and add localized strings in both `en.json` and `ar.json`.
 
 ## Future Improvements
 
-The following enhancements are planned for future releases:
-
-### Advanced Analytics
-- Real-time dashboard with charts and graphs
-- Trend analysis over time
-- Comparative analysis between surveys
-- Custom report generation
-
-### Export Functionality
-- Export survey responses to Excel
-- Generate PDF reports
-- Export survey templates
-- Bulk data export
-
-### Question Templates Marketplace
-- Pre-built question templates library
-- Community-contributed templates
-- Template categories and tags
-- Template rating and reviews
-
-### Email Notifications
-- Email notifications for new survey assignments
-- Reminder emails for pending surveys
-- Completion confirmation emails
-- Weekly/monthly summary emails
-
-### Additional Features
-- Survey scheduling and automation
-- Conditional question logic
-- File upload questions
-- Survey branching based on answers
-- Anonymous survey support
-- Survey sharing via public links
-- Advanced filtering and search
-- Bulk survey operations
-- API rate limiting and throttling
-- Audit trail for all operations
+- Richer analytics dashboards (charts, trends, comparisons between surveys/indicators).
+- Additional export formats (Excel/CSV, more PDF templates, bulk exports).
+- Advanced survey logic (conditional branching, scheduling, anonymous/public links, file upload questions).
+- Enhanced notifications (assignments, reminders, completion summaries, periodic digests).
+- More powerful filtering and search across surveys, assignments, responses, and indicators.
+- Extended auditing and rate limiting for security and compliance scenarios.
 
 ## Screenshots
 
@@ -667,7 +150,7 @@ The following screenshots are recommended to be placed under
 
 ### Indicator Details
 
-![Response Statistics](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/indicatordetails.png)
+![Indicator Details](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/indicatordetails.png)
 
 ### User Management
 
@@ -675,4 +158,5 @@ The following screenshots are recommended to be placed under
 
 ### Indicator PDF Report
 
-![Employee Performance PDF Report](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/indicatorreport.png)
+![Indicator PDF Report](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/indicatorreport.png)
+
