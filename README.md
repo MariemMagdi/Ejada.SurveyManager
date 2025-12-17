@@ -19,11 +19,11 @@ A comprehensive survey management platform built with ASP.NET Core and ABP Frame
 
 ## Project Overview
 
-The Survey Management System is an enterprise-grade application designed to streamline the entire survey lifecycle from creation to analysis. It serves multiple user roles within an organization:
+The Survey Management System is an enterprise-grade application designed to streamline the entire survey lifecycle from creation to analysis. It serves three main user roles within an organization:
 
-- **Administrators**: Full control over surveys, questions, indicators, and assignments
-- **Managers**: Ability to assign surveys to employees and view aggregated responses
-- **Employees**: Access to assigned surveys, ability to answer questions, and view their own responses
+- **Admin**: Full control over configuration, surveys, questions, indicators, assignments, and users
+- **Auditor**: Read-only / analytical access to indicators, responses, and generated reports
+- **Employee**: Access to assigned surveys, ability to answer questions, and view their own responses
 
 ### High-Level Features
 
@@ -51,6 +51,7 @@ The Survey Management System is an enterprise-grade application designed to stre
 - **Entity Framework Core**: ORM for database operations
 - **SQL Server**: Relational database management system
 - **OpenIddict**: Authentication server for OAuth 2.0 / OpenID Connect
+- **QuestPDF**: PDF generation library for per-user performance reports based on survey indicators
 
 ## Features
 
@@ -80,6 +81,10 @@ The Survey Management System is an enterprise-grade application designed to stre
 - Link multiple questions to indicators
 - View response statistics per indicator
 - Active/inactive indicator status management
+- Export **indicator-level PDF reports** that include:
+  - All questions linked to the indicator
+  - Per-question statistics (total and submitted responses, averages for Likert questions)
+  - Detailed employee responses (email, answer, response date), optionally filtered to submitted responses only
 
 ### Survey Assignment
 
@@ -107,6 +112,19 @@ The Survey Management System is an enterprise-grade application designed to stre
   - Option distribution
   - Average ratings (for Likert scales)
   - Percentage breakdowns
+
+### User Management & Performance Reports
+
+- Modern users page with a responsive data grid showing:
+  - Username, email, name, surname
+  - Assigned roles visualized as badges
+- Sorting and basic filtering support on user columns
+- Integration with identity user and role APIs via ABP
+- Ability to generate **per-employee performance reports**:
+  - PDF report summarizing the employee's answers grouped by indicators
+  - Includes indicator-wise breakdown of questions and the employee's answers
+  - Only available for users in the **Employee** role
+  - Generated using **QuestPDF** and downloaded directly from the Blazor client
 
 ### Dashboard
 
@@ -400,6 +418,13 @@ Administrators have full access to all features:
 - Mark assignments as expired
 - Manage user permissions
 
+### Auditor Capabilities
+
+Auditors focus on **reviewing data and insights** rather than managing configuration:
+- View all indicators and their linked questions
+- View survey instances and responses for analytical/review purposes
+- Access indicator-level PDF reports and employee performance reports (subject to assigned permissions)
+
 ### Employee Capabilities
 
 Employees have limited access:
@@ -615,9 +640,39 @@ The following enhancements are planned for future releases:
 - API rate limiting and throttling
 - Audit trail for all operations
 
+## Screenshots
 
-[Add contribution guidelines if applicable]
+The following screenshots are recommended to be placed under  
+`src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/` and referenced as below.
 
-## Support
+### Dashboard
 
-For issues, questions, or contributions, please [specify your support channel].
+![Dashboard](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/dashboard.png)
+
+### Survey Management
+
+![Survey Management](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/surveyManagement.png)
+
+### Question Creation
+
+![Question Creation](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/questioncreation.png)
+
+### Survey Assignment
+
+![Survey Assignment](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/surveyassignment.png)
+
+### Survey Response
+
+![Survey Response](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/surveyresponse.png)
+
+### Indicator Details
+
+![Response Statistics](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/indicatordetails.png)
+
+### User Management
+
+![User Management](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/usermanagement.png)
+
+### Indicator PDF Report
+
+![Employee Performance PDF Report](src/Ejada.SurveyManager.Blazor.Client/wwwroot/images/screenshots/indicatorreport.png)
